@@ -1068,6 +1068,30 @@ window.addEventListener("DOMContentLoaded", async () => {
 document.getElementById("gl-modal").addEventListener("click", function(e) {
   if (e.target === this) closeModal();
 });
+ 
+// PULL TO REFRESH
+let pullStartY = 0;
+document.addEventListener("touchstart", e => {
+  if (window.scrollY === 0) pullStartY = e.touches[0].clientY;
+}, { passive: true });
+document.addEventListener("touchend", async e => {
+  const dist = e.changedTouches[0].clientY - pullStartY;
+  if (dist < 80) return;
+  const ind = document.createElement("div");
+  ind.style.cssText = "position:fixed;top:0;left:50%;transform:translateX(-50%);background:#E8192C;color:#fff;font-size:12px;font-weight:600;padding:8px 20px;border-radius:0 0 16px 16px;z-index:9999;";
+  ind.textContent = "Refreshing...";
+  document.body.appendChild(ind);
+  await loadData();
+  const active = document.querySelector(".section.active");
+  if (active) {
+    const id = active.id;
+    if (id === "section-events") renderEvents();
+    if (id === "section-mygl") renderMyGL();
+    if (id === "section-admin") renderAdmin();
+    if (id === "section-dashboard") renderDashboard();
+  }
+  setTimeout(() => ind.remove(), 800);
+}, { passive: true });
 </script>
 </body>
 </html>
