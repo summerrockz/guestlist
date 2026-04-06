@@ -693,10 +693,10 @@ function showSection(id) {
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
 
-  if (id === "section-events") renderEvents();
-  if (id === "section-mygl") renderMyGL();
-  if (id === "section-admin") renderAdmin();
-  if (id === "section-dashboard") renderDashboard();
+  if (id === "section-events") { loadData().then(renderEvents); }
+  if (id === "section-mygl") { loadData().then(renderMyGL); }
+  if (id === "section-admin") { loadData().then(renderAdmin); }
+  if (id === "section-dashboard") { loadData().then(renderDashboard); }
 }
 
 // ── LOGIN ──
@@ -759,6 +759,10 @@ async function loadData() {
   ]);
 }
 
+async function refreshData() {
+  await loadData();
+}
+
 // ── DASHBOARD ──
 function renderDashboard() {
   const t = today();
@@ -809,7 +813,7 @@ function renderEvents() {
       const isFull = spotsLeft !== null && spotsLeft <= 0;
       const needsEmail = (cl.format || "").includes("email");
       const freeText = ev.free_condition
-        ? `Free ${ev.free_condition}`
+        ? (ev.free_condition.toLowerCase().startsWith("free") ? ev.free_condition : `Free ${ev.free_condition}`)
         : (ev.price_after ? `€${ev.price_after} ${ev.price_type || ""}` : "Free");
 
       return `
@@ -1069,4 +1073,3 @@ document.getElementById("gl-modal").addEventListener("click", function(e) {
 </script>
 </body>
 </html>
-
