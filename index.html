@@ -1157,7 +1157,7 @@ async function notifyClubAdmins(clubId, clubName, guestName, pax) {
           "x-api-key": "srz2026secret"
         },
         body: JSON.stringify({
-          title: "🎉 Nieuwe entry — " + clubName,
+          title: "🎉 New entry — " + clubName,
           body: guestName + (parseInt(pax) > 1 ? " +" + (parseInt(pax)-1) : "") + " — added by " + SELLER.seller_name,
           sellerId: adminId
         })
