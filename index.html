@@ -547,7 +547,9 @@ textarea.input-field {
     <div class="section" id="section-events">
       <div class="section-title">Today's events</div>
       <div class="date-bar">
-        <input type="date" id="events-date">
+        <input type="date" id="events-date-from">
+        <span style="color:var(--muted);font-size:12px;">→</span>
+        <input type="date" id="events-date-to">
       </div>
       <div id="events-list"><div class="loading">Loading events…</div></div>
     </div>
@@ -556,10 +558,9 @@ textarea.input-field {
     <div class="section" id="section-mygl">
       <div class="section-title">My guestlist entries</div>
       <div class="date-bar">
-        <input type="date" id="mygl-date-from">
-        <span style="color:var(--muted);font-size:12px;">→</span>
-        <input type="date" id="mygl-date-to">
+        <input type="date" id="mygl-date">
       </div>
+      <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:16px;">
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
  
@@ -697,7 +698,13 @@ function showSection(id) {
   if (navEl) navEl.classList.add("active");
  
   if (id === "section-events") { loadData().then(renderEvents); }
-  if (id === "section-mygl") { loadData().then(renderMyGL); }
+  if (id === "section-mygl") {
+    loadData().then(renderMyGL);
+    setTimeout(() => {
+      const s = document.getElementById("mygl-search");
+      if (s) s.oninput = renderMyGL;
+    }, 100);
+  }
   if (id === "section-admin") { loadData().then(renderAdmin); }
   if (id === "section-dashboard") { loadData().then(renderDashboard); }
 }
@@ -740,16 +747,16 @@ async function initApp() {
   }
  
   // set default dates
-  document.getElementById("events-date").value = today();
-  document.getElementById("mygl-date-from").value = today();
-  document.getElementById("mygl-date-to").value = today();
+  document.getElementById("events-date-from").value = today();
+  document.getElementById("events-date-to").value = today();
+  document.getElementById("mygl-date").value = today();
   document.getElementById("admin-date-from").value = today();
   document.getElementById("admin-date-to").value = today();
  
   // date change listeners
-  document.getElementById("events-date").onchange = renderEvents;
-  document.getElementById("mygl-date-from").onchange = renderMyGL;
-  document.getElementById("mygl-date-to").onchange = renderMyGL;
+  document.getElementById("events-date-from").onchange = renderEvents;
+  document.getElementById("events-date-to").onchange = renderEvents;
+  document.getElementById("mygl-date").onchange = renderMyGL;
   document.getElementById("admin-date-from").onchange = renderAdmin;
   document.getElementById("admin-date-to").onchange = renderAdmin;
  
@@ -788,29 +795,35 @@ function renderDashboard() {
  
 // ── EVENTS ──
 function renderEvents() {
-  const date = document.getElementById("events-date").value || today();
+  const dateFrom = document.getElementById("events-date-from").value || today();
+  const dateTo = document.getElementById("events-date-to").value || today();
   const wrap = document.getElementById("events-list");
  
   const dayEvents = EVENTS.filter(e => {
     const ed = (e.date || "").slice(0, 10);
-    return ed === date && (e.status || "").toLowerCase() !== "inactive";
-  });
- 
-  // group by club
-  const byClub = {};
-  dayEvents.forEach(e => {
-    if (!byClub[e.club_id]) byClub[e.club_id] = [];
-    byClub[e.club_id].push(e);
+    return ed >= dateFrom && ed <= dateTo && (e.status || "").toLowerCase() !== "inactive";
   });
  
   if (!dayEvents.length) {
-    wrap.innerHTML = `<div class="empty">No events for ${formatDate(date)}.</div>`;
+    wrap.innerHTML = `<div class="empty">No events for this period.</div>`;
     return;
   }
  
   const club = id => CLUBS.find(c => c.club_id === id) || {};
  
-  wrap.innerHTML = Object.entries(byClub).map(([clubId, events]) => {
+  // group by date then club
+  const byDateClub = {};
+  dayEvents.forEach(e => {
+    const d = (e.date || "").slice(0, 10);
+    if (!byDateClub[d]) byDateClub[d] = {};
+    if (!byDateClub[d][e.club_id]) byDateClub[d][e.club_id] = [];
+    byDateClub[d][e.club_id].push(e);
+  });
+ 
+  wrap.innerHTML = Object.keys(byDateClub).sort().map(date => {
+    const byClub = byDateClub[date];
+    return `<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>` +
+    Object.entries(byClub).map(([clubId, events]) => {
     const cl = club(clubId);
     const ds = deadlineStatus(cl.deadline, date);
     const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
@@ -848,12 +861,13 @@ function renderEvents() {
       `;
     }).join("");
   }).join("");
+  }).join("");
 }
  
 // ── MY GL ──
 function renderMyGL() {
-  const dateFrom = document.getElementById("mygl-date-from").value || today();
-  const dateTo = document.getElementById("mygl-date-to").value || today();
+  const date = document.getElementById("mygl-date").value || today();
+  const search = (document.getElementById("mygl-search")?.value || "").toLowerCase().trim();
   const wrap = document.getElementById("mygl-list");
  
   const myId = String(SELLER.seller_id || "").trim();
@@ -865,29 +879,26 @@ function renderMyGL() {
  
   const mine = ENTRIES.filter(e => {
     const sid = String(e.seller_id || "").trim();
-    const d = (e.date || "").slice(0, 10);
+    const matchesDate = (e.date || "").slice(0, 10) === date;
+    const matchesSearch = !search || (e.guest_name || "").toLowerCase().includes(search);
     return (sid === myId || managedIds.includes(sid)) &&
-      d >= dateFrom && d <= dateTo &&
+      matchesDate && matchesSearch &&
       (e.status || "").toLowerCase() !== "deleted";
   });
  
   if (!mine.length) {
-    wrap.innerHTML = `<div class="empty">No entries for this period.</div>`;
+    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
     return;
   }
  
-  // group by date then club
-  const byDate = {};
+  // group by club
+  const byClub = {};
   mine.forEach(e => {
-    const d = (e.date || "").slice(0, 10);
-    if (!byDate[d]) byDate[d] = {};
-    if (!byDate[d][e.club_name]) byDate[d][e.club_name] = [];
-    byDate[d][e.club_name].push(e);
+    if (!byClub[e.club_name]) byClub[e.club_name] = [];
+    byClub[e.club_name].push(e);
   });
  
-  wrap.innerHTML = Object.keys(byDate).sort().map(date => `
-    <div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>
-    ${Object.entries(byDate[date]).map(([clubName, entries]) => `
+  wrap.innerHTML = Object.entries(byClub).map(([clubName, entries]) => `
     <div class="day-group-label">${clubName} · ${entries.length} entries</div>
     ${entries.map(e => `
       <div class="gl-card">
@@ -902,7 +913,6 @@ function renderMyGL() {
         ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
         <button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Remove</button>
       </div>
-    `).join("")}
     `).join("")}
   `).join("");
 }
