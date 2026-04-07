@@ -976,8 +976,7 @@ function renderMyGL() {
           <div class="gl-pax" style="${(e.status||'').toLowerCase()==='cancelled' ? 'background:rgba(232,25,44,0.1);' : ''}">+${parseInt(e.pax) - 1 || 0}</div>
         </div>
         <div class="gl-meta">
-          ${e.email ? `📧 ${e.email}` : ""}
-          ${e.notes ? ` · ${e.notes}` : ""}
+          📅 ${formatDate(e.date)}${e.email ? ` · 📧 ${e.email}` : ""}${e.notes ? ` · ${e.notes}` : ""}
         </div>
         ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
         ${(e.status||'').toLowerCase()==='cancelled' 
