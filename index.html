@@ -989,12 +989,15 @@ function renderAdmin() {
       const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
       const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
       const line = `${e.guest_name}${plusPax}${emailPart}`;
-      const sentKey = `sent_${clubId}_${date}_${e.entry_id}`;
+      const sentKey = "sent_" + clubId + "_" + date + "_" + e.entry_id;
       const isSent = localStorage.getItem(sentKey) === "1";
-      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isCancelled ? 'opacity:0.5;' : ''}">
-        ${!isCancelled ? `<input type="checkbox" ${isSent ? "checked" : ""} style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem('${sentKey}',this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" ${isSent ? 'onload="this.closest('div').style.opacity='0.4'"' : ''}>` : `<span style="color:var(--red);font-size:13px;">✕</span>`}
-        <span style="font-family:monospace;font-size:13px;${isCancelled ? 'text-decoration:line-through;color:var(--red);' : ''}">${isCancelled ? line + " ⚠️ CANCELLED" : line}</span>
-      </div>`;
+      const rowOpacity = isCancelled ? "0.5" : (isSent ? "0.4" : "1");
+      const checkbox = !isCancelled
+        ? `<input type="checkbox" ${isSent ? "checked" : ""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`
+        : `<span style="color:#E8192C;font-size:13px;">✕</span>`;
+      const textStyle = isCancelled ? "text-decoration:line-through;color:#E8192C;" : "";
+      const text = isCancelled ? line + " ⚠️ CANCELLED" : line;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:13px;${textStyle}">${text}</span></div>`;
     }).join("");
  
     return `
@@ -1162,3 +1165,4 @@ document.addEventListener("touchend", async e => {
 </script>
 </body>
 </html>
+ 
