@@ -901,10 +901,22 @@ function renderAdmin() {
   const date = document.getElementById("admin-date").value || today();
   const wrap = document.getElementById("admin-list");
  
+  // filter clubs this admin manages
+  const myClubs = CLUBS.filter(c => {
+    const admins = String(c.admin_id || "").split(",").map(x => x.trim());
+    return admins.includes(String(SELLER.seller_id).trim());
+  }).map(c => c.club_id);
+ 
   const dayEntries = ENTRIES.filter(e =>
     (e.date || "").slice(0, 10) === date &&
-    (e.status || "").toLowerCase() !== "deleted"
+    (e.status || "").toLowerCase() !== "deleted" &&
+    myClubs.includes(e.club_id)
   );
+ 
+  if (!myClubs.length) {
+    wrap.innerHTML = `<div class="empty">No clubs assigned to you.</div>`;
+    return;
+  }
  
   if (!dayEntries.length) {
     wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
