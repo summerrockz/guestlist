@@ -511,6 +511,7 @@ textarea.input-field {
       <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" style="width:32px;height:32px;border-radius:50%;position:absolute;left:50%;transform:translateX(-50%);">
       <div class="header-user" id="header-user"></div>
     </div>
+    <div id="deadline-banner" style="display:none;background:var(--red);color:#fff;font-size:12px;font-weight:600;padding:8px 16px;text-align:center;letter-spacing:0.05em;"></div>
  
     <!-- DASHBOARD -->
     <div class="section active" id="section-dashboard">
@@ -759,6 +760,7 @@ async function initApp() {
   // load data
   await loadData();
   renderDashboard();
+  checkDeadlines();
 }
  
 async function loadData() {
@@ -1138,6 +1140,49 @@ window.addEventListener("DOMContentLoaded", async () => {
 document.getElementById("gl-modal").addEventListener("click", function(e) {
   if (e.target === this) closeModal();
 });
+ 
+// ── DEADLINE NOTIFICATIONS ──
+function checkDeadlines() {
+  if (!CLUBS || !EVENTS) return;
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const banner = document.getElementById("deadline-banner");
+  if (!banner) return;
+ 
+  const warnings = [];
+ 
+  CLUBS.forEach(cl => {
+    if (!cl.deadline) return;
+    const [h, m] = cl.deadline.split(":").map(Number);
+    const deadline = new Date();
+    deadline.setHours(h, m, 0, 0);
+    if (h < 6) deadline.setDate(deadline.getDate() + 1);
+ 
+    const diff = deadline - now;
+    if (diff > 0 && diff < 60 * 60 * 1000) {
+      const minsLeft = Math.round(diff / 60000);
+      // check if there are events today for this club
+      const hasEvent = EVENTS.some(ev =>
+        ev.club_id === cl.club_id &&
+        (ev.date || "").slice(0, 10) === todayStr &&
+        (ev.status || "").toLowerCase() !== "inactive"
+      );
+      if (hasEvent) {
+        warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);
+      }
+    }
+  });
+ 
+  if (warnings.length) {
+    banner.textContent = warnings.join("  ·  ");
+    banner.style.display = "block";
+  } else {
+    banner.style.display = "none";
+  }
+}
+ 
+// Check every minute
+setInterval(checkDeadlines, 60000);
  
 // PULL TO REFRESH
 let pullStartY = 0;
