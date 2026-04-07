@@ -1,34 +1,11 @@
 import webpush from 'web-push';
+import Redis from 'ioredis';
 
 webpush.setVapidDetails(
   'mailto:info@theibizaexpert.com',
   process.env.VAPID_PUBLIC_KEY,
   process.env.VAPID_PRIVATE_KEY
 );
-
-// Simple in-memory store won't work across requests
-// Instead we'll use a KV approach via fetch to Upstash REST API
-async function getSubscribers() {
-  const url = process.env.KV_REST_API_URL || process.env.REDIS_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-  
-  const r = await fetch(`${url}/smembers/push_subscribers`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await r.json();
-  return data.result || [];
-}
-
-async function getSubscription(id) {
-  const url = process.env.KV_REST_API_URL || process.env.REDIS_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-  
-  const r = await fetch(`${url}/get/push_sub_${id}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await r.json();
-  return data.result ? JSON.parse(data.result) : null;
-}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -45,19 +22,24 @@ export default async function handler(req, res) {
 
   const { title, body } = req.body;
 
+  const redis = new Redis(process.env.REDIS_URL);
+
   try {
-    const subscriberIds = await getSubscribers();
-    
+    const subscriberIds = await redis.smembers('push_subscribers');
+
     await Promise.allSettled(
       subscriberIds.map(async (id) => {
-        const subscription = await getSubscription(id);
-        if (!subscription) return;
+        const sub = await redis.get(`push_sub_${id}`);
+        if (!sub) return;
+        const subscription = JSON.parse(sub);
         await webpush.sendNotification(subscription, JSON.stringify({ title, body }));
       })
     );
 
+    await redis.quit();
     return res.status(200).json({ ok: true, count: subscriberIds.length });
   } catch (e) {
+    await redis.quit();
     console.error(e);
     return res.status(500).json({ error: e.message });
   }
