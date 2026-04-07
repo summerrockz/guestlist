@@ -600,8 +600,11 @@ textarea.input-field {
     <div class="modal-title" id="modal-club-name">Add to guestlist</div>
     <div class="modal-sub" id="modal-event-info"></div>
  
-    <label class="form-label">Guest name</label>
-    <input type="text" class="input-field" id="modal-guest-name" placeholder="First and last name">
+    <!-- Single name for email+pax clubs -->
+    <div id="modal-single-name-group">
+      <label class="form-label">Guest name</label>
+      <input type="text" class="input-field" id="modal-guest-name" placeholder="First and last name">
+    </div>
  
     <div id="modal-pax-group">
       <label class="form-label">Pax (including guest)</label>
@@ -611,6 +614,18 @@ textarea.input-field {
         <option value="3">+2 (3 total)</option>
         <option value="4">+3 (4 total)</option>
       </select>
+    </div>
+ 
+    <!-- Multiple names for name-only clubs -->
+    <div id="modal-multi-name-group" style="display:none;">
+      <label class="form-label">Total pax</label>
+      <select class="input-field" id="modal-pax-count" onchange="renderNameFields()">
+        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+        <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+        <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+      <div id="modal-name-fields" style="margin-top:8px;"></div>
     </div>
  
     <div id="modal-email-group">
@@ -1044,9 +1059,21 @@ function openModal(eventId, clubId) {
     (CURRENT_EVENT?.event_name || "") + (CURRENT_EVENT?.time ? ` · ${CURRENT_EVENT.time}` : "");
  
   const needsEmail = (cl.format || "").includes("email");
-  document.getElementById("modal-email-group").style.display = needsEmail ? "block" : "none";
+  const needsPax = (cl.format || "").includes("pax");
+  const nameOnly = !needsPax && !needsEmail;
  
-  const maxPax = parseInt(cl.max_pax_per_email) || 4;
+  // show correct mode
+  document.getElementById("modal-single-name-group").style.display = nameOnly ? "none" : "block";
+  document.getElementById("modal-pax-group").style.display = needsPax ? "block" : "none";
+  document.getElementById("modal-email-group").style.display = needsEmail ? "block" : "none";
+  document.getElementById("modal-multi-name-group").style.display = nameOnly ? "block" : "none";
+ 
+  if (nameOnly) {
+    document.getElementById("modal-pax-count").value = "1";
+    renderNameFields();
+  }
+ 
+  const maxPax = needsPax ? (parseInt(cl.max_pax_per_email) || 4) : 1;
   const paxSel = document.getElementById("modal-pax");
   paxSel.innerHTML = "";
   for (let i = 1; i <= maxPax; i++) {
@@ -1064,6 +1091,15 @@ function openModal(eventId, clubId) {
   document.getElementById("gl-modal").classList.add("open");
 }
  
+function renderNameFields() {
+  const count = parseInt(document.getElementById("modal-pax-count").value) || 1;
+  const wrap = document.getElementById("modal-name-fields");
+  wrap.innerHTML = Array.from({length: count}, (_, i) => `
+    <label class="form-label">Name ${i + 1}</label>
+    <input type="text" class="input-field modal-multi-name" placeholder="First and last name" style="margin-bottom:8px;">
+  `).join("");
+}
+ 
 function closeModal() {
   document.getElementById("gl-modal").classList.remove("open");
   CURRENT_EVENT = null;
@@ -1076,10 +1112,34 @@ document.getElementById("modal-submit").onclick = async () => {
   const notes = document.getElementById("modal-notes").value.trim();
   const msg = document.getElementById("modal-msg");
  
-  if (!guestName) { msg.textContent = "Guest name is required."; return; }
- 
   const cl = CLUBS.find(c => c.club_id === CURRENT_EVENT?.club_id) || {};
   const needsEmail = (cl.format || "").includes("email");
+  const needsPax = (cl.format || "").includes("pax");
+  const nameOnly = !needsPax && !needsEmail;
+ 
+  if (nameOnly) {
+    const nameFields = Array.from(document.querySelectorAll(".modal-multi-name"));
+    const names = nameFields.map(f => f.value.trim()).filter(Boolean);
+    if (!names.length) { msg.textContent = "Enter at least one name."; return; }
+    const btn = document.getElementById("modal-submit");
+    btn.disabled = true; btn.textContent = "Adding…";
+    names.forEach(name => {
+      const entry = {
+        entry_id: genId(), seller_id: SELLER.seller_id, seller_name: SELLER.seller_name,
+        club_id: CURRENT_EVENT.club_id, club_name: cl.club_name || CURRENT_EVENT.club_id,
+        event_id: CURRENT_EVENT.event_id, event_name: CURRENT_EVENT.event_name || "",
+        date: CURRENT_EVENT.date, guest_name: name, pax: 1, email: "", notes: notes,
+        created_at: new Date().toISOString(), status: "active"
+      };
+      ENTRIES.push(entry);
+      post({ action: "add_entry", ...entry });
+    });
+    closeModal(); renderMyGL(); renderDashboard();
+    btn.disabled = false; btn.textContent = "Add to guestlist";
+    return;
+  }
+ 
+  if (!guestName) { msg.textContent = "Guest name is required."; return; }
   if (needsEmail && !email) { msg.textContent = "Email is required for this club."; return; }
  
   const entry = {
@@ -1210,4 +1270,3 @@ document.addEventListener("touchend", async e => {
 </script>
 </body>
 </html>
- 
