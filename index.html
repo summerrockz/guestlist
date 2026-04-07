@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Summerrockz – Guestlist Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -568,9 +568,7 @@ textarea.input-field {
     <div class="section" id="section-admin">
       <div class="section-title">Export per club</div>
       <div class="date-bar">
-        <input type="date" id="admin-date-from">
-        <span style="color:var(--muted);font-size:12px;">→</span>
-        <input type="date" id="admin-date-to">
+        <input type="date" id="admin-date">
       </div>
       <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
@@ -750,15 +748,13 @@ async function initApp() {
   document.getElementById("events-date-from").value = today();
   document.getElementById("events-date-to").value = today();
   document.getElementById("mygl-date").value = today();
-  document.getElementById("admin-date-from").value = today();
-  document.getElementById("admin-date-to").value = today();
+  document.getElementById("admin-date").value = today();
  
   // date change listeners
   document.getElementById("events-date-from").onchange = renderEvents;
   document.getElementById("events-date-to").onchange = renderEvents;
   document.getElementById("mygl-date").onchange = renderMyGL;
-  document.getElementById("admin-date-from").onchange = renderAdmin;
-  document.getElementById("admin-date-to").onchange = renderAdmin;
+  document.getElementById("admin-date").onchange = renderAdmin;
  
   // load data
   await loadData();
@@ -881,9 +877,12 @@ function renderMyGL() {
     const sid = String(e.seller_id || "").trim();
     const matchesDate = (e.date || "").slice(0, 10) === date;
     const matchesSearch = !search || (e.guest_name || "").toLowerCase().includes(search);
-    return (sid === myId || managedIds.includes(sid)) &&
-      matchesDate && matchesSearch &&
-      (e.status || "").toLowerCase() !== "deleted";
+    const isOwn = sid === myId || managedIds.includes(sid);
+    const status = (e.status || "").toLowerCase();
+    const visible = status !== "deleted";
+    // if searching: ignore date filter
+    if (search) return isOwn && matchesSearch && visible;
+    return isOwn && matchesDate && visible;
   });
  
   if (!mine.length) {
@@ -901,41 +900,42 @@ function renderMyGL() {
   wrap.innerHTML = Object.entries(byClub).map(([clubName, entries]) => `
     <div class="day-group-label">${clubName} · ${entries.length} entries</div>
     ${entries.map(e => `
-      <div class="gl-card">
+      <div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled' ? 'opacity:0.5;border-color:rgba(232,25,44,0.3);' : ''}">
         <div class="gl-card-top">
-          <div class="gl-guest-name">${e.guest_name}</div>
-          <div class="gl-pax">+${parseInt(e.pax) - 1 || 0}</div>
+          <div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled' ? 'text-decoration:line-through;color:var(--muted);' : ''}">${e.guest_name}</div>
+          <div class="gl-pax" style="${(e.status||'').toLowerCase()==='cancelled' ? 'background:rgba(232,25,44,0.1);' : ''}">+${parseInt(e.pax) - 1 || 0}</div>
         </div>
         <div class="gl-meta">
           ${e.email ? `📧 ${e.email}` : ""}
           ${e.notes ? ` · ${e.notes}` : ""}
         </div>
         ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
-        <button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Remove</button>
+        ${(e.status||'').toLowerCase()==='cancelled' 
+          ? `<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`
+          : `<button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Cancel entry</button>`
+        }
       </div>
     `).join("")}
   `).join("");
 }
  
 async function deleteEntry(entryId, btn) {
-  if (!confirm("Remove this entry?")) return;
-  btn.textContent = "Removing…";
+  if (!confirm("Cancel this entry? It will be marked as cancelled so you know to notify the club.")) return;
+  btn.textContent = "Cancelling…";
   btn.disabled = true;
  
-  // optimistic update
-  ENTRIES = ENTRIES.map(e => e.entry_id === entryId ? { ...e, status: "deleted" } : e);
+  ENTRIES = ENTRIES.map(e => e.entry_id === entryId ? { ...e, status: "cancelled" } : e);
   renderMyGL();
   renderDashboard();
  
-  post({ action: "delete_entry", entry_id: entryId });
+  post({ action: "cancel_entry", entry_id: entryId });
 }
  
 // ── ADMIN EXPORT ──
 function renderAdmin() {
   if ((SELLER.role || "").toLowerCase() !== "admin") return;
  
-  const dateFrom = document.getElementById("admin-date-from").value || today();
-  const dateTo = document.getElementById("admin-date-to").value || today();
+  const date = document.getElementById("admin-date").value || today();
   const wrap = document.getElementById("admin-list");
  
   // filter clubs this admin manages
@@ -946,7 +946,7 @@ function renderAdmin() {
  
   const dayEntries = ENTRIES.filter(e => {
     const d = (e.date || "").slice(0, 10);
-    return d >= dateFrom && d <= dateTo &&
+    return d === date &&
       (e.status || "").toLowerCase() !== "deleted" &&
       myClubs.includes(e.club_id);
   });
@@ -957,7 +957,7 @@ function renderAdmin() {
   }
  
   if (!dayEntries.length) {
-    wrap.innerHTML = `<div class="empty">No entries for this period.</div>`;
+    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
     return;
   }
  
@@ -972,24 +972,28 @@ function renderAdmin() {
   wrap.innerHTML = Object.entries(byClub).map(([clubId, data]) => {
     const cl = CLUBS.find(c => c.club_id === clubId) || {};
     const format = cl.format || "name";
-    const ds = deadlineStatus(cl.deadline, dateFrom);
+    const ds = deadlineStatus(cl.deadline, date);
     const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
  
-    const lines = data.entries.map(e => {
-      const paxNum = parseInt(e.pax) || 1;
-      const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
-      const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
-      return `${e.guest_name}${plusPax}${emailPart}`;
+    // include cancelled in export so admin knows to notify club
+    const allEntries = ENTRIES.filter(e => {
+      const d = (e.date || "").slice(0, 10);
+      return d === date && myClubs.includes(e.club_id) &&
+        (e.club_id === clubId) &&
+        ["active","cancelled"].includes((e.status||"").toLowerCase());
     });
  
-    const entryRows = data.entries.map((e, i) => {
+    const entryRows = allEntries.map((e, i) => {
+      const isCancelled = (e.status||"").toLowerCase() === "cancelled";
       const paxNum = parseInt(e.pax) || 1;
       const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
       const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
       const line = `${e.guest_name}${plusPax}${emailPart}`;
-      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <input type="checkbox" id="sent-${clubId}-${i}" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;" onchange="this.closest('div').style.opacity=this.checked?'0.4':'1'">
-        <span style="font-family:monospace;font-size:13px;">${line}</span>
+      const sentKey = `sent_${clubId}_${date}_${e.entry_id}`;
+      const isSent = localStorage.getItem(sentKey) === "1";
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isCancelled ? 'opacity:0.5;' : ''}">
+        ${!isCancelled ? `<input type="checkbox" ${isSent ? "checked" : ""} style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem('${sentKey}',this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" ${isSent ? 'onload="this.closest('div').style.opacity='0.4'"' : ''}>` : `<span style="color:var(--red);font-size:13px;">✕</span>`}
+        <span style="font-family:monospace;font-size:13px;${isCancelled ? 'text-decoration:line-through;color:var(--red);' : ''}">${isCancelled ? line + " ⚠️ CANCELLED" : line}</span>
       </div>`;
     }).join("");
  
@@ -998,7 +1002,7 @@ function renderAdmin() {
         <div class="admin-club-header">
           <div>
             <div class="admin-club-name">${data.name}</div>
-            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${dateFrom ? " · " + formatDate(dateFrom) : ""}</div>
+            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${date ? " · " + formatDate(date) : ""}</div>
           </div>
           <div class="admin-count">${data.entries.reduce((sum, e) => sum + (parseInt(e.pax) || 1), 0)} pax</div>
         </div>
@@ -1013,7 +1017,8 @@ function renderAdmin() {
  
 function copyExport(clubId, btn) {
   const box = document.getElementById(`export-${clubId}`);
-  const lines = Array.from(box.querySelectorAll("span")).map(s => s.textContent.trim()).join("\n");
+  // only copy non-cancelled (no strikethrough spans)
+  const lines = Array.from(box.querySelectorAll("span")).filter(s => !s.style.textDecoration.includes("line-through")).map(s => s.textContent.trim()).filter(Boolean).join("\n");
   navigator.clipboard.writeText(lines).then(() => {
     btn.textContent = "✓ Copied!";
     btn.classList.add("copied");
