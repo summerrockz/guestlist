@@ -796,7 +796,7 @@ function renderEvents() {
   });
  
   if (!dayEvents.length) {
-    wrap.innerHTML = `<div class="empty">No events found for ${formatDate(date)}.<br>Add events in the Google Sheet.</div>`;
+    wrap.innerHTML = `<div class="empty">No events for ${formatDate(date)}.</div>`;
     return;
   }
  
