@@ -556,7 +556,9 @@ textarea.input-field {
     <div class="section" id="section-mygl">
       <div class="section-title">My guestlist entries</div>
       <div class="date-bar">
-        <input type="date" id="mygl-date">
+        <input type="date" id="mygl-date-from">
+        <span style="color:var(--muted);font-size:12px;">→</span>
+        <input type="date" id="mygl-date-to">
       </div>
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
@@ -565,7 +567,9 @@ textarea.input-field {
     <div class="section" id="section-admin">
       <div class="section-title">Export per club</div>
       <div class="date-bar">
-        <input type="date" id="admin-date">
+        <input type="date" id="admin-date-from">
+        <span style="color:var(--muted);font-size:12px;">→</span>
+        <input type="date" id="admin-date-to">
       </div>
       <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
@@ -737,13 +741,17 @@ async function initApp() {
  
   // set default dates
   document.getElementById("events-date").value = today();
-  document.getElementById("mygl-date").value = today();
-  document.getElementById("admin-date").value = today();
+  document.getElementById("mygl-date-from").value = today();
+  document.getElementById("mygl-date-to").value = today();
+  document.getElementById("admin-date-from").value = today();
+  document.getElementById("admin-date-to").value = today();
  
   // date change listeners
   document.getElementById("events-date").onchange = renderEvents;
-  document.getElementById("mygl-date").onchange = renderMyGL;
-  document.getElementById("admin-date").onchange = renderAdmin;
+  document.getElementById("mygl-date-from").onchange = renderMyGL;
+  document.getElementById("mygl-date-to").onchange = renderMyGL;
+  document.getElementById("admin-date-from").onchange = renderAdmin;
+  document.getElementById("admin-date-to").onchange = renderAdmin;
  
   // load data
   await loadData();
@@ -844,12 +852,12 @@ function renderEvents() {
  
 // ── MY GL ──
 function renderMyGL() {
-  const date = document.getElementById("mygl-date").value || today();
+  const dateFrom = document.getElementById("mygl-date-from").value || today();
+  const dateTo = document.getElementById("mygl-date-to").value || today();
   const wrap = document.getElementById("mygl-list");
  
   const myId = String(SELLER.seller_id || "").trim();
  
-  // find sellers this person manages
   const managedIds = SELLERS.filter(s => {
     const mgrs = String(s.manager_id || "").split(",").map(x => x.trim());
     return mgrs.includes(myId);
@@ -857,24 +865,29 @@ function renderMyGL() {
  
   const mine = ENTRIES.filter(e => {
     const sid = String(e.seller_id || "").trim();
+    const d = (e.date || "").slice(0, 10);
     return (sid === myId || managedIds.includes(sid)) &&
-      (e.date || "").slice(0, 10) === date &&
+      d >= dateFrom && d <= dateTo &&
       (e.status || "").toLowerCase() !== "deleted";
   });
  
   if (!mine.length) {
-    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
+    wrap.innerHTML = `<div class="empty">No entries for this period.</div>`;
     return;
   }
  
-  // group by club
-  const byClub = {};
+  // group by date then club
+  const byDate = {};
   mine.forEach(e => {
-    if (!byClub[e.club_name]) byClub[e.club_name] = [];
-    byClub[e.club_name].push(e);
+    const d = (e.date || "").slice(0, 10);
+    if (!byDate[d]) byDate[d] = {};
+    if (!byDate[d][e.club_name]) byDate[d][e.club_name] = [];
+    byDate[d][e.club_name].push(e);
   });
  
-  wrap.innerHTML = Object.entries(byClub).map(([clubName, entries]) => `
+  wrap.innerHTML = Object.keys(byDate).sort().map(date => `
+    <div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>
+    ${Object.entries(byDate[date]).map(([clubName, entries]) => `
     <div class="day-group-label">${clubName} · ${entries.length} entries</div>
     ${entries.map(e => `
       <div class="gl-card">
@@ -889,6 +902,7 @@ function renderMyGL() {
         ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
         <button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Remove</button>
       </div>
+    `).join("")}
     `).join("")}
   `).join("");
 }
@@ -910,7 +924,8 @@ async function deleteEntry(entryId, btn) {
 function renderAdmin() {
   if ((SELLER.role || "").toLowerCase() !== "admin") return;
  
-  const date = document.getElementById("admin-date").value || today();
+  const dateFrom = document.getElementById("admin-date-from").value || today();
+  const dateTo = document.getElementById("admin-date-to").value || today();
   const wrap = document.getElementById("admin-list");
  
   // filter clubs this admin manages
@@ -919,11 +934,12 @@ function renderAdmin() {
     return admins.includes(String(SELLER.seller_id).trim());
   }).map(c => c.club_id);
  
-  const dayEntries = ENTRIES.filter(e =>
-    (e.date || "").slice(0, 10) === date &&
-    (e.status || "").toLowerCase() !== "deleted" &&
-    myClubs.includes(e.club_id)
-  );
+  const dayEntries = ENTRIES.filter(e => {
+    const d = (e.date || "").slice(0, 10);
+    return d >= dateFrom && d <= dateTo &&
+      (e.status || "").toLowerCase() !== "deleted" &&
+      myClubs.includes(e.club_id);
+  });
  
   if (!myClubs.length) {
     wrap.innerHTML = `<div class="empty">No clubs assigned to you.</div>`;
@@ -931,11 +947,11 @@ function renderAdmin() {
   }
  
   if (!dayEntries.length) {
-    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
+    wrap.innerHTML = `<div class="empty">No entries for this period.</div>`;
     return;
   }
  
-  // group by club
+  // group by club then date
   const byClub = {};
   dayEntries.forEach(e => {
     const key = e.club_id || e.club_name;
@@ -946,29 +962,39 @@ function renderAdmin() {
   wrap.innerHTML = Object.entries(byClub).map(([clubId, data]) => {
     const cl = CLUBS.find(c => c.club_id === clubId) || {};
     const format = cl.format || "name";
-    const ds = deadlineStatus(cl.deadline, date);
+    const ds = deadlineStatus(cl.deadline, dateFrom);
     const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
  
-    const exportText = data.entries.map(e => {
-      if (format.includes("email")) {
-        const paxNum = parseInt(e.pax) || 1;
-        const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
-        const emailPart = e.email ? ` ${e.email}` : "";
-        return `${e.guest_name}${plusPax}${emailPart}`;
-      }
-      return e.guest_name;
-    }).join("\n");
+    const lines = data.entries.map(e => {
+      const paxNum = parseInt(e.pax) || 1;
+      const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
+      const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
+      return `${e.guest_name}${plusPax}${emailPart}`;
+    });
+ 
+    const entryRows = data.entries.map((e, i) => {
+      const paxNum = parseInt(e.pax) || 1;
+      const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
+      const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
+      const line = `${e.guest_name}${plusPax}${emailPart}`;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <input type="checkbox" id="sent-${clubId}-${i}" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;" onchange="this.closest('div').style.opacity=this.checked?'0.4':'1'">
+        <span style="font-family:monospace;font-size:13px;">${line}</span>
+      </div>`;
+    }).join("");
  
     return `
       <div class="admin-club-card">
         <div class="admin-club-header">
           <div>
             <div class="admin-club-name">${data.name}</div>
-            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${date ? " · " + formatDate(date) : ""}</div>
+            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${dateFrom ? " · " + formatDate(dateFrom) : ""}</div>
           </div>
           <div class="admin-count">${data.entries.reduce((sum, e) => sum + (parseInt(e.pax) || 1), 0)} pax</div>
         </div>
-        <div class="export-box" id="export-${clubId}">${exportText}</div>
+        <div class="export-box" id="export-${clubId}" style="font-family:inherit;">
+          ${entryRows}
+        </div>
         <button class="btn-copy" onclick="copyExport('${clubId}', this)">📋 Copy list</button>
       </div>
     `;
@@ -976,8 +1002,9 @@ function renderAdmin() {
 }
  
 function copyExport(clubId, btn) {
-  const text = document.getElementById(`export-${clubId}`).textContent;
-  navigator.clipboard.writeText(text).then(() => {
+  const box = document.getElementById(`export-${clubId}`);
+  const lines = Array.from(box.querySelectorAll("span")).map(s => s.textContent.trim()).join("\n");
+  navigator.clipboard.writeText(lines).then(() => {
     btn.textContent = "✓ Copied!";
     btn.classList.add("copied");
     setTimeout(() => {
