@@ -756,7 +756,8 @@ async function initApp() {
   document.getElementById("access-page").classList.remove("active");
   document.getElementById("access-page").style.display = "none";
   document.getElementById("main-app").style.display = "block";
-  document.getElementById("header-user").textContent = SELLER.seller_name;
+  const teamFlag = SELLER.team ? " " + SELLER.team : "";
+  document.getElementById("header-user").textContent = SELLER.seller_name + teamFlag;
 
   if ((SELLER.role || "").toLowerCase() === "admin") {
     document.getElementById("admin-dash-card").style.display = "block";
