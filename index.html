@@ -789,12 +789,20 @@ async function setupPushNotifications() {
     const reg = await navigator.serviceWorker.register("/sw.js");
     const btn = document.getElementById("notif-btn");
 
-    // check localStorage first
-    if (localStorage.getItem("srz_notif_enabled") === "1") {
-      if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
-      // re-subscribe silently if subscription lost
+    // if permission already granted, auto re-subscribe (works on new device too)
+    if (Notification.permission === "granted") {
       const existing = await reg.pushManager.getSubscription();
-      if (!existing && Notification.permission === "granted") {
+      if (existing) {
+        if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
+        localStorage.setItem("srz_notif_enabled", "1");
+        // always re-register to keep subscription fresh in Redis
+        await fetch(VERCEL_URL + "/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subscription: existing, sellerId: SELLER.seller_id })
+        }).catch(() => {});
+      } else {
+        // permission granted but no subscription - re-subscribe silently
         try {
           const sub = await reg.pushManager.subscribe({
             userVisibleOnly: true,
@@ -805,15 +813,16 @@ async function setupPushNotifications() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ subscription: sub, sellerId: SELLER.seller_id })
           });
+          if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
+          localStorage.setItem("srz_notif_enabled", "1");
         } catch(e) {}
       }
       return;
     }
 
-    const existing = await reg.pushManager.getSubscription();
-    if (existing) {
+    // check localStorage for UI state
+    if (localStorage.getItem("srz_notif_enabled") === "1") {
       if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
-      localStorage.setItem("srz_notif_enabled", "1");
     }
   } catch(e) {
     console.log("SW registration failed:", e);
@@ -879,7 +888,7 @@ function renderDashboard() {
   const t = today();
   const myEntries = ENTRIES.filter(e =>
     String(e.seller_id || "").trim() === String(SELLER.seller_id || "").trim() &&
-    (e.status || "").toLowerCase() !== "deleted"
+    (e.status || "").toLowerCase() === "active"
   );
   const todayEntries = myEntries.filter(e => (e.date || "").slice(0, 10) === t);
   const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 7);
