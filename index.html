@@ -964,9 +964,9 @@ function renderAdmin() {
         <div class="admin-club-header">
           <div>
             <div class="admin-club-name">${data.name}</div>
-            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}</div>
+            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${date ? " · " + formatDate(date) : ""}</div>
           </div>
-          <div class="admin-count">${data.entries.length} names</div>
+          <div class="admin-count">${data.entries.reduce((sum, e) => sum + (parseInt(e.pax) || 1), 0)} pax</div>
         </div>
         <div class="export-box" id="export-${clubId}">${exportText}</div>
         <button class="btn-copy" onclick="copyExport('${clubId}', this)">📋 Copy list</button>
