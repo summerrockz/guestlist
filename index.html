@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Poppins", sans-serif; }
- 
+
 :root {
   --red: #E8192C;
   --dark: #111111;
@@ -21,16 +21,16 @@
   --amber: #F59E0B;
   --blue: #3B82F6;
 }
- 
+
 body {
   background: var(--dark);
   color: var(--text);
   min-height: 100vh;
 }
- 
+
 .page { display: none; }
 .page.active { display: block; }
- 
+
 /* ── ACCESS ── */
 #access-page {
   min-height: 100vh;
@@ -42,7 +42,7 @@ body {
   background: #0e0e0e;
 }
 #access-page.active { display: flex; }
- 
+
 .login-logo {
   font-size: 11px;
   letter-spacing: 0.3em;
@@ -94,16 +94,16 @@ body {
 }
 .input-field::placeholder { color: rgba(255,255,255,0.25); }
 .input-field:focus { outline: none; border-color: var(--red); }
- 
+
 select.input-field { cursor: pointer; }
 select.input-field option { background: #222; color: #fff; }
- 
+
 textarea.input-field {
   border-radius: 18px;
   resize: vertical;
   min-height: 90px;
 }
- 
+
 .btn-primary {
   width: 100%;
   padding: 14px;
@@ -119,7 +119,7 @@ textarea.input-field {
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,25,44,0.35); }
 .btn-primary:active { transform: scale(0.97); }
- 
+
 .btn-secondary {
   background: rgba(255,255,255,0.08);
   border: 1px solid var(--border);
@@ -132,16 +132,16 @@ textarea.input-field {
   transition: background 0.2s;
 }
 .btn-secondary:hover { background: rgba(255,255,255,0.13); }
- 
+
 .msg { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
- 
+
 /* ── MAIN LAYOUT ── */
 .app-wrap {
   max-width: 480px;
   margin: 0 auto;
   padding: 0 0 80px;
 }
- 
+
 /* ── HEADER ── */
 .app-header {
   display: flex;
@@ -165,7 +165,7 @@ textarea.input-field {
   font-size: 12px;
   color: var(--muted);
 }
- 
+
 /* ── NAV ── */
 .bottom-nav {
   position: fixed;
@@ -196,11 +196,11 @@ textarea.input-field {
 }
 .nav-item.active { color: var(--red); }
 .nav-icon { font-size: 20px; margin-bottom: 2px; }
- 
+
 /* ── SECTIONS ── */
 .section { display: none; padding: 16px; }
 .section.active { display: block; }
- 
+
 .section-title {
   font-size: 11px;
   letter-spacing: 0.22em;
@@ -209,7 +209,7 @@ textarea.input-field {
   font-weight: 600;
   margin-bottom: 16px;
 }
- 
+
 /* ── DASHBOARD CARDS ── */
 .dash-grid {
   display: grid;
@@ -235,7 +235,7 @@ textarea.input-field {
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
- 
+
 .dash-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -249,7 +249,7 @@ textarea.input-field {
 .dash-card:active { transform: scale(0.98); }
 .dash-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
 .dash-card-sub { font-size: 12px; color: var(--muted); }
- 
+
 /* ── EVENT CARDS ── */
 .event-card {
   background: var(--card);
@@ -277,7 +277,7 @@ textarea.input-field {
 .deadline-ok { background: rgba(34,197,94,0.15); color: var(--green); }
 .deadline-warn { background: rgba(245,158,11,0.15); color: var(--amber); }
 .deadline-closed { background: rgba(232,25,44,0.15); color: var(--red); }
- 
+
 .event-meta {
   display: flex;
   gap: 16px;
@@ -286,7 +286,7 @@ textarea.input-field {
   margin-bottom: 12px;
 }
 .event-meta span { display: flex; align-items: center; gap: 4px; }
- 
+
 .btn-add-gl {
   width: 100%;
   padding: 10px;
@@ -301,7 +301,7 @@ textarea.input-field {
 }
 .btn-add-gl:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-add-gl:not(:disabled):hover { opacity: 0.85; }
- 
+
 /* ── GL ENTRY CARDS ── */
 .gl-card {
   background: var(--card);
@@ -337,7 +337,7 @@ textarea.input-field {
   margin-top: 8px;
 }
 .gl-delete:hover { color: var(--red); }
- 
+
 /* ── ADMIN EXPORT ── */
 .admin-club-card {
   background: var(--card);
@@ -390,7 +390,7 @@ textarea.input-field {
 }
 .btn-copy:hover { background: rgba(255,255,255,0.14); }
 .btn-copy.copied { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
- 
+
 .sent-badge {
   display: inline-flex;
   align-items: center;
@@ -399,7 +399,7 @@ textarea.input-field {
   color: var(--green);
   margin-top: 4px;
 }
- 
+
 /* ── DATE FILTER ── */
 .date-bar {
   display: flex;
@@ -418,7 +418,7 @@ textarea.input-field {
   -webkit-appearance: none;
 }
 .date-bar input:focus { outline: none; border-color: var(--red); }
- 
+
 /* ── MODAL ── */
 .modal-overlay {
   position: fixed;
@@ -462,7 +462,7 @@ textarea.input-field {
   cursor: pointer;
   line-height: 1;
 }
- 
+
 /* ── EMPTY STATE ── */
 .empty {
   text-align: center;
@@ -470,7 +470,7 @@ textarea.input-field {
   color: var(--muted);
   font-size: 13px;
 }
- 
+
 /* ── DAY GROUP ── */
 .day-group-label {
   font-size: 10px;
@@ -481,12 +481,12 @@ textarea.input-field {
   border-bottom: 1px solid var(--border);
   margin-bottom: 10px;
 }
- 
+
 .loading { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
- 
+
 <!-- ACCESS PAGE -->
 <div id="access-page" class="active">
   <div class="login-logo">Summerrockz Ibiza</div>
@@ -501,18 +501,18 @@ textarea.input-field {
     <div class="msg" id="login-msg">Enter your email & access code.</div>
   </div>
 </div>
- 
+
 <!-- MAIN APP -->
 <div id="main-app" style="display:none;">
   <div class="app-wrap">
- 
+
     <div class="app-header">
       <div class="header-brand">Summerrockz GL</div>
       <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" style="width:32px;height:32px;border-radius:50%;position:absolute;left:50%;transform:translateX(-50%);">
       <div class="header-user" id="header-user"></div>
     </div>
     <div id="deadline-banner" style="display:none;background:var(--red);color:#fff;font-size:12px;font-weight:600;padding:8px 16px;text-align:center;letter-spacing:0.05em;"></div>
- 
+
     <!-- DASHBOARD -->
     <div class="section active" id="section-dashboard">
       <div style="padding-top:16px;">
@@ -526,7 +526,7 @@ textarea.input-field {
             <div class="dash-stat-label">Total this week</div>
           </div>
         </div>
- 
+
         <div class="dash-card" onclick="showSection('section-events')">
           <div class="dash-card-title">➕ Add to guestlist</div>
           <div class="dash-card-sub">Browse today's events and add guests</div>
@@ -539,12 +539,12 @@ textarea.input-field {
           <div class="dash-card-title">📤 Admin export</div>
           <div class="dash-card-sub">Export guestlists per club</div>
         </div>
- 
+
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="width:100%; margin-top:12px;">Log out</button>
       </div>
     </div>
- 
+
     <!-- EVENTS -->
     <div class="section" id="section-events">
       <div class="section-title">Today's events</div>
@@ -555,7 +555,7 @@ textarea.input-field {
       </div>
       <div id="events-list"><div class="loading">Loading events…</div></div>
     </div>
- 
+
     <!-- MY GL -->
     <div class="section" id="section-mygl">
       <div class="section-title">My guestlist entries</div>
@@ -565,7 +565,7 @@ textarea.input-field {
       <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:16px;">
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
- 
+
     <!-- ADMIN -->
     <div class="section" id="section-admin">
       <div class="section-title">Export per club</div>
@@ -574,9 +574,9 @@ textarea.input-field {
       </div>
       <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
- 
+
   </div>
- 
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="showSection('section-dashboard')" id="nav-dashboard">
@@ -593,20 +593,20 @@ textarea.input-field {
     </button>
   </nav>
 </div>
- 
+
 <!-- ADD GL MODAL -->
 <div class="modal-overlay" id="gl-modal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title" id="modal-club-name">Add to guestlist</div>
     <div class="modal-sub" id="modal-event-info"></div>
- 
+
     <!-- Single name for email+pax clubs -->
     <div id="modal-single-name-group">
       <label class="form-label">Guest name</label>
       <input type="text" class="input-field" id="modal-guest-name" placeholder="First and last name">
     </div>
- 
+
     <div id="modal-pax-group">
       <label class="form-label">Pax (including guest)</label>
       <select class="input-field" id="modal-pax">
@@ -616,7 +616,7 @@ textarea.input-field {
         <option value="4">+3 (4 total)</option>
       </select>
     </div>
- 
+
     <!-- Multiple names for name-only clubs -->
     <div id="modal-multi-name-group" style="display:none;">
       <label class="form-label">Total pax</label>
@@ -628,34 +628,34 @@ textarea.input-field {
       </select>
       <div id="modal-name-fields" style="margin-top:8px;"></div>
     </div>
- 
+
     <div id="modal-email-group">
       <label class="form-label">Email</label>
       <input type="email" class="input-field" id="modal-email" placeholder="guest@email.com">
     </div>
- 
+
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
- 
+
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
     <div class="msg" id="modal-msg"></div>
   </div>
 </div>
- 
+
 <script>
 const VAPID_PUBLIC_KEY = "BFmet7gmvosa46cHJD377NTiAsk0DvkRaBT5hbgl0tY2CuNWWmGOY9ji-aVq3Yce6tBUmbmITOgTlGr4Uqdrs34";
 const VERCEL_URL = "https://guestlist-kappa.vercel.app";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnZ2hthZ8hyfiMjGGQgaXfeCxKO-bFPDz0wbpmdcczPfJNHnZao-Z0S98GnKa2qSSM/exec";
 const SHEET_ID = "1mU89b_jyH0oNWO1g64EnyAh7tPOYDTMQxeImCA-Avek";
 const OPEN_URL = `https://opensheet.elk.sh/${SHEET_ID}`;
- 
+
 let SELLER = null;
 let SELLERS = [];
 let CLUBS = [];
 let EVENTS = [];
 let ENTRIES = [];
 let CURRENT_EVENT = null;
- 
+
 // ── UTILS ──
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -673,13 +673,13 @@ function deadlineStatus(deadlineStr, eventDate) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
   if (eventDate !== todayStr) return "ok";
- 
+
   const [h, m] = deadlineStr.split(":").map(Number);
   const deadline = new Date();
   deadline.setHours(h, m, 0, 0);
   // handle past midnight deadlines
   if (h < 6) deadline.setDate(deadline.getDate() + 1);
- 
+
   const diff = deadline - now;
   if (diff < 0) return "closed";
   if (diff < 60 * 60 * 1000) return "warn";
@@ -689,7 +689,7 @@ function deadlineLabel(deadlineStr) {
   if (!deadlineStr) return "";
   return `Deadline ${deadlineStr}`;
 }
- 
+
 // ── FETCH ──
 async function fetchSheet(tab) {
   const r = await fetch(`${OPEN_URL}/${tab}`);
@@ -699,7 +699,7 @@ async function post(body) {
   const params = new URLSearchParams(body).toString();
   return fetch(`${SCRIPT_URL}?${params}`);
 }
- 
+
 // ── NAV ──
 function showSection(id) {
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
@@ -713,7 +713,7 @@ function showSection(id) {
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
- 
+
   if (id === "section-events") { loadData().then(renderEvents); }
   if (id === "section-mygl") {
     loadData().then(renderMyGL);
@@ -725,16 +725,16 @@ function showSection(id) {
   if (id === "section-admin") { loadData().then(renderAdmin); }
   if (id === "section-dashboard") { loadData().then(renderDashboard); }
 }
- 
+
 // ── LOGIN ──
 document.getElementById("login-btn").onclick = async () => {
   const email = document.getElementById("login-email").value.trim().toLowerCase();
   const code = document.getElementById("login-code").value.trim();
   const msg = document.getElementById("login-msg");
- 
+
   if (!email || !code) { msg.textContent = "Fill in both fields."; return; }
   msg.textContent = "Checking…";
- 
+
   try {
     const sellers = await fetchSheet("SELLERS");
     const match = sellers.find(s =>
@@ -743,7 +743,7 @@ document.getElementById("login-btn").onclick = async () => {
       (s.status || "").toLowerCase() === "active"
     );
     if (!match) { msg.textContent = "Incorrect login details."; return; }
- 
+
     SELLER = match;
     localStorage.setItem("srz_seller", JSON.stringify(match));
     await initApp();
@@ -751,37 +751,37 @@ document.getElementById("login-btn").onclick = async () => {
     msg.textContent = "Could not connect. Try again.";
   }
 };
- 
+
 async function initApp() {
   document.getElementById("access-page").classList.remove("active");
   document.getElementById("access-page").style.display = "none";
   document.getElementById("main-app").style.display = "block";
   document.getElementById("header-user").textContent = SELLER.seller_name;
- 
+
   if ((SELLER.role || "").toLowerCase() === "admin") {
     document.getElementById("admin-dash-card").style.display = "block";
     document.getElementById("nav-admin").style.display = "flex";
   }
- 
+
   // set default dates
   document.getElementById("events-date-from").value = today();
   document.getElementById("events-date-to").value = today();
   document.getElementById("mygl-date").value = today();
   document.getElementById("admin-date").value = today();
- 
+
   // date change listeners
   document.getElementById("events-date-from").onchange = renderEvents;
   document.getElementById("events-date-to").onchange = renderEvents;
   document.getElementById("mygl-date").onchange = renderMyGL;
   document.getElementById("admin-date").onchange = renderAdmin;
- 
+
   // load data
   await loadData();
   renderDashboard();
   checkDeadlines();
   setupPushNotifications();
 }
- 
+
 async function setupPushNotifications() {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
   try {
@@ -790,7 +790,7 @@ async function setupPushNotifications() {
     console.log("SW registration failed:", e);
   }
 }
- 
+
 async function enableNotifications() {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     alert("Push notifications not supported on this browser.");
@@ -821,7 +821,7 @@ async function enableNotifications() {
     alert("Could not enable notifications: " + e.message);
   }
 }
- 
+
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -830,7 +830,7 @@ function urlBase64ToUint8Array(base64String) {
   for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
   return outputArray;
 }
- 
+
 async function loadData() {
   [SELLERS, CLUBS, EVENTS, ENTRIES] = await Promise.all([
     fetchSheet("SELLERS"),
@@ -839,11 +839,11 @@ async function loadData() {
     fetchSheet("GL_ENTRIES")
   ]);
 }
- 
+
 async function refreshData() {
   await loadData();
 }
- 
+
 // ── DASHBOARD ──
 function renderDashboard() {
   const t = today();
@@ -854,29 +854,29 @@ function renderDashboard() {
   const todayEntries = myEntries.filter(e => (e.date || "").slice(0, 10) === t);
   const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 7);
   const weekEntries = myEntries.filter(e => new Date(e.date) >= weekStart);
- 
+
   document.getElementById("stat-today").textContent = todayEntries.length;
   document.getElementById("stat-total").textContent = weekEntries.length;
 }
- 
+
 // ── EVENTS ──
 function renderEvents() {
   const dateFrom = document.getElementById("events-date-from").value || today();
   const dateTo = document.getElementById("events-date-to").value || today();
   const wrap = document.getElementById("events-list");
- 
+
   const dayEvents = EVENTS.filter(e => {
     const ed = (e.date || "").slice(0, 10);
     return ed >= dateFrom && ed <= dateTo && (e.status || "").toLowerCase() !== "inactive";
   });
- 
+
   if (!dayEvents.length) {
     wrap.innerHTML = `<div class="empty">No events for this period.</div>`;
     return;
   }
- 
+
   const club = id => CLUBS.find(c => c.club_id === id) || {};
- 
+
   // group by date then club
   const byDateClub = {};
   dayEvents.forEach(e => {
@@ -885,7 +885,7 @@ function renderEvents() {
     if (!byDateClub[d][e.club_id]) byDateClub[d][e.club_id] = [];
     byDateClub[d][e.club_id].push(e);
   });
- 
+
   wrap.innerHTML = Object.keys(byDateClub).sort().map(date => {
     const byClub = byDateClub[date];
     return `<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>` +
@@ -894,7 +894,7 @@ function renderEvents() {
     const ds = deadlineStatus(cl.deadline, date);
     const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
     const closed = ds === "closed";
- 
+
     return events.map(ev => {
       const spotsLeft = parseInt(ev.spots_left) || null;
       const isFull = spotsLeft !== null && spotsLeft <= 0;
@@ -902,7 +902,7 @@ function renderEvents() {
       const freeText = ev.free_condition
         ? (ev.free_condition.toLowerCase().startsWith("free") ? ev.free_condition : `Free ${ev.free_condition}`)
         : (ev.price_after ? `€${ev.price_after} ${ev.price_type || ""}` : "Free");
- 
+
       return `
         <div class="event-card">
           <div class="event-card-top">
@@ -929,20 +929,20 @@ function renderEvents() {
   }).join("");
   }).join("");
 }
- 
+
 // ── MY GL ──
 function renderMyGL() {
   const date = document.getElementById("mygl-date").value || today();
   const search = (document.getElementById("mygl-search")?.value || "").toLowerCase().trim();
   const wrap = document.getElementById("mygl-list");
- 
+
   const myId = String(SELLER.seller_id || "").trim();
- 
+
   const managedIds = SELLERS.filter(s => {
     const mgrs = String(s.manager_id || "").split(",").map(x => x.trim());
     return mgrs.includes(myId);
   }).map(s => String(s.seller_id).trim());
- 
+
   const mine = ENTRIES.filter(e => {
     const sid = String(e.seller_id || "").trim();
     const matchesDate = (e.date || "").slice(0, 10) === date;
@@ -954,19 +954,19 @@ function renderMyGL() {
     if (search) return isOwn && matchesSearch && visible;
     return isOwn && matchesDate && visible;
   });
- 
+
   if (!mine.length) {
     wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
     return;
   }
- 
+
   // group by club
   const byClub = {};
   mine.forEach(e => {
     if (!byClub[e.club_name]) byClub[e.club_name] = [];
     byClub[e.club_name].push(e);
   });
- 
+
   wrap.innerHTML = Object.entries(byClub).map(([clubName, entries]) => `
     <div class="day-group-label">${clubName} · ${entries.length} entries</div>
     ${entries.map(e => `
@@ -988,49 +988,49 @@ function renderMyGL() {
     `).join("")}
   `).join("");
 }
- 
+
 async function deleteEntry(entryId, btn) {
   if (!confirm("Cancel this entry? It will be marked as cancelled so you know to notify the club.")) return;
   btn.textContent = "Cancelling…";
   btn.disabled = true;
- 
+
   ENTRIES = ENTRIES.map(e => e.entry_id === entryId ? { ...e, status: "cancelled" } : e);
   renderMyGL();
   renderDashboard();
- 
+
   post({ action: "cancel_entry", entry_id: entryId });
 }
- 
+
 // ── ADMIN EXPORT ──
 function renderAdmin() {
   if ((SELLER.role || "").toLowerCase() !== "admin") return;
- 
+
   const date = document.getElementById("admin-date").value || today();
   const wrap = document.getElementById("admin-list");
- 
+
   // filter clubs this admin manages
   const myClubs = CLUBS.filter(c => {
     const admins = String(c.admin_id || "").split(",").map(x => x.trim());
     return admins.includes(String(SELLER.seller_id).trim());
   }).map(c => c.club_id);
- 
+
   const dayEntries = ENTRIES.filter(e => {
     const d = (e.date || "").slice(0, 10);
     return d === date &&
       (e.status || "").toLowerCase() !== "deleted" &&
       myClubs.includes(e.club_id);
   });
- 
+
   if (!myClubs.length) {
     wrap.innerHTML = `<div class="empty">No clubs assigned to you.</div>`;
     return;
   }
- 
+
   if (!dayEntries.length) {
     wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
     return;
   }
- 
+
   // group by club then date
   const byClub = {};
   dayEntries.forEach(e => {
@@ -1038,13 +1038,13 @@ function renderAdmin() {
     if (!byClub[key]) byClub[key] = { name: e.club_name, entries: [] };
     byClub[key].entries.push(e);
   });
- 
+
   wrap.innerHTML = Object.entries(byClub).map(([clubId, data]) => {
     const cl = CLUBS.find(c => c.club_id === clubId) || {};
     const format = cl.format || "name";
     const ds = deadlineStatus(cl.deadline, date);
     const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
- 
+
     // include cancelled in export so admin knows to notify club
     const allEntries = ENTRIES.filter(e => {
       const d = (e.date || "").slice(0, 10);
@@ -1052,7 +1052,7 @@ function renderAdmin() {
         (e.club_id === clubId) &&
         ["active","cancelled"].includes((e.status||"").toLowerCase());
     });
- 
+
     const entryRows = allEntries.map((e, i) => {
       const isCancelled = (e.status||"").toLowerCase() === "cancelled";
       const paxNum = parseInt(e.pax) || 1;
@@ -1069,7 +1069,7 @@ function renderAdmin() {
       const text = isCancelled ? line + " ⚠️ CANCELLED" : line;
       return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:13px;${textStyle}">${text}</span></div>`;
     }).join("");
- 
+
     return `
       <div class="admin-club-card">
         <div class="admin-club-header">
@@ -1087,7 +1087,7 @@ function renderAdmin() {
     `;
   }).join("");
 }
- 
+
 function copyExport(clubId, btn) {
   const box = document.getElementById(`export-${clubId}`);
   // only copy non-cancelled (no strikethrough spans)
@@ -1101,31 +1101,31 @@ function copyExport(clubId, btn) {
     }, 2000);
   });
 }
- 
+
 // ── MODAL ──
 function openModal(eventId, clubId) {
   CURRENT_EVENT = EVENTS.find(e => e.event_id === eventId);
   const cl = CLUBS.find(c => c.club_id === clubId) || {};
- 
+
   document.getElementById("modal-club-name").textContent = cl.club_name || clubId;
   document.getElementById("modal-event-info").textContent =
     (CURRENT_EVENT?.event_name || "") + (CURRENT_EVENT?.time ? ` · ${CURRENT_EVENT.time}` : "");
- 
+
   const needsEmail = (cl.format || "").includes("email");
   const needsPax = (cl.format || "").includes("pax");
   const nameOnly = !needsPax && !needsEmail;
- 
+
   // show correct mode
   document.getElementById("modal-single-name-group").style.display = nameOnly ? "none" : "block";
   document.getElementById("modal-pax-group").style.display = needsPax ? "block" : "none";
   document.getElementById("modal-email-group").style.display = needsEmail ? "block" : "none";
   document.getElementById("modal-multi-name-group").style.display = nameOnly ? "block" : "none";
- 
+
   if (nameOnly) {
     document.getElementById("modal-pax-count").value = "1";
     renderNameFields();
   }
- 
+
   const maxPax = needsPax ? (parseInt(cl.max_pax_per_email) || 4) : 1;
   const paxSel = document.getElementById("modal-pax");
   paxSel.innerHTML = "";
@@ -1135,15 +1135,39 @@ function openModal(eventId, clubId) {
     opt.textContent = i === 1 ? "1 (just the guest)" : `+${i-1} (${i} total)`;
     paxSel.appendChild(opt);
   }
- 
+
   document.getElementById("modal-guest-name").value = "";
   document.getElementById("modal-email").value = "";
   document.getElementById("modal-notes").value = "";
   document.getElementById("modal-msg").textContent = "";
- 
+
   document.getElementById("gl-modal").classList.add("open");
 }
- 
+
+async function notifyClubAdmins(clubId, clubName, guestName, pax) {
+  try {
+    const cl = CLUBS.find(c => c.club_id === clubId) || {};
+    const adminIds = String(cl.admin_id || "").split(",").map(x => x.trim()).filter(Boolean);
+    
+    for (const adminId of adminIds) {
+      await fetch(VERCEL_URL + "/api/notify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "srz2026secret"
+        },
+        body: JSON.stringify({
+          title: "🎉 Nieuwe entry — " + clubName,
+          body: guestName + (parseInt(pax) > 1 ? " +" + (parseInt(pax)-1) : "") + " — added by " + SELLER.seller_name,
+          sellerId: adminId
+        })
+      });
+    }
+  } catch(e) {
+    console.log("Notify failed:", e);
+  }
+}
+
 function renderNameFields() {
   const count = parseInt(document.getElementById("modal-pax-count").value) || 1;
   const wrap = document.getElementById("modal-name-fields");
@@ -1152,24 +1176,24 @@ function renderNameFields() {
     <input type="text" class="input-field modal-multi-name" placeholder="First and last name" style="margin-bottom:8px;">
   `).join("");
 }
- 
+
 function closeModal() {
   document.getElementById("gl-modal").classList.remove("open");
   CURRENT_EVENT = null;
 }
- 
+
 document.getElementById("modal-submit").onclick = async () => {
   const guestName = document.getElementById("modal-guest-name").value.trim();
   const pax = document.getElementById("modal-pax").value;
   const email = document.getElementById("modal-email").value.trim();
   const notes = document.getElementById("modal-notes").value.trim();
   const msg = document.getElementById("modal-msg");
- 
+
   const cl = CLUBS.find(c => c.club_id === CURRENT_EVENT?.club_id) || {};
   const needsEmail = (cl.format || "").includes("email");
   const needsPax = (cl.format || "").includes("pax");
   const nameOnly = !needsPax && !needsEmail;
- 
+
   if (nameOnly) {
     const nameFields = Array.from(document.querySelectorAll(".modal-multi-name"));
     const names = nameFields.map(f => f.value.trim()).filter(Boolean);
@@ -1189,12 +1213,13 @@ document.getElementById("modal-submit").onclick = async () => {
     });
     closeModal(); renderMyGL(); renderDashboard();
     btn.disabled = false; btn.textContent = "Add to guestlist";
+    notifyClubAdmins(CURRENT_EVENT.club_id, cl.club_name || CURRENT_EVENT.club_id, names.join(", "), names.length);
     return;
   }
- 
+
   if (!guestName) { msg.textContent = "Guest name is required."; return; }
   if (needsEmail && !email) { msg.textContent = "Email is required for this club."; return; }
- 
+
   const entry = {
     entry_id: genId(),
     seller_id: SELLER.seller_id,
@@ -1211,24 +1236,27 @@ document.getElementById("modal-submit").onclick = async () => {
     created_at: new Date().toISOString(),
     status: "active"
   };
- 
+
   const btn = document.getElementById("modal-submit");
   btn.disabled = true;
   btn.textContent = "Adding…";
   msg.textContent = "";
- 
+
   // optimistic
   ENTRIES.push(entry);
   closeModal();
   renderMyGL();
   renderDashboard();
- 
+
   post({ action: "add_entry", ...entry }).finally(() => {
     btn.disabled = false;
     btn.textContent = "Add to guestlist";
   });
+
+  // notify admins of this club
+  notifyClubAdmins(entry.club_id, entry.club_name, entry.guest_name, entry.pax);
 };
- 
+
 // ── LOGOUT ──
 document.getElementById("logout-btn").onclick = () => {
   localStorage.removeItem("srz_seller");
@@ -1237,7 +1265,7 @@ document.getElementById("logout-btn").onclick = () => {
   document.getElementById("access-page").style.display = "flex";
   document.getElementById("access-page").classList.add("active");
 };
- 
+
 // ── AUTO LOGIN ──
 window.addEventListener("DOMContentLoaded", async () => {
   const saved = localStorage.getItem("srz_seller");
@@ -1248,12 +1276,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("access-page").style.display = "flex";
   }
 });
- 
+
 // close modal on overlay click
 document.getElementById("gl-modal").addEventListener("click", function(e) {
   if (e.target === this) closeModal();
 });
- 
+
 // ── DEADLINE NOTIFICATIONS ──
 function checkDeadlines() {
   if (!CLUBS || !EVENTS) return;
@@ -1261,16 +1289,16 @@ function checkDeadlines() {
   const todayStr = now.toISOString().slice(0, 10);
   const banner = document.getElementById("deadline-banner");
   if (!banner) return;
- 
+
   const warnings = [];
- 
+
   CLUBS.forEach(cl => {
     if (!cl.deadline) return;
     const [h, m] = cl.deadline.split(":").map(Number);
     const deadline = new Date();
     deadline.setHours(h, m, 0, 0);
     if (h < 6) deadline.setDate(deadline.getDate() + 1);
- 
+
     const diff = deadline - now;
     if (diff > 0 && diff < 60 * 60 * 1000) {
       const minsLeft = Math.round(diff / 60000);
@@ -1285,7 +1313,7 @@ function checkDeadlines() {
       }
     }
   });
- 
+
   if (warnings.length) {
     banner.textContent = warnings.join("  ·  ");
     banner.style.display = "block";
@@ -1293,10 +1321,10 @@ function checkDeadlines() {
     banner.style.display = "none";
   }
 }
- 
+
 // Check every minute
 setInterval(checkDeadlines, 60000);
- 
+
 // PULL TO REFRESH
 let pullStartY = 0;
 document.addEventListener("touchstart", e => {
@@ -1323,4 +1351,3 @@ document.addEventListener("touchend", async e => {
 </script>
 </body>
 </html>
- 
