@@ -628,6 +628,7 @@ const SHEET_ID = "1mU89b_jyH0oNWO1g64EnyAh7tPOYDTMQxeImCA-Avek";
 const OPEN_URL = `https://opensheet.elk.sh/${SHEET_ID}`;
  
 let SELLER = null;
+let SELLERS = [];
 let CLUBS = [];
 let EVENTS = [];
 let ENTRIES = [];
@@ -750,7 +751,8 @@ async function initApp() {
 }
  
 async function loadData() {
-  [CLUBS, EVENTS, ENTRIES] = await Promise.all([
+  [SELLERS, CLUBS, EVENTS, ENTRIES] = await Promise.all([
+    fetchSheet("SELLERS"),
     fetchSheet("CLUBS"),
     fetchSheet("EVENTS"),
     fetchSheet("GL_ENTRIES")
@@ -845,11 +847,20 @@ function renderMyGL() {
   const date = document.getElementById("mygl-date").value || today();
   const wrap = document.getElementById("mygl-list");
  
-  const mine = ENTRIES.filter(e =>
-    String(e.seller_id || "").trim() === String(SELLER.seller_id || "").trim() &&
-    (e.date || "").slice(0, 10) === date &&
-    (e.status || "").toLowerCase() !== "deleted"
-  );
+  const myId = String(SELLER.seller_id || "").trim();
+ 
+  // find sellers this person manages
+  const managedIds = SELLERS.filter(s => {
+    const mgrs = String(s.manager_id || "").split(",").map(x => x.trim());
+    return mgrs.includes(myId);
+  }).map(s => String(s.seller_id).trim());
+ 
+  const mine = ENTRIES.filter(e => {
+    const sid = String(e.seller_id || "").trim();
+    return (sid === myId || managedIds.includes(sid)) &&
+      (e.date || "").slice(0, 10) === date &&
+      (e.status || "").toLowerCase() !== "deleted";
+  });
  
   if (!mine.length) {
     wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
@@ -875,6 +886,7 @@ function renderMyGL() {
           ${e.email ? `📧 ${e.email}` : ""}
           ${e.notes ? ` · ${e.notes}` : ""}
         </div>
+        ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
         <button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Remove</button>
       </div>
     `).join("")}
