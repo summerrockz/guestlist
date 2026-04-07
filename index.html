@@ -786,7 +786,35 @@ async function initApp() {
 async function setupPushNotifications() {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
   try {
-    await navigator.serviceWorker.register("/sw.js");
+    const reg = await navigator.serviceWorker.register("/sw.js");
+    const btn = document.getElementById("notif-btn");
+
+    // check localStorage first
+    if (localStorage.getItem("srz_notif_enabled") === "1") {
+      if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
+      // re-subscribe silently if subscription lost
+      const existing = await reg.pushManager.getSubscription();
+      if (!existing && Notification.permission === "granted") {
+        try {
+          const sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+          });
+          await fetch(VERCEL_URL + "/api/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscription: sub, sellerId: SELLER.seller_id })
+          });
+        } catch(e) {}
+      }
+      return;
+    }
+
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
+      localStorage.setItem("srz_notif_enabled", "1");
+    }
   } catch(e) {
     console.log("SW registration failed:", e);
   }
@@ -817,6 +845,7 @@ async function enableNotifications() {
     if (result.ok) {
       document.getElementById("notif-btn").textContent = "✅ Notifications enabled";
       document.getElementById("notif-btn").disabled = true;
+      localStorage.setItem("srz_notif_enabled", "1");
     }
   } catch(e) {
     alert("Could not enable notifications: " + e.message);
