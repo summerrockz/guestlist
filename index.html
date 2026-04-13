@@ -1840,6 +1840,7 @@ function calShowEvents() {
           <span>🎫 ${freeText}</span>
           ${spotsLeft !== null ? `<span>👥 ${spotsLeft} spots left</span>` : ""}
         </div>
+        ${ev.extra_notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>` : ""}
         <button class="btn-add-gl" ${(closed||isFull)?"disabled":""}
           onclick="openModal('${ev.event_id}','${ev.club_id}')">
           ${closed?"Deadline passed":isFull?"Guestlist full":"+ Add to guestlist"}
