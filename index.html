@@ -791,9 +791,8 @@ async function initApp() {
     document.getElementById("admin-dash-card").style.display = "block";
     document.getElementById("nav-admin").style.display = "flex";
   }
-  if (role === "event_manager") {
+  if (String(SELLER.seller_id).trim() === "1") {
     document.getElementById("vip-admin-dash-card").style.display = "block";
-    // event_manager gets a VIP manage section
     document.getElementById("section-vip-admin").style.display = "block";
   }
 
@@ -1183,7 +1182,7 @@ async function submitVipRequest() {
       body: JSON.stringify({
         title: `🍾 New VIP request — ${venue}`,
         body: `${name} · ${pax} pax · ${eventName||eventDate} — by ${SELLER.seller_name}`,
-        sellerId: "EVENT_MANAGER_ID" // vervang met jouw seller_id
+        sellerId: "1"
       })
     }).catch(()=>{});
 
