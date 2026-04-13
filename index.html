@@ -1249,7 +1249,7 @@ function renderVipSeller() {
           <div class="vip-price-label">💬 Price info from Summerrockz</div>
           <div class="vip-price-box">${priceInfo}</div>
           <button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipRequest('${r.request_id}')" style="margin-top:10px;">
-            📋 Copy request
+            📋 Copy prices
           </button>
         ` : st==="new" ? `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>` : ""}
       </div>
@@ -1350,9 +1350,10 @@ function copyVipRequest(requestId) {
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById("copy-btn-" + requestId);
     if (btn) {
+      const originalText = btn.textContent.trim();
       btn.textContent = "✓ Copied!";
       btn.classList.add("copied");
-      setTimeout(() => { btn.textContent = "📋 Copy request"; btn.classList.remove("copied"); }, 2000);
+      setTimeout(() => { btn.textContent = originalText; btn.classList.remove("copied"); }, 2000);
     }
   });
 }
