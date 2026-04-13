@@ -20,469 +20,291 @@
   --green: #22C55E;
   --amber: #F59E0B;
   --blue: #3B82F6;
+  --gold: #F59E0B;
 }
 
-body {
-  background: var(--dark);
-  color: var(--text);
-  min-height: 100vh;
-}
-
+body { background: var(--dark); color: var(--text); min-height: 100vh; }
 .page { display: none; }
 .page.active { display: block; }
 
 /* ── ACCESS ── */
 #access-page {
-  min-height: 100vh;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  background: #0e0e0e;
+  min-height: 100vh; display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px 16px; background: #0e0e0e;
 }
 #access-page.active { display: flex; }
-
-.login-logo {
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.login-title {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
+.login-logo { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.login-title { font-size: 28px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
 .login-red { color: var(--red); }
-.login-sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 36px;
-}
-.login-box {
-  width: 100%;
-  max-width: 400px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 28px 24px;
-}
-.form-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 6px;
-  display: block;
-}
-.input-field {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 12px 16px;
-  font-size: 14px;
-  color: var(--text);
-  margin-bottom: 16px;
-  transition: border-color 0.2s;
-  -webkit-appearance: none;
-}
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 36px; }
+.login-box { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 28px 24px; }
+.form-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; }
+.input-field { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 999px; padding: 12px 16px; font-size: 14px; color: var(--text); margin-bottom: 16px; transition: border-color 0.2s; -webkit-appearance: none; }
 .input-field::placeholder { color: rgba(255,255,255,0.25); }
 .input-field:focus { outline: none; border-color: var(--red); }
-
 select.input-field { cursor: pointer; }
 select.input-field option { background: #222; color: #fff; }
+textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; }
 
-textarea.input-field {
-  border-radius: 18px;
-  resize: vertical;
-  min-height: 90px;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 14px;
-  border-radius: 999px;
-  background: var(--red);
-  color: #fff;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  margin-top: 8px;
-}
+.btn-primary { width: 100%; padding: 14px; border-radius: 999px; background: var(--red); color: #fff; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; margin-top: 8px; }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,25,44,0.35); }
 .btn-primary:active { transform: scale(0.97); }
-
-.btn-secondary {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
+.btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
 .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
 .msg { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
 
 /* ── MAIN LAYOUT ── */
-.app-wrap {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 0 80px;
-}
+.app-wrap { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
 
 /* ── HEADER ── */
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 16px 12px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--dark);
-  z-index: 100;
-}
-.header-brand {
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--red);
-  font-weight: 700;
-}
-.header-user {
-  font-size: 12px;
-  color: var(--muted);
-}
+.app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 100; }
+.header-brand { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); font-weight: 700; }
+.header-user { font-size: 12px; color: var(--muted); }
 
 /* ── NAV ── */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #111;
-  border-top: 1px solid var(--border);
-  display: flex;
-  z-index: 200;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 0;
-  cursor: pointer;
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: color 0.2s;
-  border: none;
-  background: none;
-}
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111; border-top: 1px solid var(--border); display: flex; z-index: 200; max-width: 480px; margin: 0 auto; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; cursor: pointer; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; border: none; background: none; }
 .nav-item.active { color: var(--red); }
 .nav-icon { font-size: 20px; margin-bottom: 2px; }
 
 /* ── SECTIONS ── */
 .section { display: none; padding: 16px; }
 .section.active { display: block; }
+.section-title { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 16px; }
 
-.section-title {
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 600;
-  margin-bottom: 16px;
-}
-
-/* ── DASHBOARD CARDS ── */
-.dash-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.dash-stat {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 16px;
-}
-.dash-stat-val {
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.dash-stat-label {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.dash-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 16px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
-}
+/* ── DASHBOARD ── */
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.dash-stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; }
+.dash-stat-val { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.dash-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.dash-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 12px; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
 .dash-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); }
 .dash-card:active { transform: scale(0.98); }
 .dash-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
 .dash-card-sub { font-size: 12px; color: var(--muted); }
 
 /* ── EVENT CARDS ── */
-.event-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-}
-.event-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
+.event-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+.event-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .event-club { font-size: 15px; font-weight: 600; }
 .event-name { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.deadline-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
+.deadline-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.1em; }
 .deadline-ok { background: rgba(34,197,94,0.15); color: var(--green); }
 .deadline-warn { background: rgba(245,158,11,0.15); color: var(--amber); }
 .deadline-closed { background: rgba(232,25,44,0.15); color: var(--red); }
-
-.event-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
+.event-meta { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 .event-meta span { display: flex; align-items: center; gap: 4px; }
-
-.btn-add-gl {
-  width: 100%;
-  padding: 10px;
-  border-radius: 999px;
-  background: var(--red);
-  color: #fff;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
+.btn-add-gl { width: 100%; padding: 10px; border-radius: 999px; background: var(--red); color: #fff; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
 .btn-add-gl:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-add-gl:not(:disabled):hover { opacity: 0.85; }
 
-/* ── GL ENTRY CARDS ── */
-.gl-card {
+/* ── GL CARDS ── */
+.gl-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }
+.gl-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.gl-guest-name { font-size: 14px; font-weight: 600; }
+.gl-pax { font-size: 11px; background: rgba(232,25,44,0.15); color: var(--red); padding: 3px 8px; border-radius: 999px; font-weight: 600; }
+.gl-meta { font-size: 12px; color: var(--muted); }
+.gl-delete { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s; margin-top: 8px; }
+.gl-delete:hover { color: var(--red); }
+
+/* ── ADMIN ── */
+.admin-club-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.admin-club-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.admin-club-name { font-size: 15px; font-weight: 600; }
+.admin-count { font-size: 12px; color: var(--muted); background: var(--input-bg); padding: 4px 10px; border-radius: 999px; }
+.export-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.8); white-space: pre-wrap; word-break: break-word; margin-bottom: 10px; font-family: monospace; max-height: 200px; overflow-y: auto; }
+.btn-copy { width: 100%; padding: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-bottom: 6px; }
+.btn-copy:hover { background: rgba(255,255,255,0.14); }
+.btn-copy.copied { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
+
+/* ── DATE FILTER ── */
+.date-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+.date-bar input[type="date"] { flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; font-size: 13px; color: var(--text); -webkit-appearance: none; }
+.date-bar input:focus { outline: none; border-color: var(--red); }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: #1a1a1a; border-radius: 22px 22px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; }
+
+/* ── EMPTY / LOADING ── */
+.empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
+.day-group-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 12px 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.loading { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+
+/* ── VIP TABLE STYLES ── */
+.vip-request-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 8px;
+  padding: 16px;
+  margin-bottom: 10px;
 }
-.gl-card-top {
+.vip-card-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.vip-venue-name { font-size: 15px; font-weight: 600; }
+.vip-event-name { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.vip-status-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.status-new { background: rgba(59,130,246,0.15); color: var(--blue); }
+.status-price_sent { background: rgba(245,158,11,0.15); color: var(--amber); }
+.status-confirmed { background: rgba(34,197,94,0.15); color: var(--green); }
+.status-paid { background: rgba(34,197,94,0.25); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.status-cancelled { background: rgba(232,25,44,0.15); color: var(--red); }
+
+.vip-meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+
+.vip-price-box {
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+.vip-price-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
   margin-bottom: 6px;
 }
-.gl-guest-name { font-size: 14px; font-weight: 600; }
-.gl-pax {
-  font-size: 11px;
-  background: rgba(232,25,44,0.15);
-  color: var(--red);
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-.gl-meta { font-size: 12px; color: var(--muted); }
-.gl-delete {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.2);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px;
-  transition: color 0.2s;
-  margin-top: 8px;
-}
-.gl-delete:hover { color: var(--red); }
 
-/* ── ADMIN EXPORT ── */
-.admin-club-card {
+/* Admin VIP request card */
+.vip-admin-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 12px;
 }
-.admin-club-header {
+.vip-admin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
-.admin-club-name { font-size: 15px; font-weight: 600; }
-.admin-count {
-  font-size: 12px;
+.vip-admin-seller {
+  font-size: 11px;
   color: var(--muted);
-  background: var(--input-bg);
-  padding: 4px 10px;
-  border-radius: 999px;
+  margin-top: 2px;
 }
-.export-box {
-  background: rgba(0,0,0,0.3);
+.status-select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+.status-select option { background: #222; }
+
+.price-textarea {
+  width: 100%;
+  background: var(--input-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 12px;
-  font-size: 13px;
-  line-height: 1.8;
-  color: rgba(255,255,255,0.8);
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: 10px;
-  font-family: monospace;
-  max-height: 200px;
-  overflow-y: auto;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text);
+  resize: vertical;
+  min-height: 100px;
+  margin-top: 8px;
+  font-family: "Poppins", sans-serif;
+  line-height: 1.6;
 }
-.btn-copy {
+.price-textarea:focus { outline: none; border-color: var(--gold); }
+.price-textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+.btn-save-price {
   width: 100%;
   padding: 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border);
-  color: var(--text);
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: var(--gold);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  margin-top: 8px;
   transition: background 0.2s;
-  margin-bottom: 6px;
 }
-.btn-copy:hover { background: rgba(255,255,255,0.14); }
-.btn-copy.copied { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
+.btn-save-price:hover { background: rgba(245,158,11,0.25); }
+.btn-save-price.saved { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
 
-.sent-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--green);
-  margin-top: 4px;
-}
-
-/* ── DATE FILTER ── */
-.date-bar {
+.vip-filter-bar {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
-  align-items: center;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
-.date-bar input[type="date"] {
-  flex: 1;
-  background: var(--input-bg);
-  border: 1px solid var(--border);
+.vip-filter-btn {
+  white-space: nowrap;
+  padding: 6px 14px;
   border-radius: 999px;
-  padding: 10px 16px;
-  font-size: 13px;
-  color: var(--text);
-  -webkit-appearance: none;
-}
-.date-bar input:focus { outline: none; border-color: var(--red); }
-
-/* ── MODAL ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  z-index: 500;
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: #1a1a1a;
-  border-radius: 22px 22px 0 0;
-  padding: 24px 20px 40px;
-  width: 100%;
-  max-width: 480px;
-  border-top: 1px solid var(--border);
-  animation: slideUp 0.3s ease;
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-.modal-title {
-  font-size: 17px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.modal-sub {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
   font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-.modal-close {
-  float: right;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 22px;
   cursor: pointer;
-  line-height: 1;
+  transition: all 0.2s;
+  font-family: "Poppins", sans-serif;
+}
+.vip-filter-btn.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
 }
 
-/* ── EMPTY STATE ── */
-.empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--muted);
+.btn-new-vip {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #F59E0B, #E8192C);
+  color: #fff;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: opacity 0.2s;
+}
+.btn-new-vip:hover { opacity: 0.9; }
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
-
-/* ── DAY GROUP ── */
-.day-group-label {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 12px 0 6px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 10px;
-}
-
-.loading { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+.detail-row:last-child { border-bottom: none; }
+.detail-label { color: var(--muted); }
+.detail-value { font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
 </style>
 </head>
 <body>
@@ -526,7 +348,6 @@ textarea.input-field {
             <div class="dash-stat-label">Total this week</div>
           </div>
         </div>
-
         <div class="dash-card" onclick="showSection('section-events')">
           <div class="dash-card-title">➕ Add to guestlist</div>
           <div class="dash-card-sub">Browse today's events and add guests</div>
@@ -535,11 +356,18 @@ textarea.input-field {
           <div class="dash-card-title">📋 My guestlist entries</div>
           <div class="dash-card-sub">View and manage your submissions</div>
         </div>
+        <div class="dash-card" onclick="showSection('section-vip')">
+          <div class="dash-card-title">🍾 VIP Table requests</div>
+          <div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div>
+        </div>
         <div id="admin-dash-card" class="dash-card" onclick="showSection('section-admin')" style="display:none;">
           <div class="dash-card-title">📤 Admin export</div>
           <div class="dash-card-sub">Export guestlists per club</div>
         </div>
-
+        <div id="vip-admin-dash-card" class="dash-card" onclick="showSection('section-vip-admin')" style="display:none;">
+          <div class="dash-card-title">💼 VIP Requests — Manage</div>
+          <div class="dash-card-sub">All incoming table requests</div>
+        </div>
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="width:100%; margin-top:12px;">Log out</button>
       </div>
@@ -559,20 +387,45 @@ textarea.input-field {
     <!-- MY GL -->
     <div class="section" id="section-mygl">
       <div class="section-title">My guestlist entries</div>
-      <div class="date-bar">
-        <input type="date" id="mygl-date">
-      </div>
+      <div class="date-bar"><input type="date" id="mygl-date"></div>
       <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:16px;">
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
 
-    <!-- ADMIN -->
+    <!-- ADMIN EXPORT -->
     <div class="section" id="section-admin">
       <div class="section-title">Export per club</div>
-      <div class="date-bar">
-        <input type="date" id="admin-date">
-      </div>
+      <div class="date-bar"><input type="date" id="admin-date"></div>
       <div id="admin-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <!-- VIP TABLES — SELLER VIEW -->
+    <div class="section" id="section-vip">
+      <div class="section-title">VIP Table requests</div>
+      <button class="btn-new-vip" onclick="openVipModal()">🍾 New table request</button>
+      <div class="vip-filter-bar" id="vip-filter-bar">
+        <button class="vip-filter-btn active" onclick="setVipFilter('all',this)">All</button>
+        <button class="vip-filter-btn" onclick="setVipFilter('new',this)">New</button>
+        <button class="vip-filter-btn" onclick="setVipFilter('price_sent',this)">Price sent</button>
+        <button class="vip-filter-btn" onclick="setVipFilter('confirmed',this)">Confirmed</button>
+        <button class="vip-filter-btn" onclick="setVipFilter('paid',this)">Paid</button>
+        <button class="vip-filter-btn" onclick="setVipFilter('cancelled',this)">Cancelled</button>
+      </div>
+      <div id="vip-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <!-- VIP TABLES — EVENT MANAGER VIEW -->
+    <div class="section" id="section-vip-admin" style="display:none;">
+      <div class="section-title">All VIP requests</div>
+      <div class="vip-filter-bar">
+        <button class="vip-filter-btn active" onclick="setVipAdminFilter('all',this)">All</button>
+        <button class="vip-filter-btn" onclick="setVipAdminFilter('new',this)">New</button>
+        <button class="vip-filter-btn" onclick="setVipAdminFilter('price_sent',this)">Price sent</button>
+        <button class="vip-filter-btn" onclick="setVipAdminFilter('confirmed',this)">Confirmed</button>
+        <button class="vip-filter-btn" onclick="setVipAdminFilter('paid',this)">Paid</button>
+        <button class="vip-filter-btn" onclick="setVipAdminFilter('cancelled',this)">Cancelled</button>
+      </div>
+      <div id="vip-admin-list"><div class="loading">Loading…</div></div>
     </div>
 
   </div>
@@ -588,6 +441,9 @@ textarea.input-field {
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl">
       <span class="nav-icon">📋</span>My GL
     </button>
+    <button class="nav-item" onclick="showSection('section-vip')" id="nav-vip">
+      <span class="nav-icon">🍾</span>VIP
+    </button>
     <button class="nav-item" onclick="showSection('section-admin')" id="nav-admin" style="display:none;">
       <span class="nav-icon">📤</span>Export
     </button>
@@ -600,13 +456,10 @@ textarea.input-field {
     <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title" id="modal-club-name">Add to guestlist</div>
     <div class="modal-sub" id="modal-event-info"></div>
-
-    <!-- Single name for email+pax clubs -->
     <div id="modal-single-name-group">
       <label class="form-label">Guest name</label>
       <input type="text" class="input-field" id="modal-guest-name" placeholder="First and last name">
     </div>
-
     <div id="modal-pax-group">
       <label class="form-label">Pax (including guest)</label>
       <select class="input-field" id="modal-pax">
@@ -616,8 +469,6 @@ textarea.input-field {
         <option value="4">+3 (4 total)</option>
       </select>
     </div>
-
-    <!-- Multiple names for name-only clubs -->
     <div id="modal-multi-name-group" style="display:none;">
       <label class="form-label">Total pax</label>
       <select class="input-field" id="modal-pax-count" onchange="renderNameFields()">
@@ -628,17 +479,130 @@ textarea.input-field {
       </select>
       <div id="modal-name-fields" style="margin-top:8px;"></div>
     </div>
-
     <div id="modal-email-group">
       <label class="form-label">Email</label>
       <input type="email" class="input-field" id="modal-email" placeholder="guest@email.com">
     </div>
-
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
-
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
     <div class="msg" id="modal-msg"></div>
+  </div>
+</div>
+
+<!-- VIP REQUEST MODAL -->
+<div class="modal-overlay" id="vip-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeVipModal()">×</button>
+    <div class="modal-title">🍾 New VIP Request</div>
+    <div class="modal-sub" style="margin-bottom:16px;">Fill in the details for your table request</div>
+
+    <!-- Step 1: Venue + Type -->
+    <label class="form-label">Venue</label>
+    <select class="input-field" id="vip-venue" onchange="onVenueChange()">
+      <option value="">— select venue —</option>
+      <option value="Hi Ibiza">Hï Ibiza</option>
+      <option value="Ushuaia">Ushuaïa</option>
+      <option value="UNVRS">UNVRS</option>
+      <option value="Chinois">Chinois</option>
+      <option value="Lio VIP">Lio — VIP Table</option>
+      <option value="Lio Restaurant">Lio — Restaurant</option>
+    </select>
+
+    <!-- Event dropdown (Hi / Ushuaia / UNVRS / Chinois) -->
+    <div id="vip-event-group" style="display:none;">
+      <label class="form-label">Event</label>
+      <select class="input-field" id="vip-event">
+        <option value="">— select event —</option>
+      </select>
+    </div>
+
+    <!-- SHARED FIELDS -->
+    <div id="vip-fields-wrap" style="display:none;">
+
+      <!-- Name (all venues) -->
+      <label class="form-label">Name</label>
+      <input type="text" class="input-field" id="vip-name" placeholder="Guest name">
+
+      <!-- Date (all venues) -->
+      <div id="vip-date-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="input-field" id="vip-date">
+      </div>
+
+      <!-- Time (Lio Restaurant only) -->
+      <div id="vip-time-group" style="display:none;">
+        <label class="form-label">Time</label>
+        <select class="input-field" id="vip-time">
+          <option value="20:30">20:30</option>
+          <option value="21:00">21:00</option>
+          <option value="21:30">21:30</option>
+        </select>
+      </div>
+
+      <!-- Pax (all) -->
+      <label class="form-label">Pax</label>
+      <input type="number" class="input-field" id="vip-pax" placeholder="Number of people" min="1">
+
+      <!-- Ratio (Hi / Ushuaia / UNVRS) -->
+      <div id="vip-ratio-group" style="display:none;">
+        <label class="form-label">Ratio</label>
+        <input type="text" class="input-field" id="vip-ratio" placeholder="e.g. 2M & 3F">
+      </div>
+
+      <!-- Nationality (Hi / Ushuaia / UNVRS) -->
+      <div id="vip-nationality-group" style="display:none;">
+        <label class="form-label">Nationality</label>
+        <input type="text" class="input-field" id="vip-nationality" placeholder="e.g. Spanish, British…">
+      </div>
+
+      <!-- Special occasion (Hi / Ushuaia / UNVRS) -->
+      <div id="vip-occasion-group" style="display:none;">
+        <label class="form-label">Special occasion</label>
+        <input type="text" class="input-field" id="vip-occasion" placeholder="e.g. Birthday, Anniversary…">
+      </div>
+
+      <!-- Budget (all except Lio Restaurant) -->
+      <div id="vip-budget-group">
+        <label class="form-label">Budget</label>
+        <input type="text" class="input-field" id="vip-budget" placeholder="e.g. €2,000 minimum spend">
+      </div>
+
+      <!-- Preferred zone (Chinois / Lio VIP) -->
+      <div id="vip-zone-group" style="display:none;">
+        <label class="form-label">Preferred zone</label>
+        <input type="text" class="input-field" id="vip-zone" placeholder="e.g. Main room, Terrace…">
+      </div>
+
+      <!-- Email (Chinois / Lio) -->
+      <div id="vip-email-group" style="display:none;">
+        <label class="form-label">Email</label>
+        <input type="email" class="input-field" id="vip-email" placeholder="guest@email.com">
+      </div>
+
+      <!-- Phone (Chinois / Lio) -->
+      <div id="vip-phone-group" style="display:none;">
+        <label class="form-label">Phone number</label>
+        <input type="tel" class="input-field" id="vip-phone" placeholder="+34 600 000 000">
+      </div>
+
+      <!-- Dinnershow (Lio Restaurant) -->
+      <div id="vip-dinnershow-group" style="display:none;">
+        <label class="form-label">Dinnershow</label>
+        <select class="input-field" id="vip-dinnershow">
+          <option value="">— select option —</option>
+          <option value="Atrium €200pp">Atrium — €200 per person</option>
+          <option value="Atrium €250pp">Atrium — €250 per person</option>
+          <option value="Spotlight €300pp">Spotlight — €300 per person</option>
+          <option value="Center Stage €600pp">Center Stage — €600 per person</option>
+          <option value="Center Stage €800pp">Center Stage — €800 per person</option>
+          <option value="Center Stage €1000pp">Center Stage — €1,000 per person</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" id="vip-submit" onclick="submitVipRequest()">Send request</button>
+      <div class="msg" id="vip-msg"></div>
+    </div>
   </div>
 </div>
 
@@ -654,40 +618,108 @@ let SELLERS = [];
 let CLUBS = [];
 let EVENTS = [];
 let ENTRIES = [];
+let VIP_REQUESTS = [];
 let CURRENT_EVENT = null;
+let vipFilter = 'all';
+let vipAdminFilter = 'all';
+
+// ── EVENT DATA ──
+const VIP_EVENTS = {
+  "Hi Ibiza": [
+    {name:"Hï Ibiza Opening Party",dates:["2026-04-25"]},
+    {name:"CamelPhat",dates:["2026-05-01","2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
+    {name:"Argy & ARTBAT",dates:["2026-05-07","2026-05-14","2026-05-21","2026-05-28"]},
+    {name:"Paco Osuna presents NOW HERE",dates:["2026-05-17"]},
+    {name:"MEDUZA & James Hype Present Our House",dates:["2026-05-27","2026-06-03","2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-22","2026-07-29","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
+    {name:"Francis Mercier presents Solèy",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
+    {name:"Eastenderz",dates:["2026-06-02","2026-06-09","2026-06-16","2026-06-23","2026-06-30","2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25","2026-09-01","2026-09-08","2026-09-15","2026-09-22","2026-09-29","2026-10-06"]},
+    {name:"Dom Dolla",dates:["2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28"]},
+    {name:"Hugel Presents Make The Girls Dance",dates:["2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]},
+    {name:"MESTIZA",dates:["2026-05-31","2026-06-07","2026-06-14","2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]},
+    {name:"Black Coffee",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]}
+  ],
+  "Ushuaia": [
+    {name:"Ushuaïa Ibiza Opening Party",dates:["2026-04-26"]},
+    {name:"ANTS",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
+    {name:"I Love Reggaeton Ibiza",dates:["2026-05-03","2026-05-10","2026-05-17","2026-05-24","2026-05-31","2026-06-07"]},
+    {name:"Tomorrowland & Dimitri Vegas & Like Mike",dates:["2026-05-06","2026-05-13","2026-05-20","2026-05-27","2026-06-03","2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-29","2026-08-05","2026-08-19","2026-08-26","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
+    {name:"Calvin Harris",dates:["2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
+    {name:"Armin van Buuren",dates:["2026-06-18"]},
+    {name:"F*** Me I'm Famous! by David Guetta",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
+    {name:"Ozuna",dates:["2026-06-16","2026-06-23","2026-06-30"]},
+    {name:"Swedish House Mafia",dates:["2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13"]},
+    {name:"Martin Garrix",dates:["2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]},
+    {name:"Calvin Harris.",dates:["2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25"]},
+    {name:"elrow Ushuaïa Ibiza",dates:["2026-07-22","2026-08-12","2026-09-02"]},
+    {name:"Hugel presents Make the Girls Dance Day",dates:["2026-06-25"]}
+  ],
+  "UNVRS": [
+    {name:"[UNVRS] Opening Party",dates:["2026-04-26"]},
+    {name:"ANTS [UNVRS]",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30"]},
+    {name:"No Art Ibiza",dates:["2026-05-24","2026-09-29"]},
+    {name:"Black Coffee",dates:["2026-05-27","2026-09-22","2026-10-01"]},
+    {name:"John Summit presents Experts Only",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27"]},
+    {name:"elrow Ibiza",dates:["2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
+    {name:"FISHER",dates:["2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10"]},
+    {name:"ANYMA",dates:["2026-06-09","2026-06-16","2026-06-23","2026-06-30","2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25","2026-09-01","2026-09-08","2026-09-15"]},
+    {name:"ANOTR",dates:["2026-06-14"]},
+    {name:"Peggy Gou presents Midnight Lobster Club",dates:["2026-06-12"]},
+    {name:"Carl Cox",dates:["2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]},
+    {name:"David Guetta Presents Galactic Circus",dates:["2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
+    {name:"Jamie Jones presents Paradise: Starship Eden",dates:["2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-22","2026-07-29","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30","2026-10-07"]},
+    {name:"Tiësto",dates:["2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31"]},
+    {name:"Armin van Buuren presents A State of Trance",dates:["2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
+    {name:"Adriatique presents X",dates:["2026-09-17","2026-09-24"]},
+    {name:"Indira Paganotto presents ARTCORE",dates:["2026-10-09"]}
+  ],
+  "Chinois": [
+    {name:"Chinois Presents: Andrea Oliva, Henri Bregmann, Karretero",dates:["2026-04-17"]},
+    {name:"Chinois Presents: Maceo Plex, Husa & Zeyada Live, Bruz",dates:["2026-04-18"]},
+    {name:"Nervous Records: Todd Terry, Josh Wink, Oscar G., Harry Romero",dates:["2026-04-22"]},
+    {name:"IMS DALT VILA AFTERPARTY",dates:["2026-04-24"]},
+    {name:"Meneito: Alvama Ice, Juacko, Sergio Vicedo, Pikkaboy",dates:["2026-04-25"]},
+    {name:"La Troya",dates:["2026-04-26"]},
+    {name:"Chinois Presents: Major League Djz",dates:["2026-05-01"]},
+    {name:"Chinois Presents: Claptone",dates:["2026-05-02"]},
+    {name:"Meneito: Fer Palacio, Pawly, Sergio Vicedo, Pikkaboy",dates:["2026-05-09"]},
+    {name:"TRIP",dates:["2026-04-23","2026-04-30","2026-05-17"]},
+    {name:"Defected",dates:["2026-05-07","2026-05-14","2026-05-21","2026-05-28","2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24","2026-10-01","2026-10-08"]},
+    {name:"Claptone: The Masquerade — Opening Party",dates:["2026-05-16"]},
+    {name:"Claptone: The Masquerade",dates:["2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
+    {name:"Claptone: The Masquerade — Closing Party",dates:["2026-10-10"]},
+    {name:"Major League DJz Presents Echoes of Tomorrow",dates:["2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02","2026-10-09"]},
+    {name:"Bedouin Presents Saga",dates:["2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]}
+  ]
+};
 
 // ── UTILS ──
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
+function today() { return new Date().toISOString().slice(0,10); }
 function formatDate(d) {
   if (!d) return "";
-  const dt = new Date(d);
-  return dt.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" });
+  const dt = new Date(d + 'T12:00:00');
+  return dt.toLocaleDateString("en-GB", { weekday:"short", day:"2-digit", month:"short" });
 }
-function genId() {
-  return "GL-" + Date.now().toString(36).toUpperCase();
-}
+function genId() { return "VIP-" + Date.now().toString(36).toUpperCase(); }
 function deadlineStatus(deadlineStr, eventDate) {
   if (!deadlineStr) return "ok";
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = now.toISOString().slice(0,10);
   if (eventDate !== todayStr) return "ok";
-
-  const [h, m] = deadlineStr.split(":").map(Number);
+  const [h,m] = deadlineStr.split(":").map(Number);
   const deadline = new Date();
-  deadline.setHours(h, m, 0, 0);
-  // handle past midnight deadlines
-  if (h < 6) deadline.setDate(deadline.getDate() + 1);
-
+  deadline.setHours(h,m,0,0);
+  if (h < 6) deadline.setDate(deadline.getDate()+1);
   const diff = deadline - now;
   if (diff < 0) return "closed";
-  if (diff < 60 * 60 * 1000) return "warn";
+  if (diff < 60*60*1000) return "warn";
   return "ok";
 }
-function deadlineLabel(deadlineStr) {
-  if (!deadlineStr) return "";
-  return `Deadline ${deadlineStr}`;
+function deadlineLabel(s) { return s ? `Deadline ${s}` : ""; }
+function statusLabel(s) {
+  return {new:"🆕 New",price_sent:"💬 Price sent",confirmed:"✅ Confirmed",paid:"💰 Paid",cancelled:"❌ Cancelled"}[s] || s;
+}
+function statusClass(s) {
+  return {new:"status-new",price_sent:"status-price_sent",confirmed:"status-confirmed",paid:"status-paid",cancelled:"status-cancelled"}[s] || "status-new";
 }
 
 // ── FETCH ──
@@ -704,26 +736,22 @@ async function post(body) {
 function showSection(id) {
   document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  const sec = document.getElementById(id);
+  if (sec) { sec.classList.add("active"); sec.style.display = "block"; }
   const navMap = {
-    "section-dashboard": "nav-dashboard",
-    "section-events": "nav-events",
-    "section-mygl": "nav-mygl",
-    "section-admin": "nav-admin"
+    "section-dashboard":"nav-dashboard","section-events":"nav-events",
+    "section-mygl":"nav-mygl","section-admin":"nav-admin",
+    "section-vip":"nav-vip","section-vip-admin":"nav-vip"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
 
-  if (id === "section-events") { loadData().then(renderEvents); }
-  if (id === "section-mygl") {
-    loadData().then(renderMyGL);
-    setTimeout(() => {
-      const s = document.getElementById("mygl-search");
-      if (s) s.oninput = renderMyGL;
-    }, 100);
-  }
-  if (id === "section-admin") { loadData().then(renderAdmin); }
-  if (id === "section-dashboard") { loadData().then(renderDashboard); }
+  if (id === "section-events") loadData().then(renderEvents);
+  if (id === "section-mygl") { loadData().then(renderMyGL); setTimeout(()=>{ const s=document.getElementById("mygl-search"); if(s) s.oninput=renderMyGL; },100); }
+  if (id === "section-admin") loadData().then(renderAdmin);
+  if (id === "section-dashboard") loadData().then(renderDashboard);
+  if (id === "section-vip") loadVipRequests().then(renderVipSeller);
+  if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
 }
 
 // ── LOGIN ──
@@ -731,25 +759,20 @@ document.getElementById("login-btn").onclick = async () => {
   const email = document.getElementById("login-email").value.trim().toLowerCase();
   const code = document.getElementById("login-code").value.trim();
   const msg = document.getElementById("login-msg");
-
   if (!email || !code) { msg.textContent = "Fill in both fields."; return; }
   msg.textContent = "Checking…";
-
   try {
     const sellers = await fetchSheet("SELLERS");
     const match = sellers.find(s =>
-      (s.seller_email || "").trim().toLowerCase() === email &&
-      (s.seller_code || "").trim() === code &&
-      (s.status || "").toLowerCase() === "active"
+      (s.seller_email||"").trim().toLowerCase() === email &&
+      (s.seller_code||"").trim() === code &&
+      (s.status||"").toLowerCase() === "active"
     );
     if (!match) { msg.textContent = "Incorrect login details."; return; }
-
     SELLER = match;
     localStorage.setItem("srz_seller", JSON.stringify(match));
     await initApp();
-  } catch(e) {
-    msg.textContent = "Could not connect. Try again.";
-  }
+  } catch(e) { msg.textContent = "Could not connect. Try again."; }
 };
 
 async function initApp() {
@@ -759,24 +782,28 @@ async function initApp() {
   const teamFlag = SELLER.team ? " " + SELLER.team : "";
   document.getElementById("header-user").textContent = SELLER.seller_name + teamFlag;
 
-  if ((SELLER.role || "").toLowerCase() === "admin") {
+  const role = (SELLER.role||"").toLowerCase();
+
+  if (role === "admin") {
     document.getElementById("admin-dash-card").style.display = "block";
     document.getElementById("nav-admin").style.display = "flex";
   }
+  if (role === "event_manager") {
+    document.getElementById("vip-admin-dash-card").style.display = "block";
+    // event_manager gets a VIP manage section
+    document.getElementById("section-vip-admin").style.display = "block";
+  }
 
-  // set default dates
   document.getElementById("events-date-from").value = today();
   document.getElementById("events-date-to").value = today();
   document.getElementById("mygl-date").value = today();
   document.getElementById("admin-date").value = today();
 
-  // date change listeners
   document.getElementById("events-date-from").onchange = renderEvents;
   document.getElementById("events-date-to").onchange = renderEvents;
   document.getElementById("mygl-date").onchange = renderMyGL;
   document.getElementById("admin-date").onchange = renderAdmin;
 
-  // load data
   await loadData();
   renderDashboard();
   checkDeadlines();
@@ -788,112 +815,72 @@ async function setupPushNotifications() {
   try {
     const reg = await navigator.serviceWorker.register("/sw.js");
     const btn = document.getElementById("notif-btn");
-
-    // if permission already granted, auto re-subscribe (works on new device too)
     if (Notification.permission === "granted") {
       const existing = await reg.pushManager.getSubscription();
       if (existing) {
         if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
-        localStorage.setItem("srz_notif_enabled", "1");
-        // always re-register to keep subscription fresh in Redis
-        await fetch(VERCEL_URL + "/api/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ subscription: existing, sellerId: SELLER.seller_id })
-        }).catch(() => {});
+        localStorage.setItem("srz_notif_enabled","1");
+        await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:existing,sellerId:SELLER.seller_id})}).catch(()=>{});
       } else {
-        // permission granted but no subscription - re-subscribe silently
         try {
-          const sub = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-          });
-          await fetch(VERCEL_URL + "/api/subscribe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ subscription: sub, sellerId: SELLER.seller_id })
-          });
+          const sub = await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
+          await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:sub,sellerId:SELLER.seller_id})});
           if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
-          localStorage.setItem("srz_notif_enabled", "1");
+          localStorage.setItem("srz_notif_enabled","1");
         } catch(e) {}
       }
       return;
     }
-
-    // check localStorage for UI state
-    if (localStorage.getItem("srz_notif_enabled") === "1") {
+    if (localStorage.getItem("srz_notif_enabled")==="1") {
       if (btn) { btn.textContent = "✅ Notifications enabled"; btn.disabled = true; }
     }
-  } catch(e) {
-    console.log("SW registration failed:", e);
-  }
+  } catch(e) { console.log("SW registration failed:",e); }
 }
 
 async function enableNotifications() {
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-    alert("Push notifications not supported on this browser.");
-    return;
-  }
+  if (!("serviceWorker" in navigator)||!("PushManager" in window)) { alert("Push notifications not supported on this browser."); return; }
   try {
     const reg = await navigator.serviceWorker.ready;
     const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("Notifications blocked. Please enable in your browser settings.");
-      return;
-    }
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-    const response = await fetch(VERCEL_URL + "/api/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subscription: sub, sellerId: SELLER.seller_id })
-    });
+    if (permission !== "granted") { alert("Notifications blocked. Please enable in your browser settings."); return; }
+    const sub = await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
+    const response = await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:sub,sellerId:SELLER.seller_id})});
     const result = await response.json();
     if (result.ok) {
       document.getElementById("notif-btn").textContent = "✅ Notifications enabled";
       document.getElementById("notif-btn").disabled = true;
-      localStorage.setItem("srz_notif_enabled", "1");
+      localStorage.setItem("srz_notif_enabled","1");
     }
-  } catch(e) {
-    alert("Could not enable notifications: " + e.message);
-  }
+  } catch(e) { alert("Could not enable notifications: "+e.message); }
 }
 
 function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const padding = "=".repeat((4-base64String.length%4)%4);
+  const base64 = (base64String+padding).replace(/-/g,"+").replace(/_/g,"/");
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  for (let i=0;i<rawData.length;++i) outputArray[i]=rawData.charCodeAt(i);
   return outputArray;
 }
 
 async function loadData() {
-  [SELLERS, CLUBS, EVENTS, ENTRIES] = await Promise.all([
-    fetchSheet("SELLERS"),
-    fetchSheet("CLUBS"),
-    fetchSheet("EVENTS"),
-    fetchSheet("GL_ENTRIES")
+  [SELLERS,CLUBS,EVENTS,ENTRIES] = await Promise.all([
+    fetchSheet("SELLERS"), fetchSheet("CLUBS"),
+    fetchSheet("EVENTS"), fetchSheet("GL_ENTRIES")
   ]);
 }
 
-async function refreshData() {
-  await loadData();
+async function loadVipRequests() {
+  VIP_REQUESTS = await fetchSheet("VIP_REQUESTS");
 }
 
 // ── DASHBOARD ──
 function renderDashboard() {
   const t = today();
-  const myEntries = ENTRIES.filter(e =>
-    String(e.seller_id || "").trim() === String(SELLER.seller_id || "").trim() &&
-    (e.status || "").toLowerCase() === "active"
-  );
-  const todayEntries = myEntries.filter(e => (e.date || "").slice(0, 10) === t);
-  const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 7);
-  const weekEntries = myEntries.filter(e => new Date(e.date) >= weekStart);
-
+  const myEntries = ENTRIES.filter(e => String(e.seller_id||"").trim()===String(SELLER.seller_id||"").trim() && (e.status||"").toLowerCase()==="active");
+  const todayEntries = myEntries.filter(e => (e.date||"").slice(0,10)===t);
+  const weekStart = new Date(); weekStart.setDate(weekStart.getDate()-7);
+  const weekEntries = myEntries.filter(e => new Date(e.date)>=weekStart);
   document.getElementById("stat-today").textContent = todayEntries.length;
   document.getElementById("stat-total").textContent = weekEntries.length;
 }
@@ -903,397 +890,460 @@ function renderEvents() {
   const dateFrom = document.getElementById("events-date-from").value || today();
   const dateTo = document.getElementById("events-date-to").value || today();
   const wrap = document.getElementById("events-list");
-
-  const dayEvents = EVENTS.filter(e => {
-    const ed = (e.date || "").slice(0, 10);
-    return ed >= dateFrom && ed <= dateTo && (e.status || "").toLowerCase() !== "inactive";
-  });
-
-  if (!dayEvents.length) {
-    wrap.innerHTML = `<div class="empty">No events for this period.</div>`;
-    return;
-  }
-
-  const club = id => CLUBS.find(c => c.club_id === id) || {};
-
-  // group by date then club
+  const dayEvents = EVENTS.filter(e => { const ed=(e.date||"").slice(0,10); return ed>=dateFrom && ed<=dateTo && (e.status||"").toLowerCase()!=="inactive"; });
+  if (!dayEvents.length) { wrap.innerHTML=`<div class="empty">No events for this period.</div>`; return; }
+  const club = id => CLUBS.find(c=>c.club_id===id)||{};
   const byDateClub = {};
-  dayEvents.forEach(e => {
-    const d = (e.date || "").slice(0, 10);
-    if (!byDateClub[d]) byDateClub[d] = {};
-    if (!byDateClub[d][e.club_id]) byDateClub[d][e.club_id] = [];
-    byDateClub[d][e.club_id].push(e);
-  });
-
+  dayEvents.forEach(e => { const d=(e.date||"").slice(0,10); if(!byDateClub[d])byDateClub[d]={}; if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[]; byDateClub[d][e.club_id].push(e); });
   wrap.innerHTML = Object.keys(byDateClub).sort().map(date => {
     const byClub = byDateClub[date];
     return `<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>` +
-    Object.entries(byClub).map(([clubId, events]) => {
-    const cl = club(clubId);
-    const ds = deadlineStatus(cl.deadline, date);
-    const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
-    const closed = ds === "closed";
-
-    return events.map(ev => {
-      const spotsLeft = parseInt(ev.spots_left) || null;
-      const isFull = spotsLeft !== null && spotsLeft <= 0;
-      const needsEmail = (cl.format || "").includes("email");
-      const freeText = ev.free_condition
-        ? (ev.free_condition.toLowerCase().startsWith("free") ? ev.free_condition : `Free ${ev.free_condition}`)
-        : (ev.price_after ? `€${ev.price_after} ${ev.price_type || ""}` : "Free");
-
-      return `
-        <div class="event-card">
-          <div class="event-card-top">
-            <div>
-              <div class="event-club">${cl.club_name || clubId}</div>
-              ${ev.event_name ? `<div class="event-name">${ev.event_name}</div>` : ""}
-            </div>
-            <div class="deadline-badge ${dsClass}">${closed ? "Closed" : deadlineLabel(cl.deadline)}</div>
-          </div>
-          <div class="event-meta">
-            ${ev.time ? `<span>🕐 ${ev.time}</span>` : ""}
-            <span>🎫 ${freeText}</span>
-            ${spotsLeft !== null ? `<span>👥 ${spotsLeft} spots left</span>` : ""}
-          </div>
-          ${ev.extra_notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>` : ""}
-          <button class="btn-add-gl"
-            ${(closed || isFull) ? "disabled" : ""}
-            onclick="openModal('${ev.event_id}','${clubId}')">
-            ${closed ? "Deadline passed" : isFull ? "Guestlist full" : "+ Add to guestlist"}
-          </button>
-        </div>
-      `;
+    Object.entries(byClub).map(([clubId,events]) => {
+      const cl = club(clubId);
+      const ds = deadlineStatus(cl.deadline,date);
+      const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
+      const closed = ds==="closed";
+      return events.map(ev => {
+        const spotsLeft = parseInt(ev.spots_left)||null;
+        const isFull = spotsLeft!==null && spotsLeft<=0;
+        const freeText = ev.free_condition ? (ev.free_condition.toLowerCase().startsWith("free")?ev.free_condition:`Free ${ev.free_condition}`) : (ev.price_after?`€${ev.price_after} ${ev.price_type||""}`:"Free");
+        return `<div class="event-card"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull)?"disabled":""} onclick="openModal('${ev.event_id}','${clubId}')">${closed?"Deadline passed":isFull?"Guestlist full":"+ Add to guestlist"}</button></div>`;
+      }).join("");
     }).join("");
-  }).join("");
   }).join("");
 }
 
 // ── MY GL ──
 function renderMyGL() {
-  const date = document.getElementById("mygl-date").value || today();
-  const search = (document.getElementById("mygl-search")?.value || "").toLowerCase().trim();
+  const date = document.getElementById("mygl-date").value||today();
+  const search = (document.getElementById("mygl-search")?.value||"").toLowerCase().trim();
   const wrap = document.getElementById("mygl-list");
-
-  const myId = String(SELLER.seller_id || "").trim();
-
-  const managedIds = SELLERS.filter(s => {
-    const mgrs = String(s.manager_id || "").split(",").map(x => x.trim());
-    return mgrs.includes(myId);
-  }).map(s => String(s.seller_id).trim());
-
+  const myId = String(SELLER.seller_id||"").trim();
+  const managedIds = SELLERS.filter(s => { const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim()); return mgrs.includes(myId); }).map(s=>String(s.seller_id).trim());
   const mine = ENTRIES.filter(e => {
-    const sid = String(e.seller_id || "").trim();
-    const matchesDate = (e.date || "").slice(0, 10) === date;
-    const matchesSearch = !search || (e.guest_name || "").toLowerCase().includes(search);
-    const isOwn = sid === myId || managedIds.includes(sid);
-    const status = (e.status || "").toLowerCase();
-    const visible = status !== "deleted";
-    // if searching: ignore date filter
-    if (search) return isOwn && matchesSearch && visible;
-    return isOwn && matchesDate && visible;
+    const sid=String(e.seller_id||"").trim();
+    const matchesDate=(e.date||"").slice(0,10)===date;
+    const matchesSearch=!search||(e.guest_name||"").toLowerCase().includes(search);
+    const isOwn=sid===myId||managedIds.includes(sid);
+    const visible=(e.status||"").toLowerCase()!=="deleted";
+    if (search) return isOwn&&matchesSearch&&visible;
+    return isOwn&&matchesDate&&visible;
   });
-
-  if (!mine.length) {
-    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
-    return;
-  }
-
-  // group by club
+  if (!mine.length) { wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.</div>`; return; }
   const byClub = {};
-  mine.forEach(e => {
-    if (!byClub[e.club_name]) byClub[e.club_name] = [];
-    byClub[e.club_name].push(e);
-  });
-
-  wrap.innerHTML = Object.entries(byClub).map(([clubName, entries]) => `
+  mine.forEach(e => { if(!byClub[e.club_name])byClub[e.club_name]=[]; byClub[e.club_name].push(e); });
+  wrap.innerHTML = Object.entries(byClub).map(([clubName,entries]) => `
     <div class="day-group-label">${clubName} · ${entries.length} entries</div>
-    ${entries.map(e => `
-      <div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled' ? 'opacity:0.5;border-color:rgba(232,25,44,0.3);' : ''}">
-        <div class="gl-card-top">
-          <div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled' ? 'text-decoration:line-through;color:var(--muted);' : ''}">${e.guest_name}</div>
-          <div class="gl-pax" style="${(e.status||'').toLowerCase()==='cancelled' ? 'background:rgba(232,25,44,0.1);' : ''}">+${parseInt(e.pax) - 1 || 0}</div>
-        </div>
-        <div class="gl-meta">
-          📅 ${formatDate(e.date)}${e.email ? ` · 📧 ${e.email}` : ""}${e.notes ? ` · ${e.notes}` : ""}
-        </div>
-        ${String(e.seller_id || "").trim() !== String(SELLER.seller_id || "").trim() ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name || ""}</div>` : ""}
-        ${(e.status||'').toLowerCase()==='cancelled' 
-          ? `<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`
-          : `<button class="gl-delete" onclick="deleteEntry('${e.entry_id}', this)">🗑 Cancel entry</button>`
-        }
-      </div>
-    `).join("")}
+    ${entries.map(e => `<div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled'?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div class="gl-card-top"><div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled'?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</div><div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div><div class="gl-meta">📅 ${formatDate(e.date)}${e.email?` · 📧 ${e.email}`:""}${e.notes?` · ${e.notes}`:""}</div>${String(e.seller_id||"").trim()!==String(SELLER.seller_id||"").trim()?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name||""}</div>`:""} ${(e.status||'').toLowerCase()==='cancelled'?`<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`:`<button class="gl-delete" onclick="deleteEntry('${e.entry_id}',this)">🗑 Cancel entry</button>`}</div>`).join("")}
   `).join("");
 }
 
 async function deleteEntry(entryId, btn) {
-  if (!confirm("Cancel this entry? It will be marked as cancelled so you know to notify the club.")) return;
-  btn.textContent = "Cancelling…";
-  btn.disabled = true;
-
-  ENTRIES = ENTRIES.map(e => e.entry_id === entryId ? { ...e, status: "cancelled" } : e);
-  renderMyGL();
-  renderDashboard();
-
-  post({ action: "cancel_entry", entry_id: entryId });
+  if (!confirm("Cancel this entry?")) return;
+  btn.textContent = "Cancelling…"; btn.disabled = true;
+  ENTRIES = ENTRIES.map(e => e.entry_id===entryId?{...e,status:"cancelled"}:e);
+  renderMyGL(); renderDashboard();
+  post({action:"cancel_entry",entry_id:entryId});
 }
 
 // ── ADMIN EXPORT ──
 function renderAdmin() {
-  if ((SELLER.role || "").toLowerCase() !== "admin") return;
-
-  const date = document.getElementById("admin-date").value || today();
+  if ((SELLER.role||"").toLowerCase()!=="admin") return;
+  const date = document.getElementById("admin-date").value||today();
   const wrap = document.getElementById("admin-list");
-
-  // filter clubs this admin manages
-  const myClubs = CLUBS.filter(c => {
-    const admins = String(c.admin_id || "").split(",").map(x => x.trim());
-    return admins.includes(String(SELLER.seller_id).trim());
-  }).map(c => c.club_id);
-
-  const dayEntries = ENTRIES.filter(e => {
-    const d = (e.date || "").slice(0, 10);
-    return d === date &&
-      (e.status || "").toLowerCase() !== "deleted" &&
-      myClubs.includes(e.club_id);
-  });
-
-  if (!myClubs.length) {
-    wrap.innerHTML = `<div class="empty">No clubs assigned to you.</div>`;
-    return;
-  }
-
-  if (!dayEntries.length) {
-    wrap.innerHTML = `<div class="empty">No entries for ${formatDate(date)}.</div>`;
-    return;
-  }
-
-  // group by club then date
+  const myClubs = CLUBS.filter(c => { const admins=String(c.admin_id||"").split(",").map(x=>x.trim()); return admins.includes(String(SELLER.seller_id).trim()); }).map(c=>c.club_id);
+  const dayEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&(e.status||"").toLowerCase()!=="deleted"&&myClubs.includes(e.club_id); });
+  if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
+  if (!dayEntries.length) { wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.</div>`; return; }
   const byClub = {};
-  dayEntries.forEach(e => {
-    const key = e.club_id || e.club_name;
-    if (!byClub[key]) byClub[key] = { name: e.club_name, entries: [] };
-    byClub[key].entries.push(e);
-  });
-
-  wrap.innerHTML = Object.entries(byClub).map(([clubId, data]) => {
-    const cl = CLUBS.find(c => c.club_id === clubId) || {};
-    const format = cl.format || "name";
-    const ds = deadlineStatus(cl.deadline, date);
-    const dsClass = { ok: "deadline-ok", warn: "deadline-warn", closed: "deadline-closed" }[ds];
-
-    // include cancelled in export so admin knows to notify club
-    const allEntries = ENTRIES.filter(e => {
-      const d = (e.date || "").slice(0, 10);
-      return d === date && myClubs.includes(e.club_id) &&
-        (e.club_id === clubId) &&
-        ["active","cancelled"].includes((e.status||"").toLowerCase());
-    });
-
-    const entryRows = allEntries.map((e, i) => {
-      const isCancelled = (e.status||"").toLowerCase() === "cancelled";
-      const paxNum = parseInt(e.pax) || 1;
-      const plusPax = paxNum > 1 ? ` +${paxNum - 1}` : "";
-      const emailPart = format.includes("email") && e.email ? ` ${e.email}` : "";
-      const line = `${e.guest_name}${plusPax}${emailPart}`;
-      const sentKey = "sent_" + clubId + "_" + date + "_" + e.entry_id;
-      const isSent = localStorage.getItem(sentKey) === "1";
-      const rowOpacity = isCancelled ? "0.5" : (isSent ? "0.4" : "1");
-      const checkbox = !isCancelled
-        ? `<input type="checkbox" ${isSent ? "checked" : ""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`
-        : `<span style="color:#E8192C;font-size:13px;">✕</span>`;
-      const textStyle = isCancelled ? "text-decoration:line-through;color:#E8192C;" : "";
-      const text = isCancelled ? line + " ⚠️ CANCELLED" : line;
+  dayEntries.forEach(e => { const key=e.club_id||e.club_name; if(!byClub[key])byClub[key]={name:e.club_name,entries:[]}; byClub[key].entries.push(e); });
+  wrap.innerHTML = Object.entries(byClub).map(([clubId,data]) => {
+    const cl = CLUBS.find(c=>c.club_id===clubId)||{};
+    const format = cl.format||"name";
+    const ds = deadlineStatus(cl.deadline,date);
+    const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
+    const allEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&myClubs.includes(e.club_id)&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()); });
+    const entryRows = allEntries.map(e => {
+      const isCancelled=(e.status||"").toLowerCase()==="cancelled";
+      const paxNum=parseInt(e.pax)||1; const plusPax=paxNum>1?` +${paxNum-1}`:"";
+      const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
+      const line=`${e.guest_name}${plusPax}${emailPart}`;
+      const sentKey="sent_"+clubId+"_"+date+"_"+e.entry_id;
+      const isSent=localStorage.getItem(sentKey)==="1";
+      const rowOpacity=isCancelled?"0.5":(isSent?"0.4":"1");
+      const checkbox=!isCancelled?`<input type="checkbox" ${isSent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
+      const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
+      const text=isCancelled?line+" ⚠️ CANCELLED":line;
       return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:13px;${textStyle}">${text}</span></div>`;
     }).join("");
-
-    return `
-      <div class="admin-club-card">
-        <div class="admin-club-header">
-          <div>
-            <div class="admin-club-name">${data.name}</div>
-            <div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline) || "No deadline"}${date ? " · " + formatDate(date) : ""}</div>
-          </div>
-          <div class="admin-count">${data.entries.reduce((sum, e) => sum + (parseInt(e.pax) || 1), 0)} pax</div>
-        </div>
-        <div class="export-box" id="export-${clubId}" style="font-family:inherit;">
-          ${entryRows}
-        </div>
-        <button class="btn-copy" onclick="copyExport('${clubId}', this)">📋 Copy list</button>
-      </div>
-    `;
+    return `<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${data.name}</div><div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline)||"No deadline"}${date?" · "+formatDate(date):""}</div></div><div class="admin-count">${data.entries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0)} pax</div></div><div class="export-box" id="export-${clubId}" style="font-family:inherit;">${entryRows}</div><button class="btn-copy" onclick="copyExport('${clubId}',this)">📋 Copy list</button></div>`;
   }).join("");
 }
 
 function copyExport(clubId, btn) {
   const box = document.getElementById(`export-${clubId}`);
-  // only copy non-cancelled (no strikethrough spans)
-  const lines = Array.from(box.querySelectorAll("span")).filter(s => !s.style.textDecoration.includes("line-through")).map(s => s.textContent.trim()).filter(Boolean).join("\n");
-  navigator.clipboard.writeText(lines).then(() => {
-    btn.textContent = "✓ Copied!";
-    btn.classList.add("copied");
-    setTimeout(() => {
-      btn.textContent = "📋 Copy list";
-      btn.classList.remove("copied");
-    }, 2000);
-  });
+  const lines = Array.from(box.querySelectorAll("span")).filter(s=>!s.style.textDecoration.includes("line-through")).map(s=>s.textContent.trim()).filter(Boolean).join("\n");
+  navigator.clipboard.writeText(lines).then(()=>{ btn.textContent="✓ Copied!"; btn.classList.add("copied"); setTimeout(()=>{ btn.textContent="📋 Copy list"; btn.classList.remove("copied"); },2000); });
 }
 
-// ── MODAL ──
+// ── MODAL GL ──
 function openModal(eventId, clubId) {
-  CURRENT_EVENT = EVENTS.find(e => e.event_id === eventId);
-  const cl = CLUBS.find(c => c.club_id === clubId) || {};
-
-  document.getElementById("modal-club-name").textContent = cl.club_name || clubId;
-  document.getElementById("modal-event-info").textContent =
-    (CURRENT_EVENT?.event_name || "") + (CURRENT_EVENT?.time ? ` · ${CURRENT_EVENT.time}` : "");
-
-  const needsEmail = (cl.format || "").includes("email");
-  const needsPax = (cl.format || "").includes("pax");
-  const nameOnly = !needsPax && !needsEmail;
-
-  // show correct mode
-  document.getElementById("modal-single-name-group").style.display = nameOnly ? "none" : "block";
-  document.getElementById("modal-pax-group").style.display = needsPax ? "block" : "none";
-  document.getElementById("modal-email-group").style.display = needsEmail ? "block" : "none";
-  document.getElementById("modal-multi-name-group").style.display = nameOnly ? "block" : "none";
-
-  if (nameOnly) {
-    document.getElementById("modal-pax-count").value = "1";
-    renderNameFields();
-  }
-
-  const maxPax = needsPax ? (parseInt(cl.max_pax_per_email) || 4) : 1;
-  const paxSel = document.getElementById("modal-pax");
-  paxSel.innerHTML = "";
-  for (let i = 1; i <= maxPax; i++) {
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = i === 1 ? "1 (just the guest)" : `+${i-1} (${i} total)`;
-    paxSel.appendChild(opt);
-  }
-
-  document.getElementById("modal-guest-name").value = "";
-  document.getElementById("modal-email").value = "";
-  document.getElementById("modal-notes").value = "";
-  document.getElementById("modal-msg").textContent = "";
-
+  CURRENT_EVENT = EVENTS.find(e=>e.event_id===eventId);
+  const cl = CLUBS.find(c=>c.club_id===clubId)||{};
+  document.getElementById("modal-club-name").textContent = cl.club_name||clubId;
+  document.getElementById("modal-event-info").textContent = (CURRENT_EVENT?.event_name||"")+(CURRENT_EVENT?.time?` · ${CURRENT_EVENT.time}`:"");
+  const needsEmail=(cl.format||"").includes("email");
+  const needsPax=(cl.format||"").includes("pax");
+  const nameOnly=!needsPax&&!needsEmail;
+  document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";
+  document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";
+  document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";
+  document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";
+  if (nameOnly) { document.getElementById("modal-pax-count").value="1"; renderNameFields(); }
+  const maxPax=needsPax?(parseInt(cl.max_pax_per_email)||4):1;
+  const paxSel=document.getElementById("modal-pax"); paxSel.innerHTML="";
+  for(let i=1;i<=maxPax;i++){const opt=document.createElement("option");opt.value=i;opt.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSel.appendChild(opt);}
+  document.getElementById("modal-guest-name").value="";
+  document.getElementById("modal-email").value="";
+  document.getElementById("modal-notes").value="";
+  document.getElementById("modal-msg").textContent="";
   document.getElementById("gl-modal").classList.add("open");
 }
 
+function renderNameFields() {
+  const count=parseInt(document.getElementById("modal-pax-count").value)||1;
+  const wrap=document.getElementById("modal-name-fields");
+  wrap.innerHTML=Array.from({length:count},(_,i)=>`<label class="form-label">Name ${i+1}</label><input type="text" class="input-field modal-multi-name" placeholder="First and last name" style="margin-bottom:8px;">`).join("");
+}
+
+function closeModal() { document.getElementById("gl-modal").classList.remove("open"); CURRENT_EVENT=null; }
+
+document.getElementById("modal-submit").onclick = async () => {
+  const guestName=document.getElementById("modal-guest-name").value.trim();
+  const pax=document.getElementById("modal-pax").value;
+  const email=document.getElementById("modal-email").value.trim();
+  const notes=document.getElementById("modal-notes").value.trim();
+  const msg=document.getElementById("modal-msg");
+  const cl=CLUBS.find(c=>c.club_id===CURRENT_EVENT?.club_id)||{};
+  const needsEmail=(cl.format||"").includes("email");
+  const needsPax=(cl.format||"").includes("pax");
+  const nameOnly=!needsPax&&!needsEmail;
+  if (nameOnly) {
+    const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));
+    const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
+    if (!names.length){msg.textContent="Enter at least one name.";return;}
+    const btn=document.getElementById("modal-submit"); btn.disabled=true; btn.textContent="Adding…";
+    names.forEach(name=>{
+      const entry={entry_id:genId().replace("VIP","GL"),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes:notes,created_at:new Date().toISOString(),status:"active"};
+      ENTRIES.push(entry); post({action:"add_entry",...entry});
+    });
+    closeModal(); renderMyGL(); renderDashboard(); btn.disabled=false; btn.textContent="Add to guestlist";
+    notifyClubAdmins(CURRENT_EVENT.club_id,cl.club_name||CURRENT_EVENT.club_id,names.join(", "),names.length);
+    return;
+  }
+  if (!guestName){msg.textContent="Guest name is required.";return;}
+  if (needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
+  const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax:pax,email:email,notes:notes,created_at:new Date().toISOString(),status:"active"};
+  const btn=document.getElementById("modal-submit"); btn.disabled=true; btn.textContent="Adding…"; msg.textContent="";
+  ENTRIES.push(entry); closeModal(); renderMyGL(); renderDashboard();
+  post({action:"add_entry",...entry}).finally(()=>{btn.disabled=false;btn.textContent="Add to guestlist";});
+  notifyClubAdmins(entry.club_id,entry.club_name,entry.guest_name,entry.pax);
+};
+
 async function notifyClubAdmins(clubId, clubName, guestName, pax) {
   try {
-    const cl = CLUBS.find(c => c.club_id === clubId) || {};
-    const adminIds = String(cl.admin_id || "").split(",").map(x => x.trim()).filter(Boolean);
-    
+    const cl=CLUBS.find(c=>c.club_id===clubId)||{};
+    const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
     for (const adminId of adminIds) {
-      await fetch(VERCEL_URL + "/api/notify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "srz2026secret"
-        },
-        body: JSON.stringify({
-          title: "🎉 New entry — " + clubName,
-          body: guestName + (parseInt(pax) > 1 ? " +" + (parseInt(pax)-1) : "") + " — added by " + SELLER.seller_name,
-          sellerId: adminId
-        })
-      });
+      await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"🎉 New entry — "+clubName,body:guestName+(parseInt(pax)>1?" +"+(parseInt(pax)-1):"")+" — added by "+SELLER.seller_name,sellerId:adminId})});
     }
-  } catch(e) {
-    console.log("Notify failed:", e);
+  } catch(e) { console.log("Notify failed:",e); }
+}
+
+// ── VIP MODAL ──
+function openVipModal() {
+  document.getElementById("vip-venue").value = "";
+  document.getElementById("vip-event-group").style.display = "none";
+  document.getElementById("vip-fields-wrap").style.display = "none";
+  document.getElementById("vip-msg").textContent = "";
+  document.getElementById("vip-modal").classList.add("open");
+}
+
+function closeVipModal() {
+  document.getElementById("vip-modal").classList.remove("open");
+}
+
+function onVenueChange() {
+  const venue = document.getElementById("vip-venue").value;
+  if (!venue) { document.getElementById("vip-event-group").style.display="none"; document.getElementById("vip-fields-wrap").style.display="none"; return; }
+
+  // Show/hide event dropdown
+  const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  document.getElementById("vip-event-group").style.display = hasEvents ? "block" : "none";
+
+  if (hasEvents) {
+    const evSel = document.getElementById("vip-event");
+    evSel.innerHTML = '<option value="">— select event —</option>';
+    const evList = VIP_EVENTS[venue] || [];
+    evList.forEach(ev => {
+      ev.dates.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = `${ev.name}||${d}`;
+        opt.textContent = `${ev.name} — ${formatDate(d)}`;
+        evSel.appendChild(opt);
+      });
+    });
+  }
+
+  // Show fields
+  document.getElementById("vip-fields-wrap").style.display = "block";
+
+  // Reset all optional groups
+  const groups = ["vip-ratio-group","vip-nationality-group","vip-occasion-group","vip-zone-group","vip-email-group","vip-phone-group","vip-time-group","vip-dinnershow-group","vip-budget-group","vip-date-group"];
+  groups.forEach(id => document.getElementById(id).style.display = "none");
+
+  // Show correct fields per venue
+  if (["Hi Ibiza","Ushuaia","UNVRS"].includes(venue)) {
+    ["vip-ratio-group","vip-nationality-group","vip-occasion-group","vip-budget-group"].forEach(id => document.getElementById(id).style.display = "block");
+  }
+  if (venue === "Chinois") {
+    ["vip-budget-group","vip-zone-group","vip-email-group","vip-phone-group"].forEach(id => document.getElementById(id).style.display = "block");
+  }
+  if (venue === "Lio VIP") {
+    ["vip-date-group","vip-budget-group","vip-zone-group","vip-email-group","vip-phone-group"].forEach(id => document.getElementById(id).style.display = "block");
+  }
+  if (venue === "Lio Restaurant") {
+    ["vip-date-group","vip-time-group","vip-email-group","vip-phone-group","vip-dinnershow-group"].forEach(id => document.getElementById(id).style.display = "block");
   }
 }
 
-function renderNameFields() {
-  const count = parseInt(document.getElementById("modal-pax-count").value) || 1;
-  const wrap = document.getElementById("modal-name-fields");
-  wrap.innerHTML = Array.from({length: count}, (_, i) => `
-    <label class="form-label">Name ${i + 1}</label>
-    <input type="text" class="input-field modal-multi-name" placeholder="First and last name" style="margin-bottom:8px;">
-  `).join("");
+async function submitVipRequest() {
+  const venue = document.getElementById("vip-venue").value;
+  const name = document.getElementById("vip-name").value.trim();
+  const pax = document.getElementById("vip-pax").value.trim();
+  const msg = document.getElementById("vip-msg");
+
+  if (!venue) { msg.textContent = "Select a venue."; return; }
+  if (!name) { msg.textContent = "Name is required."; return; }
+  if (!pax) { msg.textContent = "Pax is required."; return; }
+
+  // Get event + date
+  let eventName = "", eventDate = "";
+  const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  if (hasEvents) {
+    const evVal = document.getElementById("vip-event").value;
+    if (!evVal) { msg.textContent = "Select an event."; return; }
+    [eventName, eventDate] = evVal.split("||");
+  } else {
+    eventDate = document.getElementById("vip-date").value;
+    if (!eventDate) { msg.textContent = "Select a date."; return; }
+  }
+
+  const btn = document.getElementById("vip-submit");
+  btn.disabled = true; btn.textContent = "Sending…"; msg.textContent = "";
+
+  const request = {
+    request_id: genId(),
+    seller_id: SELLER.seller_id,
+    seller_name: SELLER.seller_name,
+    venue,
+    event_name: eventName,
+    event_date: eventDate,
+    name,
+    pax,
+    ratio: document.getElementById("vip-ratio").value.trim(),
+    nationality: document.getElementById("vip-nationality").value.trim(),
+    special_occasion: document.getElementById("vip-occasion").value.trim(),
+    budget: document.getElementById("vip-budget").value.trim(),
+    preferred_zone: document.getElementById("vip-zone").value.trim(),
+    email: document.getElementById("vip-email").value.trim(),
+    phone: document.getElementById("vip-phone").value.trim(),
+    time: document.getElementById("vip-time").value,
+    dinnershow: document.getElementById("vip-dinnershow").value,
+    type: venue.includes("Lio") ? (venue.includes("Restaurant") ? "restaurant" : "vip_table") : "vip_table",
+    status: "new",
+    price_info: "",
+    notes: "",
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    await post({action:"add_vip_request", ...request});
+    VIP_REQUESTS.push(request);
+    closeVipModal();
+    renderVipSeller();
+
+    // Notify event_manager
+    await fetch(VERCEL_URL+"/api/notify", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
+      body: JSON.stringify({
+        title: `🍾 New VIP request — ${venue}`,
+        body: `${name} · ${pax} pax · ${eventName||eventDate} — by ${SELLER.seller_name}`,
+        sellerId: "EVENT_MANAGER_ID" // vervang met jouw seller_id
+      })
+    }).catch(()=>{});
+
+    msg.textContent = "✓ Request sent!";
+  } catch(e) {
+    msg.textContent = "Error sending request. Try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Send request";
+  }
 }
 
-function closeModal() {
-  document.getElementById("gl-modal").classList.remove("open");
-  CURRENT_EVENT = null;
+// ── VIP SELLER VIEW ──
+let vipFilterActive = "all";
+function setVipFilter(f, btn) {
+  vipFilterActive = f;
+  document.querySelectorAll("#section-vip .vip-filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderVipSeller();
 }
 
-document.getElementById("modal-submit").onclick = async () => {
-  const guestName = document.getElementById("modal-guest-name").value.trim();
-  const pax = document.getElementById("modal-pax").value;
-  const email = document.getElementById("modal-email").value.trim();
-  const notes = document.getElementById("modal-notes").value.trim();
-  const msg = document.getElementById("modal-msg");
+function renderVipSeller() {
+  const wrap = document.getElementById("vip-list");
+  const myId = String(SELLER.seller_id||"").trim();
+  let reqs = VIP_REQUESTS.filter(r => String(r.seller_id||"").trim() === myId);
+  if (vipFilterActive !== "all") reqs = reqs.filter(r => (r.status||"new") === vipFilterActive);
+  reqs.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
-  const cl = CLUBS.find(c => c.club_id === CURRENT_EVENT?.club_id) || {};
-  const needsEmail = (cl.format || "").includes("email");
-  const needsPax = (cl.format || "").includes("pax");
-  const nameOnly = !needsPax && !needsEmail;
-
-  if (nameOnly) {
-    const nameFields = Array.from(document.querySelectorAll(".modal-multi-name"));
-    const names = nameFields.map(f => f.value.trim()).filter(Boolean);
-    if (!names.length) { msg.textContent = "Enter at least one name."; return; }
-    const btn = document.getElementById("modal-submit");
-    btn.disabled = true; btn.textContent = "Adding…";
-    names.forEach(name => {
-      const entry = {
-        entry_id: genId(), seller_id: SELLER.seller_id, seller_name: SELLER.seller_name,
-        club_id: CURRENT_EVENT.club_id, club_name: cl.club_name || CURRENT_EVENT.club_id,
-        event_id: CURRENT_EVENT.event_id, event_name: CURRENT_EVENT.event_name || "",
-        date: CURRENT_EVENT.date, guest_name: name, pax: 1, email: "", notes: notes,
-        created_at: new Date().toISOString(), status: "active"
-      };
-      ENTRIES.push(entry);
-      post({ action: "add_entry", ...entry });
-    });
-    closeModal(); renderMyGL(); renderDashboard();
-    btn.disabled = false; btn.textContent = "Add to guestlist";
-    notifyClubAdmins(CURRENT_EVENT.club_id, cl.club_name || CURRENT_EVENT.club_id, names.join(", "), names.length);
+  if (!reqs.length) {
+    wrap.innerHTML = `<div class="empty">No requests yet.<br><br>Tap "New table request" to get started.</div>`;
     return;
   }
 
-  if (!guestName) { msg.textContent = "Guest name is required."; return; }
-  if (needsEmail && !email) { msg.textContent = "Email is required for this club."; return; }
+  wrap.innerHTML = reqs.map(r => {
+    const st = r.status || "new";
+    const hasPrice = r.price_info && r.price_info.trim();
+    return `
+      <div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}">
+        <div class="vip-card-top">
+          <div>
+            <div class="vip-venue-name">${r.venue}</div>
+            <div class="vip-event-name">${r.event_name||""} ${r.event_date?'· '+formatDate(r.event_date):""}</div>
+          </div>
+          <div class="vip-status-badge ${statusClass(st)}">${statusLabel(st)}</div>
+        </div>
+        <div class="vip-meta">
+          👤 ${r.name} · 👥 ${r.pax} pax
+          ${r.ratio ? ` · ${r.ratio}` : ""}
+          ${r.nationality ? `<br>🌍 ${r.nationality}` : ""}
+          ${r.special_occasion ? `<br>🎉 ${r.special_occasion}` : ""}
+          ${r.budget ? `<br>💰 ${r.budget}` : ""}
+          ${r.preferred_zone ? `<br>📍 ${r.preferred_zone}` : ""}
+          ${r.email ? `<br>📧 ${r.email}` : ""}
+          ${r.phone ? `<br>📞 ${r.phone}` : ""}
+          ${r.time ? `<br>🕗 ${r.time}` : ""}
+          ${r.dinnershow ? `<br>🎭 ${r.dinnershow}` : ""}
+        </div>
+        ${hasPrice ? `
+          <div class="vip-price-label">💬 Price info from Summerrockz</div>
+          <div class="vip-price-box">${r.price_info}</div>
+        ` : st==="new" ? `<div style="font-size:12px;color:var(--muted);font-style:italic;">Awaiting price info…</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
 
-  const entry = {
-    entry_id: genId(),
-    seller_id: SELLER.seller_id,
-    seller_name: SELLER.seller_name,
-    club_id: CURRENT_EVENT.club_id,
-    club_name: cl.club_name || CURRENT_EVENT.club_id,
-    event_id: CURRENT_EVENT.event_id,
-    event_name: CURRENT_EVENT.event_name || "",
-    date: CURRENT_EVENT.date,
-    guest_name: guestName,
-    pax: pax,
-    email: email,
-    notes: notes,
-    created_at: new Date().toISOString(),
-    status: "active"
-  };
+// ── VIP ADMIN VIEW ──
+let vipAdminFilterActive = "all";
+function setVipAdminFilter(f, btn) {
+  vipAdminFilterActive = f;
+  document.querySelectorAll("#section-vip-admin .vip-filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderVipAdmin();
+}
 
-  const btn = document.getElementById("modal-submit");
-  btn.disabled = true;
-  btn.textContent = "Adding…";
-  msg.textContent = "";
+function renderVipAdmin() {
+  const wrap = document.getElementById("vip-admin-list");
+  let reqs = [...VIP_REQUESTS];
+  if (vipAdminFilterActive !== "all") reqs = reqs.filter(r => (r.status||"new") === vipAdminFilterActive);
+  reqs.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
-  // optimistic
-  ENTRIES.push(entry);
-  closeModal();
-  renderMyGL();
-  renderDashboard();
+  if (!reqs.length) { wrap.innerHTML = `<div class="empty">No requests yet.</div>`; return; }
 
-  post({ action: "add_entry", ...entry }).finally(() => {
+  wrap.innerHTML = reqs.map((r,i) => {
+    const st = r.status || "new";
+    return `
+      <div class="vip-admin-card">
+        <div class="vip-admin-header">
+          <div>
+            <div class="vip-venue-name">${r.venue}</div>
+            <div class="vip-admin-seller">by ${r.seller_name||""} · ${r.event_date?formatDate(r.event_date):""}</div>
+          </div>
+          <select class="status-select" onchange="updateVipStatus('${r.request_id}',this.value,this)">
+            <option value="new" ${st==="new"?"selected":""}>🆕 New</option>
+            <option value="price_sent" ${st==="price_sent"?"selected":""}>💬 Price sent</option>
+            <option value="confirmed" ${st==="confirmed"?"selected":""}>✅ Confirmed</option>
+            <option value="paid" ${st==="paid"?"selected":""}>💰 Paid</option>
+            <option value="cancelled" ${st==="cancelled"?"selected":""}>❌ Cancelled</option>
+          </select>
+        </div>
+
+        <div class="vip-meta" style="margin-bottom:10px;">
+          👤 ${r.name} · 👥 ${r.pax} pax
+          ${r.event_name ? `<br>🎵 ${r.event_name}` : ""}
+          ${r.ratio ? `<br>⚖️ ${r.ratio}` : ""}
+          ${r.nationality ? `<br>🌍 ${r.nationality}` : ""}
+          ${r.special_occasion ? `<br>🎉 ${r.special_occasion}` : ""}
+          ${r.budget ? `<br>💰 Budget: ${r.budget}` : ""}
+          ${r.preferred_zone ? `<br>📍 ${r.preferred_zone}` : ""}
+          ${r.email ? `<br>📧 ${r.email}` : ""}
+          ${r.phone ? `<br>📞 ${r.phone}` : ""}
+          ${r.time ? `<br>🕗 ${r.time}` : ""}
+          ${r.dinnershow ? `<br>🎭 ${r.dinnershow}` : ""}
+        </div>
+
+        <div class="vip-price-label">💬 Price info (plak hier de prijzen)</div>
+        <textarea class="price-textarea" id="price-ta-${r.request_id}" placeholder="Plak hier de WhatsApp prijsinfo van de venue…">${r.price_info||""}</textarea>
+        <button class="btn-save-price" id="price-btn-${r.request_id}" onclick="saveVipPrice('${r.request_id}','${r.seller_id}',this)">
+          💾 Opslaan & seller notificeren
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+async function updateVipStatus(requestId, newStatus, selectEl) {
+  selectEl.disabled = true;
+  try {
+    await post({action:"update_vip_status", request_id:requestId, status:newStatus});
+    VIP_REQUESTS = VIP_REQUESTS.map(r => r.request_id===requestId ? {...r,status:newStatus} : r);
+  } catch(e) { console.error(e); }
+  selectEl.disabled = false;
+}
+
+async function saveVipPrice(requestId, sellerId, btn) {
+  const ta = document.getElementById("price-ta-"+requestId);
+  const priceInfo = ta.value.trim();
+  if (!priceInfo) return;
+
+  btn.disabled = true; btn.textContent = "Saving…";
+
+  try {
+    await post({action:"update_vip_price", request_id:requestId, price_info:priceInfo});
+    VIP_REQUESTS = VIP_REQUESTS.map(r => r.request_id===requestId ? {...r,price_info:priceInfo,status:"price_sent"} : r);
+
+    // Notify the seller
+    await fetch(VERCEL_URL+"/api/notify", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
+      body: JSON.stringify({
+        title: "💬 Price info available!",
+        body: "Your VIP table request has a price update. Open the app to view.",
+        sellerId: sellerId
+      })
+    }).catch(()=>{});
+
+    btn.textContent = "✓ Saved & seller notified!";
+    btn.classList.add("saved");
+    setTimeout(()=>{ btn.textContent="💾 Opslaan & seller notificeren"; btn.classList.remove("saved"); btn.disabled=false; },2500);
+  } catch(e) {
+    btn.textContent = "Error — try again";
     btn.disabled = false;
-    btn.textContent = "Add to guestlist";
-  });
-
-  // notify admins of this club
-  notifyClubAdmins(entry.club_id, entry.club_name, entry.guest_name, entry.pax);
-};
+  }
+}
 
 // ── LOGOUT ──
 document.getElementById("logout-btn").onclick = () => {
@@ -1307,85 +1357,57 @@ document.getElementById("logout-btn").onclick = () => {
 // ── AUTO LOGIN ──
 window.addEventListener("DOMContentLoaded", async () => {
   const saved = localStorage.getItem("srz_seller");
-  if (saved) {
-    SELLER = JSON.parse(saved);
-    await initApp();
-  } else {
-    document.getElementById("access-page").style.display = "flex";
-  }
+  if (saved) { SELLER = JSON.parse(saved); await initApp(); }
+  else { document.getElementById("access-page").style.display = "flex"; }
 });
 
-// close modal on overlay click
-document.getElementById("gl-modal").addEventListener("click", function(e) {
-  if (e.target === this) closeModal();
-});
+document.getElementById("gl-modal").addEventListener("click", function(e) { if(e.target===this) closeModal(); });
+document.getElementById("vip-modal").addEventListener("click", function(e) { if(e.target===this) closeVipModal(); });
 
-// ── DEADLINE NOTIFICATIONS ──
+// ── DEADLINES ──
 function checkDeadlines() {
-  if (!CLUBS || !EVENTS) return;
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
-  const banner = document.getElementById("deadline-banner");
-  if (!banner) return;
-
+  if (!CLUBS||!EVENTS) return;
+  const now = new Date(); const todayStr = now.toISOString().slice(0,10);
+  const banner = document.getElementById("deadline-banner"); if (!banner) return;
   const warnings = [];
-
   CLUBS.forEach(cl => {
     if (!cl.deadline) return;
-    const [h, m] = cl.deadline.split(":").map(Number);
-    const deadline = new Date();
-    deadline.setHours(h, m, 0, 0);
-    if (h < 6) deadline.setDate(deadline.getDate() + 1);
-
-    const diff = deadline - now;
-    if (diff > 0 && diff < 60 * 60 * 1000) {
-      const minsLeft = Math.round(diff / 60000);
-      // check if there are events today for this club
-      const hasEvent = EVENTS.some(ev =>
-        ev.club_id === cl.club_id &&
-        (ev.date || "").slice(0, 10) === todayStr &&
-        (ev.status || "").toLowerCase() !== "inactive"
-      );
-      if (hasEvent) {
-        warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);
-      }
+    const [h,m] = cl.deadline.split(":").map(Number);
+    const deadline = new Date(); deadline.setHours(h,m,0,0);
+    if (h<6) deadline.setDate(deadline.getDate()+1);
+    const diff = deadline-now;
+    if (diff>0&&diff<60*60*1000) {
+      const minsLeft = Math.round(diff/60000);
+      const hasEvent = EVENTS.some(ev=>ev.club_id===cl.club_id&&(ev.date||"").slice(0,10)===todayStr&&(ev.status||"").toLowerCase()!=="inactive");
+      if (hasEvent) warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);
     }
   });
-
-  if (warnings.length) {
-    banner.textContent = warnings.join("  ·  ");
-    banner.style.display = "block";
-  } else {
-    banner.style.display = "none";
-  }
+  if (warnings.length) { banner.textContent=warnings.join("  ·  "); banner.style.display="block"; }
+  else { banner.style.display="none"; }
 }
-
-// Check every minute
 setInterval(checkDeadlines, 60000);
 
 // PULL TO REFRESH
 let pullStartY = 0;
-document.addEventListener("touchstart", e => {
-  if (window.scrollY === 0) pullStartY = e.touches[0].clientY;
-}, { passive: true });
-document.addEventListener("touchend", async e => {
-  const dist = e.changedTouches[0].clientY - pullStartY;
-  if (dist < 80) return;
-  const ind = document.createElement("div");
-  ind.style.cssText = "position:fixed;top:0;left:50%;transform:translateX(-50%);background:#E8192C;color:#fff;font-size:12px;font-weight:600;padding:8px 20px;border-radius:0 0 16px 16px;z-index:9999;";
-  ind.textContent = "Refreshing...";
-  document.body.appendChild(ind);
+document.addEventListener("touchstart",e=>{ if(window.scrollY===0) pullStartY=e.touches[0].clientY; },{passive:true});
+document.addEventListener("touchend",async e=>{
+  const dist=e.changedTouches[0].clientY-pullStartY; if(dist<80) return;
+  const ind=document.createElement("div");
+  ind.style.cssText="position:fixed;top:0;left:50%;transform:translateX(-50%);background:#E8192C;color:#fff;font-size:12px;font-weight:600;padding:8px 20px;border-radius:0 0 16px 16px;z-index:9999;";
+  ind.textContent="Refreshing..."; document.body.appendChild(ind);
   await loadData();
-  const active = document.querySelector(".section.active");
+  const active=document.querySelector(".section.active");
   if (active) {
-    const id = active.id;
-    if (id === "section-events") renderEvents();
-    if (id === "section-mygl") renderMyGL();
-    if (id === "section-admin") renderAdmin();
-    if (id === "section-dashboard") renderDashboard();
+    const id=active.id;
+    if(id==="section-events") renderEvents();
+    if(id==="section-mygl") renderMyGL();
+    if(id==="section-admin") renderAdmin();
+    if(id==="section-dashboard") renderDashboard();
+    if(id==="section-vip") { await loadVipRequests(); renderVipSeller(); }
+    if(id==="section-vip-admin") { await loadVipRequests(); renderVipAdmin(); }
   }
-  setTimeout(() => ind.remove(), 800);
-}, { passive: true });
+  setTimeout(()=>ind.remove(),800);
+},{passive:true});
 </script>
 </body>
 </html>
