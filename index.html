@@ -403,6 +403,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div class="section" id="section-vip">
       <div class="section-title">VIP Table requests</div>
       <button class="btn-new-vip" onclick="openVipModal()">🍾 New table request</button>
+      <input type="text" class="input-field" id="vip-search" placeholder="Search by name…" oninput="renderVipSeller()" style="margin-bottom:12px;">
       <div class="vip-filter-bar" id="vip-filter-bar">
         <button class="vip-filter-btn active" onclick="setVipFilter('all',this)">All</button>
         <button class="vip-filter-btn" onclick="setVipFilter('new',this)">New</button>
@@ -417,6 +418,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <!-- VIP TABLES — EVENT MANAGER VIEW -->
     <div class="section" id="section-vip-admin" style="display:none;">
       <div class="section-title">All VIP requests</div>
+      <input type="text" class="input-field" id="vip-admin-search" placeholder="Search by name or seller…" oninput="renderVipAdmin()" style="margin-bottom:12px;">
       <div class="vip-filter-bar">
         <button class="vip-filter-btn active" onclick="setVipAdminFilter('all',this)">All</button>
         <button class="vip-filter-btn" onclick="setVipAdminFilter('new',this)">New</button>
@@ -1207,8 +1209,10 @@ function setVipFilter(f, btn) {
 function renderVipSeller() {
   const wrap = document.getElementById("vip-list");
   const myId = String(SELLER.seller_id||"").trim();
+  const search = (document.getElementById("vip-search")?.value || "").toLowerCase().trim();
   let reqs = VIP_REQUESTS.filter(r => String(r.seller_id||"").trim() === myId);
   if (vipFilterActive !== "all") reqs = reqs.filter(r => (r.status||"new") === vipFilterActive);
+  if (search) reqs = reqs.filter(r => (r.name||"").toLowerCase().includes(search));
   reqs.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
   if (!reqs.length) {
@@ -1272,8 +1276,13 @@ function renderVipAdmin() {
     return;
   }
   const wrap = document.getElementById("vip-admin-list");
+  const adminSearch = (document.getElementById("vip-admin-search")?.value || "").toLowerCase().trim();
   let reqs = [...VIP_REQUESTS];
   if (vipAdminFilterActive !== "all") reqs = reqs.filter(r => (r.status||"new") === vipAdminFilterActive);
+  if (adminSearch) reqs = reqs.filter(r =>
+    (r.name||"").toLowerCase().includes(adminSearch) ||
+    (r.seller_name||"").toLowerCase().includes(adminSearch)
+  );
   reqs.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
 
   if (!reqs.length) { wrap.innerHTML = `<div class="empty">No requests yet.</div>`; return; }
