@@ -515,9 +515,10 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <!-- Event dropdown (Hi / Ushuaia / UNVRS / Chinois) -->
     <div id="vip-event-group" style="display:none;">
       <label class="form-label">Event</label>
-      <select class="input-field" id="vip-event">
-        <option value="">— select event —</option>
-      </select>
+      <input type="text" class="input-field" id="vip-event-search" placeholder="Search event…" oninput="filterVipEvents()" autocomplete="off" style="margin-bottom:6px;">
+      <div id="vip-event-results" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+      <input type="hidden" id="vip-event" value="">
+      <div id="vip-event-selected" style="display:none;font-size:12px;color:var(--green);margin-bottom:16px;padding:8px 12px;background:rgba(34,197,94,0.08);border-radius:8px;border:1px solid rgba(34,197,94,0.2);"></div>
     </div>
 
     <!-- SHARED FIELDS -->
@@ -1088,20 +1089,23 @@ function onVenueChange() {
   const venue = document.getElementById("vip-venue").value;
   if (!venue) { document.getElementById("vip-event-group").style.display="none"; document.getElementById("vip-fields-wrap").style.display="none"; return; }
 
-  // Show/hide event dropdown
+  // Show/hide event search
   const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
   document.getElementById("vip-event-group").style.display = hasEvents ? "block" : "none";
 
   if (hasEvents) {
-    const evSel = document.getElementById("vip-event");
-    evSel.innerHTML = '<option value="">— select event —</option>';
+    // Reset search
+    document.getElementById("vip-event-search").value = "";
+    document.getElementById("vip-event").value = "";
+    document.getElementById("vip-event-results").style.display = "none";
+    document.getElementById("vip-event-selected").style.display = "none";
+    document.getElementById("vip-event-selected").textContent = "";
+    // Store events for filtering
+    window._currentVipEvents = [];
     const evList = VIP_EVENTS[venue] || [];
     evList.forEach(ev => {
       ev.dates.forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = `${ev.name}||${d}`;
-        opt.textContent = `${ev.name} — ${formatDate(d)}`;
-        evSel.appendChild(opt);
+        window._currentVipEvents.push({ label: `${ev.name} — ${formatDate(d)}`, value: `${ev.name}||${d}` });
       });
     });
   }
@@ -1126,6 +1130,41 @@ function onVenueChange() {
   if (venue === "Lio Restaurant") {
     ["vip-date-group","vip-time-group","vip-email-group","vip-phone-group","vip-dinnershow-group"].forEach(id => document.getElementById(id).style.display = "block");
   }
+}
+
+function filterVipEvents() {
+  const q = (document.getElementById("vip-event-search").value || "").toLowerCase().trim();
+  const results = document.getElementById("vip-event-results");
+  const events = window._currentVipEvents || [];
+
+  if (!q) { results.style.display = "none"; return; }
+
+  const filtered = events.filter(ev => ev.label.toLowerCase().includes(q)).slice(0, 30);
+
+  if (!filtered.length) {
+    results.innerHTML = `<div style="padding:12px 16px;font-size:13px;color:var(--muted);">No events found</div>`;
+    results.style.display = "block";
+    return;
+  }
+
+  results.innerHTML = filtered.map(ev => `
+    <div onclick="selectVipEvent('${ev.value.replace(/'/g,"\\'")}','${ev.label.replace(/'/g,"\\'")}')}"
+      style="padding:12px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;"
+      onmouseenter="this.style.background='rgba(255,255,255,0.05)'"
+      onmouseleave="this.style.background='transparent'">
+      ${ev.label}
+    </div>
+  `).join("");
+  results.style.display = "block";
+}
+
+function selectVipEvent(value, label) {
+  document.getElementById("vip-event").value = value;
+  document.getElementById("vip-event-search").value = "";
+  document.getElementById("vip-event-results").style.display = "none";
+  const sel = document.getElementById("vip-event-selected");
+  sel.textContent = "✓ " + label;
+  sel.style.display = "block";
 }
 
 async function submitVipRequest() {
@@ -1461,9 +1500,9 @@ function openEditVipModal(requestId) {
   // Set event if applicable
   const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(r.venue);
   if (hasEvents && r.event_name && r.event_date) {
-    const evSel = document.getElementById("vip-event");
     const targetVal = `${r.event_name}||${r.event_date}`;
-    Array.from(evSel.options).forEach(o => { if(o.value === targetVal) o.selected = true; });
+    const label = `${r.event_name} — ${formatDate(r.event_date)}`;
+    selectVipEvent(targetVal, label);
   }
 
   document.getElementById("vip-name").value = r.name || "";
