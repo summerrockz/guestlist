@@ -566,6 +566,29 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <label class="form-label">Email</label>
       <input type="email" class="input-field" id="modal-email" placeholder="guest@email.com">
     </div>
+
+    <!-- DRINK PACKAGE (Chinois & Lio) -->
+    <div id="modal-drink-group" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:12px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;cursor:pointer;" onclick="toggleDrinkPackage()">
+        <div id="modal-drink-checkbox" style="width:20px;height:20px;border-radius:6px;border:2px solid rgba(245,158,11,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;"></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--amber);">🍹 Add drink package</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;">Select package & add phone number</div>
+        </div>
+      </div>
+      <div id="modal-drink-fields" style="display:none;">
+        <label class="form-label">Drink package</label>
+        <select class="input-field" id="modal-drink-package">
+          <option value="">— select package —</option>
+          <option value="3x water — €20">3x water — €20</option>
+          <option value="3x beer/wine/soft drinks — €45">3x beer/wine/soft drinks — €45</option>
+          <option value="5x beer/wine/soft drinks — €60">5x beer/wine/soft drinks — €60</option>
+        </select>
+        <label class="form-label">Phone number <span style="color:var(--red);">*</span></label>
+        <input type="tel" class="input-field" id="modal-drink-phone" placeholder="+34 600 000 000">
+      </div>
+    </div>
+
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
@@ -1057,7 +1080,12 @@ function renderAdmin() {
     const ds = deadlineStatus(cl.deadline,date);
     const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
     const allEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&myClubs.includes(e.club_id)&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()); });
-    const entryRows = allEntries.map(e => {
+
+    // Split entries: normal vs drink package
+    const normalEntries = allEntries.filter(e => !(e.notes||"").includes("🍹 Drink package:"));
+    const drinkEntries = allEntries.filter(e => (e.notes||"").includes("🍹 Drink package:"));
+
+    const entryRows = normalEntries.map(e => {
       const isCancelled=(e.status||"").toLowerCase()==="cancelled";
       const paxNum=parseInt(e.pax)||1; const plusPax=paxNum>1?` +${paxNum-1}`:"";
       const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
@@ -1070,7 +1098,37 @@ function renderAdmin() {
       const text=isCancelled?line+" ⚠️ CANCELLED":line;
       return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:13px;${textStyle}">${text}</span></div>`;
     }).join("");
-    return `<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${data.name}</div><div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline)||"No deadline"}${date?" · "+formatDate(date):""}</div></div><div class="admin-count">${data.entries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0)} pax</div></div><div class="export-box" id="export-${clubId}" style="font-family:inherit;">${entryRows}</div><button class="btn-copy" onclick="copyExport('${clubId}',this)">📋 Copy list</button></div>`;
+
+    // Drink package rows — shown separately in amber box
+    const drinkRows = drinkEntries.length ? `
+      <div style="margin-top:12px;padding:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:12px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">🍹 Drink packages</div>
+        ${drinkEntries.map(e => {
+          const isCancelled=(e.status||"").toLowerCase()==="cancelled";
+          const paxNum=parseInt(e.pax)||1; const plusPax=paxNum>1?` +${paxNum-1}`:"";
+          const notes=e.notes||"";
+          const pkgMatch=notes.match(/🍹 Drink package: ([^|]+)/);
+          const phoneMatch=notes.match(/📞 ([^|]+)/);
+          const pkg=pkgMatch?pkgMatch[1].trim():"";
+          const phone=phoneMatch?phoneMatch[1].trim():"";
+          const sentKey="sent_drink_"+clubId+"_"+date+"_"+e.entry_id;
+          const isSent=localStorage.getItem(sentKey)==="1";
+          const checkbox=!isCancelled?`<input type="checkbox" ${isSent?"checked":""} style="width:16px;height:16px;accent-color:#F59E0B;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
+          const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
+          const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
+          return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(245,158,11,0.1);opacity:${isCancelled?"0.5":isSent?"0.4":"1"};">
+            ${checkbox}
+            <div style="${textStyle}">
+              <span style="font-family:monospace;font-size:13px;">${e.guest_name}${plusPax>""?" "+plusPax:""}${emailPart}</span>
+              ${pkg?`<div style="font-size:11px;color:var(--amber);margin-top:2px;">${pkg}</div>`:""}
+              ${phone?`<div style="font-size:11px;color:var(--muted);">📞 ${phone}</div>`:""}
+              ${isCancelled?`<div style="font-size:11px;color:var(--red);">⚠️ CANCELLED</div>`:""}
+            </div>
+          </div>`;
+        }).join("")}
+      </div>` : "";
+
+    return `<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${data.name}</div><div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline)||"No deadline"}${date?" · "+formatDate(date):""}</div></div><div class="admin-count">${data.entries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0)} pax</div></div><div class="export-box" id="export-${clubId}" style="font-family:inherit;">${entryRows}</div>${drinkRows}<button class="btn-copy" onclick="copyExport('${clubId}',this)" style="margin-top:10px;">📋 Copy list</button></div>`;
   }).join("");
 }
 
@@ -1101,6 +1159,31 @@ function openModal(eventId, clubId) {
   document.getElementById("modal-email").value="";
   document.getElementById("modal-notes").value="";
   document.getElementById("modal-msg").textContent="";
+
+  // Drink package — show for Chinois & Lio
+  const hasDrink = ["club_chinois","lio"].includes(clubId);
+  document.getElementById("modal-drink-group").style.display = hasDrink ? "block" : "none";
+  if (hasDrink) {
+    // Reset drink package state
+    window._drinkPackageEnabled = false;
+    document.getElementById("modal-drink-checkbox").innerHTML = "";
+    document.getElementById("modal-drink-checkbox").style.background = "transparent";
+    document.getElementById("modal-drink-fields").style.display = "none";
+    document.getElementById("modal-drink-package").value = "";
+    document.getElementById("modal-drink-phone").value = "";
+    // Set correct packages per club
+    const pkgSel = document.getElementById("modal-drink-package");
+    pkgSel.innerHTML = '<option value="">— select package —</option>';
+    const packages = clubId === "club_chinois" ? [
+      "3x water — €20",
+      "3x beer/wine/soft drinks — €45",
+      "5x beer/wine/soft drinks — €60"
+    ] : [
+      "Drink package (TBC)"
+    ];
+    packages.forEach(p => { const o = document.createElement("option"); o.value = p; o.textContent = p; pkgSel.appendChild(o); });
+  }
+
   document.getElementById("gl-modal").classList.add("open");
 }
 
@@ -1108,6 +1191,28 @@ function renderNameFields() {
   const count=parseInt(document.getElementById("modal-pax-count").value)||1;
   const wrap=document.getElementById("modal-name-fields");
   wrap.innerHTML=Array.from({length:count},(_,i)=>`<label class="form-label">Name ${i+1}</label><input type="text" class="input-field modal-multi-name" placeholder="First and last name" style="margin-bottom:8px;">`).join("");
+}
+
+function toggleDrinkPackage() {
+  window._drinkPackageEnabled = !window._drinkPackageEnabled;
+  const cb = document.getElementById("modal-drink-checkbox");
+  const fields = document.getElementById("modal-drink-fields");
+  if (window._drinkPackageEnabled) {
+    cb.innerHTML = "✓";
+    cb.style.background = "rgba(245,158,11,0.3)";
+    cb.style.color = "var(--amber)";
+    cb.style.fontSize = "13px";
+    cb.style.fontWeight = "700";
+    cb.style.borderColor = "var(--amber)";
+    fields.style.display = "block";
+  } else {
+    cb.innerHTML = "";
+    cb.style.background = "transparent";
+    cb.style.borderColor = "rgba(245,158,11,0.5)";
+    fields.style.display = "none";
+    document.getElementById("modal-drink-package").value = "";
+    document.getElementById("modal-drink-phone").value = "";
+  }
 }
 
 function closeModal() { document.getElementById("gl-modal").classList.remove("open"); CURRENT_EVENT=null; }
@@ -1122,13 +1227,23 @@ document.getElementById("modal-submit").onclick = async () => {
   const needsEmail=(cl.format||"").includes("email");
   const needsPax=(cl.format||"").includes("pax");
   const nameOnly=!needsPax&&!needsEmail;
+
+  // Drink package
+  const drinkEnabled = window._drinkPackageEnabled;
+  const drinkPackage = drinkEnabled ? document.getElementById("modal-drink-package").value : "";
+  const drinkPhone = drinkEnabled ? document.getElementById("modal-drink-phone").value.trim() : "";
+  if (drinkEnabled && !drinkPackage) { msg.textContent = "Select a drink package."; return; }
+  if (drinkEnabled && !drinkPhone) { msg.textContent = "Phone number is required for drink package."; return; }
+  const drinkNote = drinkEnabled ? `🍹 Drink package: ${drinkPackage} | 📞 ${drinkPhone}` : "";
+  const finalNotes = [drinkNote, notes].filter(Boolean).join(" | ");
+
   if (nameOnly) {
     const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));
     const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
     if (!names.length){msg.textContent="Enter at least one name.";return;}
     const btn=document.getElementById("modal-submit"); btn.disabled=true; btn.textContent="Adding…";
     names.forEach(name=>{
-      const entry={entry_id:genId().replace("VIP","GL"),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes:notes,created_at:new Date().toISOString(),status:"active"};
+      const entry={entry_id:genId().replace("VIP","GL"),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes:finalNotes,created_at:new Date().toISOString(),status:"active"};
       ENTRIES.push(entry); post({action:"add_entry",...entry});
     });
     closeModal(); renderMyGL(); renderDashboard(); btn.disabled=false; btn.textContent="Add to guestlist";
@@ -1137,7 +1252,7 @@ document.getElementById("modal-submit").onclick = async () => {
   }
   if (!guestName){msg.textContent="Guest name is required.";return;}
   if (needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
-  const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax:pax,email:email,notes:notes,created_at:new Date().toISOString(),status:"active"};
+  const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax:pax,email:email,notes:finalNotes,created_at:new Date().toISOString(),status:"active"};
   const btn=document.getElementById("modal-submit"); btn.disabled=true; btn.textContent="Adding…"; msg.textContent="";
   ENTRIES.push(entry); closeModal(); renderMyGL(); renderDashboard();
   post({action:"add_entry",...entry}).finally(()=>{btn.disabled=false;btn.textContent="Add to guestlist";});
