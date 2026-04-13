@@ -734,7 +734,10 @@ async function post(body) {
 
 // ── NAV ──
 function showSection(id) {
-  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".section").forEach(s => {
+    s.classList.remove("active");
+    s.style.display = "none";
+  });
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   const sec = document.getElementById(id);
   if (sec) { sec.classList.add("active"); sec.style.display = "block"; }
@@ -1215,7 +1218,8 @@ function renderVipSeller() {
 
   wrap.innerHTML = reqs.map(r => {
     const st = r.status || "new";
-    const hasPrice = r.price_info && r.price_info.trim();
+    const priceInfo = (r.price_info || "").trim();
+    const hasPrice = priceInfo.length > 0;
     return `
       <div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}">
         <div class="vip-card-top">
@@ -1239,8 +1243,8 @@ function renderVipSeller() {
         </div>
         ${hasPrice ? `
           <div class="vip-price-label">💬 Price info from Summerrockz</div>
-          <div class="vip-price-box">${r.price_info}</div>
-        ` : st==="new" ? `<div style="font-size:12px;color:var(--muted);font-style:italic;">Awaiting price info…</div>` : ""}
+          <div class="vip-price-box">${priceInfo}</div>
+        ` : st==="new" ? `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>` : ""}
       </div>
     `;
   }).join("");
@@ -1263,8 +1267,13 @@ function renderVipAdmin() {
 
   if (!reqs.length) { wrap.innerHTML = `<div class="empty">No requests yet.</div>`; return; }
 
-  wrap.innerHTML = reqs.map((r,i) => {
+  // Sla op voor copy functie
+  window._vipRequestsMap = {};
+  VIP_REQUESTS.forEach(r => window._vipRequestsMap[r.request_id] = r);
+
+  wrap.innerHTML = reqs.map(r => {
     const st = r.status || "new";
+    const priceInfo = (r.price_info || "").trim();
     return `
       <div class="vip-admin-card">
         <div class="vip-admin-header">
@@ -1287,7 +1296,7 @@ function renderVipAdmin() {
           ${r.ratio ? `<br>⚖️ ${r.ratio}` : ""}
           ${r.nationality ? `<br>🌍 ${r.nationality}` : ""}
           ${r.special_occasion ? `<br>🎉 ${r.special_occasion}` : ""}
-          ${r.budget ? `<br>💰 Budget: ${r.budget}` : ""}
+          ${r.budget ? `<br>💰 ${r.budget}` : ""}
           ${r.preferred_zone ? `<br>📍 ${r.preferred_zone}` : ""}
           ${r.email ? `<br>📧 ${r.email}` : ""}
           ${r.phone ? `<br>📞 ${r.phone}` : ""}
@@ -1295,14 +1304,46 @@ function renderVipAdmin() {
           ${r.dinnershow ? `<br>🎭 ${r.dinnershow}` : ""}
         </div>
 
+        <button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipRequest('${r.request_id}')" style="margin-bottom:12px;">
+          📋 Copy request
+        </button>
+
         <div class="vip-price-label">💬 Price info (plak hier de prijzen)</div>
-        <textarea class="price-textarea" id="price-ta-${r.request_id}" placeholder="Plak hier de WhatsApp prijsinfo van de venue…">${r.price_info||""}</textarea>
+        <textarea class="price-textarea" id="price-ta-${r.request_id}" placeholder="Plak hier de WhatsApp prijsinfo van de venue…">${priceInfo}</textarea>
         <button class="btn-save-price" id="price-btn-${r.request_id}" onclick="saveVipPrice('${r.request_id}','${r.seller_id}',this)">
           💾 Opslaan & seller notificeren
         </button>
       </div>
     `;
   }).join("");
+}
+
+function copyVipRequest(requestId) {
+  const r = window._vipRequestsMap && window._vipRequestsMap[requestId];
+  if (!r) return;
+
+  const isHiUshuaiaUnvrs = ["Hi Ibiza","Ushuaia","UNVRS"].includes(r.venue);
+  const isLioRestaurant = r.venue === "Lio Restaurant";
+  const dateStr = r.event_date ? formatDate(r.event_date) : "";
+  let text = "";
+
+  if (isHiUshuaiaUnvrs) {
+    text = `Name: ${r.name||""}\nClub: ${r.venue||""}\nEvent: ${r.event_name||""}\nDate: ${dateStr}\nPax: ${r.pax||""}\nRatio: ${r.ratio||""}\nNationality: ${r.nationality||""}\nSpecial occasion: ${r.special_occasion||""}\nBudget: ${r.budget||""}`;
+  } else if (isLioRestaurant) {
+    text = `Name: ${r.name||""}\nClub: Lio\nDate: ${dateStr}\nTime: ${r.time||""}\nPax: ${r.pax||""}\nEmail: ${r.email||""}\nPhone number: ${r.phone||""}\nDinnershow: ${r.dinnershow||""}`;
+  } else {
+    // Chinois & Lio VIP
+    text = `Name: ${r.name||""}\nClub: ${r.venue==="Lio VIP"?"Lio":r.venue}\nEvent: ${r.event_name||""}\nDate: ${dateStr}\nPax: ${r.pax||""}\nBudget: ${r.budget||""}\nPreferred zone: ${r.preferred_zone||""}\nEmail: ${r.email||""}\nPhone number: ${r.phone||""}`;
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copy-btn-" + requestId);
+    if (btn) {
+      btn.textContent = "✓ Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "📋 Copy request"; btn.classList.remove("copied"); }, 2000);
+    }
+  });
 }
 
 async function updateVipStatus(requestId, newStatus, selectEl) {
