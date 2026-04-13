@@ -381,6 +381,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <span style="color:var(--muted);font-size:12px;">→</span>
         <input type="date" id="events-date-to">
       </div>
+      <input type="text" class="input-field" id="events-search" placeholder="Search event or venue…" oninput="renderEvents()" style="margin-bottom:16px;">
       <div id="events-list"><div class="loading">Loading events…</div></div>
     </div>
 
@@ -894,10 +895,15 @@ function renderDashboard() {
 function renderEvents() {
   const dateFrom = document.getElementById("events-date-from").value || today();
   const dateTo = document.getElementById("events-date-to").value || today();
+  const search = (document.getElementById("events-search")?.value || "").toLowerCase().trim();
   const wrap = document.getElementById("events-list");
-  const dayEvents = EVENTS.filter(e => { const ed=(e.date||"").slice(0,10); return ed>=dateFrom && ed<=dateTo && (e.status||"").toLowerCase()!=="inactive"; });
-  if (!dayEvents.length) { wrap.innerHTML=`<div class="empty">No events for this period.</div>`; return; }
   const club = id => CLUBS.find(c=>c.club_id===id)||{};
+  let dayEvents = EVENTS.filter(e => { const ed=(e.date||"").slice(0,10); return ed>=dateFrom && ed<=dateTo && (e.status||"").toLowerCase()!=="inactive"; });
+  if (search) dayEvents = dayEvents.filter(e => {
+    const cl = club(e.club_id);
+    return (e.event_name||"").toLowerCase().includes(search) || (cl.club_name||"").toLowerCase().includes(search);
+  });
+  if (!dayEvents.length) { wrap.innerHTML=`<div class="empty">No events for this period.</div>`; return; }
   const byDateClub = {};
   dayEvents.forEach(e => { const d=(e.date||"").slice(0,10); if(!byDateClub[d])byDateClub[d]={}; if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[]; byDateClub[d][e.club_id].push(e); });
   wrap.innerHTML = Object.keys(byDateClub).sort().map(date => {
@@ -1256,6 +1262,12 @@ function renderVipSeller() {
             📋 Copy prices
           </button>
         ` : st==="new" ? `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>` : ""}
+        ${st !== "cancelled" ? `
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button>
+            <button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}', this)">✕ Cancel</button>
+          </div>
+        ` : ""}
       </div>
     `;
   }).join("");
@@ -1328,11 +1340,15 @@ function renderVipAdmin() {
           📋 Copy request
         </button>
 
-        <div class="vip-price-label">💬 Price info (plak hier de prijzen)</div>
-        <textarea class="price-textarea" id="price-ta-${r.request_id}" placeholder="Plak hier de WhatsApp prijsinfo van de venue…">${priceInfo}</textarea>
+        <div class="vip-price-label">💬 Price info (paste price info here)</div>
+        <textarea class="price-textarea" id="price-ta-${r.request_id}" placeholder="Paste the WhatsApp price info from the venue…">${priceInfo}</textarea>
         <button class="btn-save-price" id="price-btn-${r.request_id}" onclick="saveVipPrice('${r.request_id}','${r.seller_id}',this)">
-          💾 Opslaan & seller notificeren
+          💾 Save & notify seller
         </button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button>
+          ${st !== "cancelled" ? `<button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}',this)">✕ Cancel request</button>` : ""}
+        </div>
       </div>
     `;
   }).join("");
@@ -1402,7 +1418,6 @@ async function saveVipPrice(requestId, sellerId, btn) {
     await post({action:"update_vip_price", request_id:requestId, price_info:priceInfo});
     VIP_REQUESTS = VIP_REQUESTS.map(r => r.request_id===requestId ? {...r,price_info:priceInfo,status:"price_sent"} : r);
 
-    // Notify the seller
     await fetch(VERCEL_URL+"/api/notify", {
       method:"POST",
       headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
@@ -1415,10 +1430,113 @@ async function saveVipPrice(requestId, sellerId, btn) {
 
     btn.textContent = "✓ Saved & seller notified!";
     btn.classList.add("saved");
-    setTimeout(()=>{ btn.textContent="💾 Opslaan & seller notificeren"; btn.classList.remove("saved"); btn.disabled=false; },2500);
+    setTimeout(()=>{ btn.textContent="💾 Save & notify seller"; btn.classList.remove("saved"); btn.disabled=false; },2500);
   } catch(e) {
     btn.textContent = "Error — try again";
     btn.disabled = false;
+  }
+}
+
+async function cancelVipRequest(requestId, btn) {
+  if (!confirm("Cancel this request?")) return;
+  btn.disabled = true; btn.textContent = "Cancelling…";
+  try {
+    await post({action:"update_vip_status", request_id:requestId, status:"cancelled"});
+    VIP_REQUESTS = VIP_REQUESTS.map(r => r.request_id===requestId ? {...r,status:"cancelled"} : r);
+    const isAdmin = String(SELLER.seller_id).trim() === "1";
+    isAdmin ? renderVipAdmin() : renderVipSeller();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = "✕ Cancel";
+  }
+}
+
+function openEditVipModal(requestId) {
+  const r = window._vipRequestsMap && window._vipRequestsMap[requestId];
+  if (!r) return;
+
+  // Pre-fill the existing VIP modal with current values
+  document.getElementById("vip-venue").value = r.venue;
+  onVenueChange();
+
+  // Set event if applicable
+  const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(r.venue);
+  if (hasEvents && r.event_name && r.event_date) {
+    const evSel = document.getElementById("vip-event");
+    const targetVal = `${r.event_name}||${r.event_date}`;
+    Array.from(evSel.options).forEach(o => { if(o.value === targetVal) o.selected = true; });
+  }
+
+  document.getElementById("vip-name").value = r.name || "";
+  document.getElementById("vip-date").value = r.event_date || "";
+  document.getElementById("vip-pax").value = r.pax || "";
+  document.getElementById("vip-ratio").value = r.ratio || "";
+  document.getElementById("vip-nationality").value = r.nationality || "";
+  document.getElementById("vip-occasion").value = r.special_occasion || "";
+  document.getElementById("vip-budget").value = r.budget || "";
+  document.getElementById("vip-zone").value = r.preferred_zone || "";
+  document.getElementById("vip-email").value = r.email || "";
+  document.getElementById("vip-phone").value = r.phone || "";
+  document.getElementById("vip-time").value = r.time || "20:30";
+  document.getElementById("vip-dinnershow").value = r.dinnershow || "";
+  document.getElementById("vip-msg").textContent = "";
+
+  // Change submit button to update mode
+  const btn = document.getElementById("vip-submit");
+  btn.textContent = "Update request";
+  btn.onclick = () => updateVipRequest(requestId);
+
+  document.getElementById("vip-modal").classList.add("open");
+}
+
+async function updateVipRequest(requestId) {
+  const venue = document.getElementById("vip-venue").value;
+  const name = document.getElementById("vip-name").value.trim();
+  const pax = document.getElementById("vip-pax").value.trim();
+  const msg = document.getElementById("vip-msg");
+
+  if (!name) { msg.textContent = "Name is required."; return; }
+  if (!pax) { msg.textContent = "Pax is required."; return; }
+
+  let eventName = "", eventDate = "";
+  const hasEvents = ["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  if (hasEvents) {
+    const evVal = document.getElementById("vip-event").value;
+    if (!evVal) { msg.textContent = "Select an event."; return; }
+    [eventName, eventDate] = evVal.split("||");
+  } else {
+    eventDate = document.getElementById("vip-date").value;
+  }
+
+  const btn = document.getElementById("vip-submit");
+  btn.disabled = true; btn.textContent = "Updating…"; msg.textContent = "";
+
+  const updates = {
+    action: "update_vip_request",
+    request_id: requestId,
+    venue, event_name: eventName, event_date: eventDate, name, pax,
+    ratio: document.getElementById("vip-ratio").value.trim(),
+    nationality: document.getElementById("vip-nationality").value.trim(),
+    special_occasion: document.getElementById("vip-occasion").value.trim(),
+    budget: document.getElementById("vip-budget").value.trim(),
+    preferred_zone: document.getElementById("vip-zone").value.trim(),
+    email: document.getElementById("vip-email").value.trim(),
+    phone: document.getElementById("vip-phone").value.trim(),
+    time: document.getElementById("vip-time").value,
+    dinnershow: document.getElementById("vip-dinnershow").value,
+  };
+
+  try {
+    await post(updates);
+    VIP_REQUESTS = VIP_REQUESTS.map(r => r.request_id===requestId ? {...r, ...updates} : r);
+    closeVipModal();
+    const isAdmin = String(SELLER.seller_id).trim() === "1";
+    isAdmin ? renderVipAdmin() : renderVipSeller();
+  } catch(e) {
+    msg.textContent = "Error updating. Try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Update request";
+    // Reset submit button back to create mode
+    btn.onclick = submitVipRequest;
   }
 }
 
