@@ -305,6 +305,38 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .detail-row:last-child { border-bottom: none; }
 .detail-label { color: var(--muted); }
 .detail-value { font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+
+/* ── CALENDAR ── */
+.cal-day-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 2px 3px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  min-height: 44px;
+}
+.cal-day-cell:hover { background: rgba(255,255,255,0.06); }
+.cal-day-cell.other-month { opacity: 0.2; cursor: default; }
+.cal-day-cell.today .cal-day-num {
+  background: var(--red);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.cal-day-cell.selected { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+.cal-day-num { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; line-height: 22px; }
+.cal-dots { display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -400,6 +432,51 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
 
+    <!-- CALENDAR -->
+    <div class="section" id="section-calendar">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <button onclick="calPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">‹</button>
+        <div id="cal-title" style="font-size:14px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;"></div>
+        <button onclick="calNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">›</button>
+      </div>
+
+      <!-- Weekday headers -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Mo</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Tu</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">We</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Th</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Fr</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Sa</div>
+        <div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">Su</div>
+      </div>
+
+      <!-- Calendar grid -->
+      <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px;"></div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:16px;margin-bottom:16px;font-size:11px;color:var(--muted);">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:4px;vertical-align:middle;"></span>Event</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle;"></span>My GL entry</span>
+      </div>
+
+      <!-- Day detail popup -->
+      <div id="cal-detail" style="display:none;">
+        <div id="cal-detail-title" style="font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;"></div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button onclick="calShowMyGL()" id="cal-btn-mygl"
+            style="flex:1;padding:10px;border-radius:999px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;">
+            📋 My GL
+          </button>
+          <button onclick="calShowEvents()" id="cal-btn-events"
+            style="flex:1;padding:10px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;">
+            🎉 Events
+          </button>
+        </div>
+        <div id="cal-detail-content"></div>
+      </div>
+    </div>
+
     <!-- VIP TABLES — SELLER VIEW -->
     <div class="section" id="section-vip">
       <div class="section-title">VIP Table requests</div>
@@ -443,6 +520,9 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     </button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl">
       <span class="nav-icon">📋</span>My GL
+    </button>
+    <button class="nav-item" onclick="showSection('section-calendar')" id="nav-calendar">
+      <span class="nav-icon">📅</span>Calendar
     </button>
     <button class="nav-item" onclick="showSection('section-vip')" id="nav-vip">
       <span class="nav-icon">🍾</span>VIP
@@ -748,7 +828,8 @@ function showSection(id) {
   const navMap = {
     "section-dashboard":"nav-dashboard","section-events":"nav-events",
     "section-mygl":"nav-mygl","section-admin":"nav-admin",
-    "section-vip":"nav-vip","section-vip-admin":"nav-vip"
+    "section-vip":"nav-vip","section-vip-admin":"nav-vip",
+    "section-calendar":"nav-calendar"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
@@ -760,6 +841,7 @@ function showSection(id) {
   if (id === "section-vip") loadVipRequests().then(renderVipSeller);
   if (id === "section-vip-admin" && String(SELLER.seller_id).trim() !== "1") return;
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
+  if (id === "section-calendar") loadData().then(renderCalendar);
 }
 
 // ── LOGIN ──
@@ -1579,7 +1661,207 @@ async function updateVipRequest(requestId) {
   }
 }
 
-// ── LOGOUT ──
+// ── CALENDAR ──
+let calYear, calMonth, calSelectedDate = null, calActiveView = null;
+
+function renderCalendar() {
+  const now = new Date();
+  if (!calYear) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("cal-title").textContent = MONTHS[calMonth] + " " + calYear;
+
+  // Build event dates map
+  const eventDates = new Set();
+  EVENTS.forEach(ev => {
+    if ((ev.status||"").toLowerCase() !== "inactive") {
+      const d = (ev.date||"").slice(0,10);
+      if (d) eventDates.add(d);
+    }
+  });
+
+  // Build my GL dates map
+  const myId = String(SELLER.seller_id||"").trim();
+  const myGLDates = new Set();
+  ENTRIES.forEach(e => {
+    if (String(e.seller_id||"").trim() === myId && (e.status||"").toLowerCase() === "active") {
+      const d = (e.date||"").slice(0,10);
+      if (d) myGLDates.add(d);
+    }
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth + 1, 0);
+  const startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Mon=0
+  const daysInMonth = lastDay.getDate();
+  const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
+  const todayStr = today();
+
+  let html = "";
+
+  // Previous month padding
+  for (let i = startDow - 1; i >= 0; i--) {
+    const dayNum = daysInPrevMonth - i;
+    html += `<div class="cal-day-cell other-month"><div class="cal-day-num">${dayNum}</div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === calSelectedDate;
+    const hasEvent = eventDates.has(dateStr);
+    const hasGL = myGLDates.has(dateStr);
+
+    const dots = [
+      hasEvent ? `<div class="cal-dot" style="background:var(--red);"></div>` : "",
+      hasGL ? `<div class="cal-dot" style="background:var(--green);"></div>` : ""
+    ].join("");
+
+    html += `
+      <div class="cal-day-cell${isToday?" today":""}${isSelected?" selected":""}"
+        onclick="calSelectDay('${dateStr}')">
+        <div class="cal-day-num">${d}</div>
+        ${dots ? `<div class="cal-dots">${dots}</div>` : ""}
+      </div>`;
+  }
+
+  // Next month padding
+  const totalCells = startDow + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-day-cell other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  document.getElementById("cal-grid").innerHTML = html;
+
+  // Restore selected day detail if any
+  if (calSelectedDate) {
+    document.getElementById("cal-detail").style.display = "block";
+    if (calActiveView === "mygl") calShowMyGL();
+    else if (calActiveView === "events") calShowEvents();
+  }
+}
+
+function calSelectDay(dateStr) {
+  calSelectedDate = dateStr;
+  calActiveView = null;
+  document.getElementById("cal-detail").style.display = "block";
+  document.getElementById("cal-detail-title").textContent = formatDate(dateStr);
+  document.getElementById("cal-detail-content").innerHTML = "";
+  // Re-render to show selection
+  renderCalendar();
+  // Scroll to detail
+  setTimeout(() => document.getElementById("cal-detail").scrollIntoView({behavior:"smooth",block:"nearest"}), 100);
+}
+
+function calShowMyGL() {
+  calActiveView = "mygl";
+  const myId = String(SELLER.seller_id||"").trim();
+  const managedIds = SELLERS.filter(s => {
+    const mgrs = String(s.manager_id||"").split(",").map(x=>x.trim());
+    return mgrs.includes(myId);
+  }).map(s => String(s.seller_id).trim());
+
+  const entries = ENTRIES.filter(e => {
+    const sid = String(e.seller_id||"").trim();
+    const isOwn = sid === myId || managedIds.includes(sid);
+    return (e.date||"").slice(0,10) === calSelectedDate && isOwn && (e.status||"").toLowerCase() !== "deleted";
+  });
+
+  const wrap = document.getElementById("cal-detail-content");
+
+  if (!entries.length) {
+    wrap.innerHTML = `<div class="empty" style="padding:20px;">No entries for this day.</div>`;
+    return;
+  }
+
+  const byClub = {};
+  entries.forEach(e => {
+    if (!byClub[e.club_name]) byClub[e.club_name] = [];
+    byClub[e.club_name].push(e);
+  });
+
+  wrap.innerHTML = Object.entries(byClub).map(([clubName, ents]) => `
+    <div class="day-group-label">${clubName} · ${ents.length} entries</div>
+    ${ents.map(e => `
+      <div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled'?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}">
+        <div class="gl-card-top">
+          <div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled'?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</div>
+          <div class="gl-pax">+${parseInt(e.pax)-1||0}</div>
+        </div>
+        <div class="gl-meta">${e.email?`📧 ${e.email} · `:""}${e.notes||""}</div>
+        ${String(e.seller_id||"").trim() !== myId ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name||""}</div>` : ""}
+        ${(e.status||'').toLowerCase()==='cancelled' ? `<div style="font-size:11px;color:var(--red);margin-top:4px;">⚠️ Cancelled</div>` : ""}
+      </div>
+    `).join("")}
+  `).join("");
+}
+
+function calShowEvents() {
+  calActiveView = "events";
+  const dayEvents = EVENTS.filter(e =>
+    (e.date||"").slice(0,10) === calSelectedDate &&
+    (e.status||"").toLowerCase() !== "inactive"
+  );
+
+  const wrap = document.getElementById("cal-detail-content");
+
+  if (!dayEvents.length) {
+    wrap.innerHTML = `<div class="empty" style="padding:20px;">No events this day.</div>`;
+    return;
+  }
+
+  const club = id => CLUBS.find(c => c.club_id === id) || {};
+
+  wrap.innerHTML = dayEvents.map(ev => {
+    const cl = club(ev.club_id);
+    const ds = deadlineStatus(cl.deadline, calSelectedDate);
+    const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
+    const closed = ds === "closed";
+    const spotsLeft = parseInt(ev.spots_left)||null;
+    const isFull = spotsLeft !== null && spotsLeft <= 0;
+    const freeText = ev.free_condition
+      ? (ev.free_condition.toLowerCase().startsWith("free") ? ev.free_condition : `Free ${ev.free_condition}`)
+      : (ev.price_after ? `€${ev.price_after} ${ev.price_type||""}` : "Free");
+    return `
+      <div class="event-card">
+        <div class="event-card-top">
+          <div>
+            <div class="event-club">${cl.club_name||ev.club_id}</div>
+            ${ev.event_name ? `<div class="event-name">${ev.event_name}</div>` : ""}
+          </div>
+          <div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div>
+        </div>
+        <div class="event-meta">
+          ${ev.time ? `<span>🕐 ${ev.time}</span>` : ""}
+          <span>🎫 ${freeText}</span>
+          ${spotsLeft !== null ? `<span>👥 ${spotsLeft} spots left</span>` : ""}
+        </div>
+        <button class="btn-add-gl" ${(closed||isFull)?"disabled":""}
+          onclick="openModal('${ev.event_id}','${ev.club_id}')">
+          ${closed?"Deadline passed":isFull?"Guestlist full":"+ Add to guestlist"}
+        </button>
+      </div>`;
+  }).join("");
+}
+
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  calSelectedDate = null;
+  calActiveView = null;
+  document.getElementById("cal-detail").style.display = "none";
+  renderCalendar();
+}
+
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  calSelectedDate = null;
+  calActiveView = null;
+  document.getElementById("cal-detail").style.display = "none";
+  renderCalendar();
+}
 document.getElementById("logout-btn").onclick = () => {
   localStorage.removeItem("srz_seller");
   SELLER = null;
@@ -1639,6 +1921,7 @@ document.addEventListener("touchend",async e=>{
     if(id==="section-dashboard") renderDashboard();
     if(id==="section-vip") { await loadVipRequests(); renderVipSeller(); }
     if(id==="section-vip-admin") { await loadVipRequests(); renderVipAdmin(); }
+    if(id==="section-calendar") renderCalendar();
   }
   setTimeout(()=>ind.remove(),800);
 },{passive:true});
