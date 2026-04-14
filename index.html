@@ -2281,7 +2281,7 @@ function renderProducts() {
         ${vips.map(p => `
           <div style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:10px;">
 
-            <!-- Header: type + prijs -->
+            <!-- Header -->
             <div style="background:rgba(255,255,255,0.05);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
               <div>
                 ${p.event_name?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">${p.event_name}${p.days?" · "+p.days:""}${p.time?" · "+p.time:""}</div>`:""}
@@ -2291,58 +2291,75 @@ function renderProducts() {
                 </div>
               </div>
               <div style="text-align:right;">
-                ${p.price_total?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_total}</div><div style="font-size:10px;color:var(--muted);">total min. spend</div>`
-                :p.price_pp?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_pp}</div><div style="font-size:10px;color:var(--muted);">per person</div>`:""}
+                ${p.price_total?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_total}</div>`
+                :p.price_pp?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_pp}</div>`:""}
               </div>
             </div>
 
-            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
 
-              <!-- Pax / Deposit / Per person / Included -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                ${p.pax_app?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">PAX</div><div style="font-size:16px;font-weight:700;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?` <span style='font-size:11px;color:var(--muted);font-weight:400;'>max ${p.max_pax}</span>`:""}</div></div>`:""}
-                ${p.deposit?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">DEPOSIT</div><div style="font-size:16px;font-weight:700;">€${p.deposit}</div></div>`:""}
-                ${p.price_pp&&p.price_total?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">PER PERSON</div><div style="font-size:16px;font-weight:700;">€${p.price_pp}</div></div>`:""}
-                ${p.included?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">INCLUDED</div><div style="font-size:13px;font-weight:600;">${p.included}</div></div>`:""}
-              </div>
+              <!-- Pax -->
+              ${p.pax_app?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">People in app</span>
+                <span style="font-weight:700;font-size:13px;">${p.pax_app}</span>
+              </div>`:""}
+              ${p.max_pax&&p.max_pax!=p.pax_app?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Max people at table</span>
+                <span style="font-weight:700;font-size:13px;">${p.max_pax}</span>
+              </div>`:""}
+              ${p.deposit?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Deposit</span>
+                <span style="font-weight:700;font-size:13px;">€${p.deposit}</span>
+              </div>`:""}
+              ${p.price_pp&&p.price_total?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Price per person</span>
+                <span style="font-weight:700;font-size:13px;">€${p.price_pp}</span>
+              </div>`:""}
+              ${p.included?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Included</span>
+                <span style="font-weight:700;font-size:13px;">${p.included}</span>
+              </div>`:""}
+              ${p.drinks?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Drinks</span>
+                <span style="font-weight:700;font-size:13px;text-align:right;max-width:55%;">${p.drinks}</span>
+              </div>`:""}
+              ${p.bottles?`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+                <div style="color:var(--muted);margin-bottom:4px;">Bottle options</div>
+                <div style="font-weight:600;line-height:1.6;">${p.bottles}</div>
+              </div>`:""}
+              ${p.big_sizes?`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span style="color:var(--muted);">Big sizes</span>
+                <span style="font-weight:700;font-size:13px;">${p.big_sizes}</span>
+              </div>`:""}
 
-              <!-- Commissie -->
+              <!-- Commissie — opvallend -->
               ${p.com_full||p.com_dep?`
-              <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px 14px;">
-                <div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">COMMISSION</div>
-                <div style="display:flex;gap:24px;">
+              <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 12px;margin-top:4px;">
+                <div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">YOUR COMMISSION</div>
+                <div style="display:flex;gap:20px;">
                   ${p.com_full?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If full paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_full}</div></div>`:""}
                   ${p.com_dep?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If deposit paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_dep}</div></div>`:""}
                 </div>
               </div>`:""}
 
-              <!-- Drinks -->
-              ${p.drinks?`
-              <div style="border-top:1px solid var(--border);padding-top:10px;">
-                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">DRINKS INCLUDED</div>
-                <div style="font-size:13px;font-weight:600;">${p.drinks}</div>
-              </div>`:""}
-
-              <!-- Bottles -->
-              ${p.bottles?`
-              <div>
-                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">BOTTLE OPTIONS</div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;">${p.bottles}</div>
-              </div>`:""}
-
-              <!-- Big sizes -->
-              ${p.big_sizes?`
-              <div>
-                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">BIG SIZES</div>
-                <div style="font-size:12px;color:rgba(255,255,255,0.8);">${p.big_sizes}</div>
-              </div>`:""}
-
             </div>
           </div>`).join("")}
 
-        ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);">${data.dresscode}</span></div>`:""}
+        ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);font-weight:600;">${data.dresscode}</span></div>`:""}
         ${data.notes?`<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${data.notes}</div>`:""}
         ${data.important?`<div style="margin-top:6px;padding:10px 12px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.25);border-radius:8px;font-size:11px;font-weight:600;color:var(--red);">⚠️ ${data.important}</div>`:""}
+
+        <!-- Emoji legenda -->
+        <div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">EMOJI LEGEND</div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:rgba(255,255,255,0.7);">
+            <div>💎 — VIP &nbsp;&nbsp; 💎💎 — Super VIP &nbsp;&nbsp; 💎💎💎 — Ultra VIP</div>
+            <div>❌🪑 — No chairs (standing table)</div>
+            <div>🎧 — DJ/music setup at table</div>
+            <div>💄 — Only girls allowed</div>
+            <div>💦 — On the boat</div>
+          </div>
+        </div>
       </div>
     </div>`;
   }).join("");
