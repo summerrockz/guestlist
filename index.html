@@ -477,6 +477,17 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
     </div>
 
+
+    <!-- PROGRAMME 2026 -->
+    <div class="section" id="section-programme">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <button onclick="progPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">‹</button>
+        <div id="prog-title" style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-align:center;"></div>
+        <button onclick="progNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">›</button>
+      </div>
+      <div id="prog-week" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
     <!-- VIP TABLES — SELLER VIEW -->
     <div class="section" id="section-vip">
       <div class="section-title">VIP Table requests</div>
@@ -558,6 +569,15 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div>
         <div>VIP Requests — Manage</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">All incoming table requests</div>
+      </div>
+    </button>
+
+    <button onclick="moreNav('section-programme')"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">📆</span>
+      <div>
+        <div>Programme 2026</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Weekly schedule Summerrockz</div>
       </div>
     </button>
 
@@ -889,7 +909,7 @@ function showSection(id) {
     "section-dashboard":"nav-dashboard","section-events":"nav-events",
     "section-mygl":"nav-mygl","section-admin":"nav-more",
     "section-vip":"nav-more","section-vip-admin":"nav-more",
-    "section-calendar":"nav-calendar"
+    "section-calendar":"nav-calendar","section-programme":"nav-more"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
@@ -906,6 +926,7 @@ function showSection(id) {
   }
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
   if (id === "section-calendar") loadData().then(renderCalendar);
+  if (id === "section-programme") renderProgramme();
 }
 
 // ── LOGIN ──
@@ -2043,6 +2064,221 @@ function calNext() {
   document.getElementById("cal-detail").style.display = "none";
   renderCalendar();
 }
+
+// ── PROGRAMME 2026 ──
+const PROGRAMME = {
+  "2026-05-04":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-05":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-06":["Boat Party","Tantra Bar","Zoo Bar","Cova (Gala)"],
+  "2026-05-07":["Boat Party","Tantra Bar","Zoo Bar","Cova (Presents)"],
+  "2026-05-08":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-09":["Boat Party","Tantra Bar","Zoo Bar","Cova (Pantheon)"],
+  "2026-05-10":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-11":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-12":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-13":["Boat Party","Tantra Bar","Zoo Bar","Cova (ToyTonics)"],
+  "2026-05-14":["Boat Party","Tantra Bar","Zoo Bar","Cova (Mosiman)"],
+  "2026-05-15":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-16":["Boat Party","Tantra Bar","Zoo Bar","Cova (Pantheon)"],
+  "2026-05-17":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-18":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-19":["Boat Party","Tantra Bar","Zoo Bar","Cova (Rumors)"],
+  "2026-05-20":["Boat Party","Tantra Bar","Zoo Bar","Cova (Gala)"],
+  "2026-05-21":["Boat Party","Tantra Bar","Zoo Bar","Cova (Utopic)"],
+  "2026-05-22":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-23":["Boat Party","Tantra Bar","Zoo Bar","Cova (Pantheon)"],
+  "2026-05-24":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-25":["Boat Party","Tantra Bar","Zoo Bar","Cova (MindEntreprise)"],
+  "2026-05-26":["Boat Party","Tantra Bar","Zoo Bar","Cova (Wyld)"],
+  "2026-05-27":["Boat Party","Tantra Bar","Zoo Bar","Cova (Massaka)","Ushuaia"],
+  "2026-05-28":["Boat Party","Tantra Bar","Zoo Bar","The Site"],
+  "2026-05-29":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-05-30":["Boat Party","Tantra Bar","Zoo Bar","Cova (Pantheon)"],
+  "2026-05-31":["Boat Party","Tantra Bar","Zoo Bar"],
+  "2026-06-01":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-06-02":["Bam-Bu-Ku","Nobu"],
+  "2026-06-03":["The Site","Ushuaia","Cova (Gala)"],
+  "2026-06-04":["Boat Party","Cafe del Mar"],
+  "2026-06-05":["Cova (Mosiman)"],
+  "2026-06-06":["The Site","Ushuaia","Boat Party","Cova (Pantheon)"],
+  "2026-06-07":["Cafe del Mar"],
+  "2026-06-08":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-06-09":["Bam-Bu-Ku","Nobu"],
+  "2026-06-10":["The Site","Ushuaia"],
+  "2026-06-11":["Boat Party","Cafe del Mar","Cova (Sam Divine)"],
+  "2026-06-12":["The Site","Ushuaia","Boat Party"],
+  "2026-06-13":["Cova (Pantheon)"],
+  "2026-06-14":["Cafe del Mar"],
+  "2026-06-15":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-06-16":["Bam-Bu-Ku","Nobu"],
+  "2026-06-17":["The Site","Ushuaia","Cova (Rumors)"],
+  "2026-06-18":["Boat Party","Cafe del Mar"],
+  "2026-06-19":["Cova (UTOPIC)"],
+  "2026-06-20":["The Site","Ushuaia","Boat Party","Cova (Pantheon)"],
+  "2026-06-21":["Cafe del Mar"],
+  "2026-06-22":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-06-23":["Bam-Bu-Ku","Nobu"],
+  "2026-06-24":["The Site","Ushuaia"],
+  "2026-06-25":["Boat Party","Cafe del Mar","Cova (Massaka)"],
+  "2026-06-26":["The Site","Ushuaia","Boat Party"],
+  "2026-06-27":["Cova (Pantheon)"],
+  "2026-06-28":["Cafe del Mar"],
+  "2026-06-29":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-06-30":["Bam-Bu-Ku","Nobu"],
+  "2026-07-01":["The Site","Ushuaia","Cova (Rumors)"],
+  "2026-07-02":["Nobu","Cova (Presents)"],
+  "2026-07-03":["The Site","Ushuaia","Boat Party","Cova (Gala)","Jabeque"],
+  "2026-07-04":["Cafe del Mar"],
+  "2026-07-05":["Bam-Bu-Ku"],
+  "2026-07-06":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-07-07":["Bam-Bu-Ku"],
+  "2026-07-08":["The Site","Ushuaia"],
+  "2026-07-09":["Nobu","Cova (Presents)"],
+  "2026-07-10":["The Site","Ushuaia","Boat Party","Jabeque"],
+  "2026-07-11":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-07-12":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-07-13":["Bam-Bu-Ku"],
+  "2026-07-14":["The Site","Ushuaia"],
+  "2026-07-15":["Nobu"],
+  "2026-07-16":["Cova (Massaka)"],
+  "2026-07-17":["The Site","Ushuaia","Boat Party","Jabeque"],
+  "2026-07-18":["Cafe del Mar"],
+  "2026-07-19":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-07-20":["Bam-Bu-Ku"],
+  "2026-07-21":["The Site","Ushuaia"],
+  "2026-07-22":["Nobu","Cova (UTOPIC)"],
+  "2026-07-23":["The Site","Ushuaia","Boat Party","Jabeque"],
+  "2026-07-24":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-07-25":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-07-26":["Bam-Bu-Ku"],
+  "2026-07-27":["The Site","Ushuaia"],
+  "2026-07-28":["Nobu"],
+  "2026-07-29":["The Site","Ushuaia","Boat Party","Cova (Ameme)"],
+  "2026-07-30":["Cafe del Mar"],
+  "2026-07-31":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumors)"],
+  "2026-08-01":["Cova (Presents)"],
+  "2026-08-02":["The Site","Ushuaia","Boat Party","Jabeque"],
+  "2026-08-03":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumours)"],
+  "2026-08-04":["Bam-Bu-Ku"],
+  "2026-08-05":["The Site","Ushuaia"],
+  "2026-08-06":["Nobu","Cova (Mosiman)"],
+  "2026-08-07":["The Site","Ushuaia","Boat Party","Cova (Ameme)","Jabeque"],
+  "2026-08-08":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-08-09":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumours)"],
+  "2026-08-10":["Bam-Bu-Ku"],
+  "2026-08-11":["The Site","Ushuaia","Boat Party"],
+  "2026-08-12":["Nobu","Cova (Presents)"],
+  "2026-08-13":["Ushuaia","Boat Party","Cova (Ameme)","Jabeque"],
+  "2026-08-14":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-08-15":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumours)"],
+  "2026-08-16":["Bam-Bu-Ku"],
+  "2026-08-17":["The Site","Ushuaia"],
+  "2026-08-18":["Nobu","Cova (Sam Divine)"],
+  "2026-08-19":["The Site","Ushuaia","Boat Party","Cova (Ameme)","Jabeque"],
+  "2026-08-20":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-08-21":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumours)"],
+  "2026-08-22":["Bam-Bu-Ku"],
+  "2026-08-23":["The Site","Ushuaia"],
+  "2026-08-24":["Nobu","Cova (Massaka)"],
+  "2026-08-25":["The Site","Ushuaia","Boat Party","Cova (Ameme)","Jabeque"],
+  "2026-08-26":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-08-27":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Rumours)"],
+  "2026-08-28":["Bam-Bu-Ku"],
+  "2026-08-29":["The Site","Ushuaia"],
+  "2026-08-30":["Nobu"],
+  "2026-08-31":["Boat Party","Cafe del Mar","Cova (Ameme)","Jabeque"],
+  "2026-09-01":["Cova (PIV)"],
+  "2026-09-02":["Bam-Bu-Ku","Nobu","Cova (Soundgarden)"],
+  "2026-09-03":["The Site","Ushuaia"],
+  "2026-09-04":["Boat Party","Cova (Presents)"],
+  "2026-09-05":["The Site","Ushuaia","Boat Party","Cova (Pantheon)"],
+  "2026-09-06":["Cafe del Mar"],
+  "2026-09-07":["Boat Party","Cafe del Mar","Cova (PIV)","Cova (Gala)"],
+  "2026-09-08":["Bam-Bu-Ku","Nobu"],
+  "2026-09-09":["The Site","Ushuaia"],
+  "2026-09-10":["Boat Party","Cova (Mosiman)"],
+  "2026-09-11":["The Site","Ushuaia","Boat Party","Cova (Pantheon)"],
+  "2026-09-12":["Cafe del Mar"],
+  "2026-09-13":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-09-14":["Ushuaia","Cova (Sam Divine)"],
+  "2026-09-15":["Nobu","Ushuaia"],
+  "2026-09-16":["Boat Party","Cova (Pantheon)"],
+  "2026-09-17":["Ushuaia","Boat Party"],
+  "2026-09-18":["Cafe del Mar"],
+  "2026-09-19":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-09-20":["Ushuaia","Cova (Sam Divine)"],
+  "2026-09-21":["Nobu","Ushuaia"],
+  "2026-09-22":["Boat Party"],
+  "2026-09-23":["Ushuaia","Boat Party","Cova (Massaka)"],
+  "2026-09-24":["Cafe del Mar","Cova (Pantheon)"],
+  "2026-09-25":["Boat Party","Cafe del Mar","Cova (PIV)"],
+  "2026-09-26":["Ushuaia"],
+  "2026-09-27":["Nobu","Ushuaia","Boat Party"],
+  "2026-09-28":["Boat Party"],
+  "2026-09-29":["Cova (PIV)"],
+  "2026-09-30":["Ushuaia"],
+  "2026-10-01":["Ushuaia"],
+  "2026-10-02":["Ushuaia"],
+  "2026-10-03":["Ushuaia"],
+  "2026-10-04":["Ushuaia"],
+};
+
+const CLUB_COLORS = {
+  "Boat Party":"#3B82F6","Tantra Bar":"#8B5CF6","Zoo Bar":"#EC4899",
+  "Cafe del Mar":"#F59E0B","Bam-Bu-Ku":"#22C55E","Ushuaia":"#E8192C",
+  "The Site":"#14B8A6","Nobu":"#F97316","Jabeque":"#84CC16",
+  "Cova (Gala)":"#A855F7","Cova (Presents)":"#A855F7","Cova (Pantheon)":"#A855F7",
+  "Cova (ToyTonics)":"#A855F7","Cova (Mosiman)":"#A855F7","Cova (Rumors)":"#A855F7",
+  "Cova (Rumours)":"#A855F7","Cova (Utopic)":"#A855F7","Cova (UTOPIC)":"#A855F7",
+  "Cova (MindEntreprise)":"#A855F7","Cova (Wyld)":"#A855F7","Cova (Massaka)":"#A855F7",
+  "Cova (Sam Divine)":"#A855F7","Cova (Ameme)":"#A855F7","Cova (Soundgarden)":"#A855F7",
+  "Cova (PIV)":"#6366F1",
+};
+
+function getClubColor(c) { return CLUB_COLORS[c] || "#6B7280"; }
+
+let progWeekStart = null;
+
+function getWeekStart(date) {
+  const d = new Date(date); const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff); d.setHours(0,0,0,0); return d;
+}
+
+function renderProgramme() {
+  if (!progWeekStart) progWeekStart = getWeekStart(new Date());
+  const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const todayStr = today();
+  const weekEnd = new Date(progWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
+  document.getElementById("prog-title").textContent =
+    `${progWeekStart.getDate()} ${months[progWeekStart.getMonth()]} — ${weekEnd.getDate()} ${months[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  let html = "";
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
+    const dateStr = d.toISOString().slice(0,10);
+    const isToday = dateStr === todayStr;
+    const clubs = PROGRAMME[dateStr] || [];
+    html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="font-size:9px;font-weight:600;color:${isToday?"#fff":"var(--muted)"};text-transform:uppercase;">${days[i]}</div>
+          <div style="font-size:14px;font-weight:700;color:${isToday?"#fff":"var(--text)"};">${d.getDate()}</div>
+        </div>
+        <div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;">
+          ${clubs.length === 0
+            ? `<span style="font-size:12px;color:var(--muted);font-style:italic;">No events</span>`
+            : clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById("prog-week").innerHTML = html;
+}
+
+function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgramme(); }
+function progNext() { progWeekStart.setDate(progWeekStart.getDate()+7); renderProgramme(); }
+
 document.getElementById("logout-btn").onclick = doLogout;
 
 function doLogout() {
