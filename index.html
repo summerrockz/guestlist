@@ -524,13 +524,60 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <button class="nav-item" onclick="showSection('section-calendar')" id="nav-calendar">
       <span class="nav-icon">📅</span>Calendar
     </button>
-    <button class="nav-item" onclick="showSection('section-vip')" id="nav-vip">
-      <span class="nav-icon">🍾</span>VIP
-    </button>
-    <button class="nav-item" onclick="showSection('section-admin')" id="nav-admin" style="display:none;">
-      <span class="nav-icon">📤</span>Export
+    <button class="nav-item" onclick="openMoreMenu()" id="nav-more">
+      <span class="nav-icon">⋯</span>More
     </button>
   </nav>
+</div>
+
+<!-- MORE MENU OVERLAY -->
+<div id="more-overlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;"></div>
+<div id="more-menu" style="display:none;position:fixed;bottom:70px;left:0;right:0;max-width:480px;margin:0 auto;z-index:301;padding:0 12px;">
+  <div style="background:#1c1c1c;border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,0.5);">
+
+    <button onclick="moreNav('section-vip')"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">🍾</span>
+      <div>
+        <div>VIP Table requests</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Request tables at Hi, Ushuaia & more</div>
+      </div>
+    </button>
+
+    <button id="more-admin" onclick="moreNav('section-admin')"
+      style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">📤</span>
+      <div>
+        <div>Export guestlist</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Copy lists per club</div>
+      </div>
+    </button>
+
+    <button id="more-vip-admin" onclick="moreNav('section-vip-admin')"
+      style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">💼</span>
+      <div>
+        <div>VIP Requests — Manage</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">All incoming table requests</div>
+      </div>
+    </button>
+
+    <button onclick="enableNotifications();closeMoreMenu();"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">🔔</span>
+      <div>
+        <div id="more-notif-label">Enable notifications</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Get alerts for new entries & prices</div>
+      </div>
+    </button>
+
+    <button onclick="doLogout()"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;color:rgba(232,25,44,0.85);cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">🚪</span>
+      <div>Log out</div>
+    </button>
+
+  </div>
 </div>
 
 <!-- ADD GL MODAL -->
@@ -850,8 +897,8 @@ function showSection(id) {
   if (sec) { sec.classList.add("active"); sec.style.display = "block"; }
   const navMap = {
     "section-dashboard":"nav-dashboard","section-events":"nav-events",
-    "section-mygl":"nav-mygl","section-admin":"nav-admin",
-    "section-vip":"nav-vip","section-vip-admin":"nav-vip",
+    "section-mygl":"nav-mygl","section-admin":"nav-more",
+    "section-vip":"nav-more","section-vip-admin":"nav-more",
     "section-calendar":"nav-calendar"
   };
   const navEl = document.getElementById(navMap[id]);
@@ -899,11 +946,12 @@ async function initApp() {
 
   if (role === "admin") {
     document.getElementById("admin-dash-card").style.display = "block";
-    document.getElementById("nav-admin").style.display = "flex";
+    document.getElementById("more-admin").style.display = "flex";
   }
   if (String(SELLER.seller_id).trim() === "1") {
     document.getElementById("vip-admin-dash-card").style.display = "block";
     document.getElementById("section-vip-admin").style.display = "block";
+    document.getElementById("more-vip-admin").style.display = "flex";
   }
 
   document.getElementById("events-date-from").value = today();
@@ -1981,13 +2029,38 @@ function calNext() {
   document.getElementById("cal-detail").style.display = "none";
   renderCalendar();
 }
-document.getElementById("logout-btn").onclick = () => {
+document.getElementById("logout-btn").onclick = doLogout;
+
+function doLogout() {
   localStorage.removeItem("srz_seller");
   SELLER = null;
+  closeMoreMenu();
   document.getElementById("main-app").style.display = "none";
   document.getElementById("access-page").style.display = "flex";
   document.getElementById("access-page").classList.add("active");
-};
+}
+
+function openMoreMenu() {
+  document.getElementById("more-overlay").style.display = "block";
+  document.getElementById("more-menu").style.display = "block";
+  // Update notification label
+  const notifEnabled = localStorage.getItem("srz_notif_enabled") === "1" || Notification.permission === "granted";
+  const lbl = document.getElementById("more-notif-label");
+  if (lbl) lbl.textContent = notifEnabled ? "✅ Notifications enabled" : "Enable notifications";
+  // Mark nav-more active
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById("nav-more").classList.add("active");
+}
+
+function closeMoreMenu() {
+  document.getElementById("more-overlay").style.display = "none";
+  document.getElementById("more-menu").style.display = "none";
+}
+
+function moreNav(sectionId) {
+  closeMoreMenu();
+  showSection(sectionId);
+}
 
 // ── AUTO LOGIN ──
 window.addEventListener("DOMContentLoaded", async () => {
