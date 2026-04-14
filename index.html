@@ -542,28 +542,34 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div id="vpt-content-request">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
           <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Hi Ibiza · Ushuaia · UNVRS</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Full name</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Club</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Event</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Date</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Pax</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Ratio</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Nationality</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Special occasion</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div style="font-size:13px;">Budget</div></div>
+          <div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">
+            Full name:<br>
+            Club:<br>
+            Event:<br>
+            Date:<br>
+            Pax:<br>
+            Ratio:<br>
+            Nationality:<br>
+            Special occasion:<br>
+            Budget:
+          </div>
+          <button onclick="copyVipTemplate('hi')" id="copy-hi-btn" class="btn-copy" style="margin-top:14px;">Copy template</button>
         </div>
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
           <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Chinois · Lio</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Name</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Club</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Event</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Date</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Pax</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Budget</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Preferred zone</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Email</div></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;"><div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div><div style="font-size:13px;">Phone number</div></div>
+          <div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">
+            Name:<br>
+            Club:<br>
+            Event:<br>
+            Date:<br>
+            Pax:<br>
+            Budget:<br>
+            Preferred zone:<br>
+            Email:<br>
+            Phone number:
+          </div>
+          <button onclick="copyVipTemplate('lio')" id="copy-lio-btn" class="btn-copy" style="margin-top:14px;">Copy template</button>
         </div>
       </div>
 
@@ -594,14 +600,14 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">4</div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;">
             <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Monitor payment</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.5;">You can monitor the link yourself to see if the client paid or not. Once paid — VIP TABLE BOOKED!</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5;">You can monitor the link yourself to see if the client paid or not by clicking/checking the link. Once paid — VIP TABLE BOOKED!</div>
           </div>
         </div>
         <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:14px;">
           <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:6px;">Payment links</div>
           <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;">
             For <strong>Hi, UNVRS &amp; Ushuaia</strong> — you receive the link from Rowan on WhatsApp.<br>
-            For <strong>Lio</strong> — the client receives the link to pay by email.
+            For <strong>Lio &amp; Chinois</strong> — the client receives the link to pay by email.
           </div>
         </div>
       </div>
@@ -2263,6 +2269,24 @@ function calShowEvents() {
         </button>
       </div>`;
   }).join("");
+}
+
+function copyVipTemplate(type) {
+  let text = "";
+  if (type === "hi") {
+    text = "Full name:\nClub:\nEvent:\nDate:\nPax:\nRatio:\nNationality:\nSpecial occasion:\nBudget:";
+  } else {
+    text = "Name:\nClub:\nEvent:\nDate:\nPax:\nBudget:\nPreferred zone:\nEmail:\nPhone number:";
+  }
+  const btnId = type === "hi" ? "copy-hi-btn" : "copy-lio-btn";
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy template"; btn.classList.remove("copied"); }, 2000);
+    }
+  });
 }
 
 function setVipProcessTab(tab) {
