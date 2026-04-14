@@ -1366,9 +1366,31 @@ function clearMyGLDate() {
 async function deleteEntry(entryId, btn) {
   if (!confirm("Cancel this entry?")) return;
   btn.textContent = "Cancelling…"; btn.disabled = true;
+
+  const entry = ENTRIES.find(e => e.entry_id === entryId);
+  const wasSent = entry && (entry.sent_to_club||"").toLowerCase() === "yes";
+
   ENTRIES = ENTRIES.map(e => e.entry_id===entryId?{...e,status:"cancelled"}:e);
   renderMyGL(); renderDashboard();
-  post({action:"cancel_entry",entry_id:entryId});
+  post({action:"cancel_entry", entry_id:entryId});
+
+  // Notify club admins
+  if (entry) {
+    const cl = CLUBS.find(c => c.club_id === entry.club_id) || {};
+    const adminIds = String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    const urgentFlag = wasSent ? " ⚠️ Already sent to club!" : "";
+    for (const adminId of adminIds) {
+      fetch(VERCEL_URL+"/api/notify", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
+        body: JSON.stringify({
+          title: "❌ Entry cancelled — " + (cl.club_name||entry.club_name),
+          body: (entry.guest_name||"") + (parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"") + " — cancelled by " + SELLER.seller_name + urgentFlag,
+          sellerId: adminId
+        })
+      }).catch(()=>{});
+    }
+  }
 }
 
 // ── ADMIN EXPORT ──
