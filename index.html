@@ -900,7 +900,10 @@ function showSection(id) {
   if (id === "section-dashboard") loadData().then(renderDashboard);
   if (id === "section-vip") loadVipRequests().then(renderVipSeller);
   if (id === "section-vip-admin" && String(SELLER.seller_id).trim() !== "1") return;
-  if (id === "section-admin" && (SELLER.role||"").toLowerCase() !== "admin") return;
+  if (id === "section-admin") {
+    const myAdminClubs = CLUBS.filter(c => String(c.admin_id||"").split(",").map(x=>x.trim()).includes(String(SELLER.seller_id||"").trim()));
+    if (!myAdminClubs.length) return;
+  }
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
   if (id === "section-calendar") loadData().then(renderCalendar);
 }
@@ -935,11 +938,9 @@ async function initApp() {
 
   const role = (SELLER.role||"").toLowerCase();
 
-  // Export guestlist — only role=admin (strict, not manager)
-  if (role === "admin") {
-    document.getElementById("admin-dash-card").style.display = "block";
-    document.getElementById("more-admin").style.display = "flex";
-  }
+  // Export guestlist — anyone whose seller_id appears in any club's admin_id
+  // This is checked after loadData() in renderDashboard/initApp
+  // We defer this check to after data loads
   // VIP Manage — ONLY seller_id 1 (info@theibizaexpert.com)
   if (String(SELLER.seller_id).trim() === "1") {
     document.getElementById("vip-admin-dash-card").style.display = "block";
@@ -1030,12 +1031,28 @@ async function loadVipRequests() {
 // ── DASHBOARD ──
 function renderDashboard() {
   const t = today();
-  const myEntries = ENTRIES.filter(e => String(e.seller_id||"").trim()===String(SELLER.seller_id||"").trim() && (e.status||"").toLowerCase()==="active");
+  const myId = String(SELLER.seller_id||"").trim();
+  const myEntries = ENTRIES.filter(e => String(e.seller_id||"").trim()===myId && (e.status||"").toLowerCase()==="active");
   const todayEntries = myEntries.filter(e => (e.date||"").slice(0,10)===t);
   const weekStart = new Date(); weekStart.setDate(weekStart.getDate()-7);
   const weekEntries = myEntries.filter(e => new Date(e.date)>=weekStart);
   document.getElementById("stat-today").textContent = todayEntries.length;
   document.getElementById("stat-total").textContent = weekEntries.length;
+
+  // Show export if this seller is admin_id of at least one club
+  const isClubAdmin = CLUBS.some(c => {
+    const adminIds = String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    return adminIds.includes(myId);
+  });
+  const exportCard = document.getElementById("admin-dash-card");
+  const moreAdmin = document.getElementById("more-admin");
+  if (isClubAdmin) {
+    if (exportCard) exportCard.style.display = "block";
+    if (moreAdmin) moreAdmin.style.display = "flex";
+  } else {
+    if (exportCard) exportCard.style.display = "none";
+    if (moreAdmin) moreAdmin.style.display = "none";
+  }
 }
 
 // ── EVENTS ──
@@ -1106,11 +1123,14 @@ async function deleteEntry(entryId, btn) {
 
 // ── ADMIN EXPORT ──
 function renderAdmin() {
-  const isAdmin = (SELLER.role||"").toLowerCase() === "admin";
-  if (!isAdmin) { wrap.innerHTML=`<div class="empty">Not authorised.</div>`; return; }
+  const myId = String(SELLER.seller_id||"").trim();
+  const myClubs = CLUBS.filter(c => {
+    const adminIds = String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    return adminIds.includes(myId);
+  }).map(c=>c.club_id);
+  if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
   const date = document.getElementById("admin-date").value||today();
   const wrap = document.getElementById("admin-list");
-  const myClubs = CLUBS.filter(c => { const admins=String(c.admin_id||"").split(",").map(x=>x.trim()); return admins.includes(String(SELLER.seller_id).trim()); }).map(c=>c.club_id);
   const dayEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&(e.status||"").toLowerCase()!=="deleted"&&myClubs.includes(e.club_id); });
   if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
   if (!dayEntries.length) { wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.</div>`; return; }
