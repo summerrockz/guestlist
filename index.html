@@ -2261,8 +2261,8 @@ function renderProducts() {
 
   wrap.innerHTML = Object.entries(byVenue).map(([venue, data], vi) => {
     const first = data.items[0] || {};
-    const tickets = data.items.filter(p => ["special","normal"].some(t => (p.ticket_type||"").toLowerCase().includes(t)));
-    const vips = data.items.filter(p => !["special","normal"].some(t => (p.ticket_type||"").toLowerCase().includes(t)));
+    const tickets = [];
+    const vips = data.items;
 
     return `<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
       ${data.image_url ? `<div style="position:relative;cursor:pointer;" onclick="toggleProduct(${vi})"><img src="${data.image_url}" style="width:100%;height:140px;object-fit:cover;display:block;"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%);"></div><div style="position:absolute;bottom:12px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;"><div><div style="font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">${venue}</div>${data.time?`<div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;">${data.time}${data.days?" · "+data.days:""}</div>`:""}</div><div style="font-size:18px;">›</div></div></div>`
