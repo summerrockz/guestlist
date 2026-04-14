@@ -2559,11 +2559,8 @@ document.getElementById("logout-btn").onclick = doLogout;
 
 function doLogout() {
   localStorage.removeItem("srz_seller");
-  SELLER = null;
-  closeMoreMenu();
-  document.getElementById("main-app").style.display = "none";
-  document.getElementById("access-page").style.display = "flex";
-  document.getElementById("access-page").classList.add("active");
+  localStorage.removeItem("srz_notif_enabled");
+  window.location.reload();
 }
 
 function openMoreMenu() {
