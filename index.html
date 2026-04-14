@@ -2244,6 +2244,8 @@ function renderProducts() {
     if (!byVenue[v]) byVenue[v] = { image_url: p.image_url||"", time: p.time||"", days: p.days||"", music: p.music||"", dresscode: p.dresscode||"", notes: p.notes||"", items: [] };
     byVenue[v].items.push(p);
   });
+  // Sort items by event_name so same events are grouped
+  Object.values(byVenue).forEach(d => d.items.sort((a,b) => (a.event_name||"").localeCompare(b.event_name||"")));
 
   function ticketColor(t) {
     t = (t||"").toLowerCase();
@@ -2274,6 +2276,7 @@ function renderProducts() {
 
         ${vips.map(p => `
           <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:8px;">
+            ${p.event_name?`<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">${p.event_name}${p.days?" · "+p.days:""}${p.time?" · "+p.time:""}</div>`:""}
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
               <div style="display:flex;align-items:center;gap:6px;">
                 <span>${p.emoji||""}</span>
