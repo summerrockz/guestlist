@@ -400,7 +400,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-card-title">💼 VIP Requests — Manage</div>
           <div class="dash-card-sub">All incoming table requests</div>
         </div>
-        <button class="btn-secondary" id="notif-btn" style="display:none;" onclick="enableNotifications()">🔔 Enable notifications</button>
+        <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
       </div>
     </div>
@@ -558,15 +558,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div>
         <div>VIP Requests — Manage</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">All incoming table requests</div>
-      </div>
-    </button>
-
-    <button onclick="enableNotifications();closeMoreMenu();"
-      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
-      <span style="font-size:22px;">🔔</span>
-      <div>
-        <div id="more-notif-label">Enable notifications</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Get alerts for new entries & prices</div>
       </div>
     </button>
 
@@ -909,6 +900,7 @@ function showSection(id) {
   if (id === "section-dashboard") loadData().then(renderDashboard);
   if (id === "section-vip") loadVipRequests().then(renderVipSeller);
   if (id === "section-vip-admin" && String(SELLER.seller_id).trim() !== "1") return;
+  if (id === "section-admin" && (SELLER.role||"").toLowerCase() !== "admin") return;
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
   if (id === "section-calendar") loadData().then(renderCalendar);
 }
@@ -943,15 +935,13 @@ async function initApp() {
 
   const role = (SELLER.role||"").toLowerCase();
 
-  // Admin export — only for role=admin, NOT manager
-  if (role === "admin" && String(SELLER.seller_id).trim() !== "1") {
+  // Export guestlist — only role=admin (strict, not manager)
+  if (role === "admin") {
     document.getElementById("admin-dash-card").style.display = "block";
     document.getElementById("more-admin").style.display = "flex";
   }
-  // VIP manage + full admin — only seller_id 1
+  // VIP Manage — ONLY seller_id 1 (info@theibizaexpert.com)
   if (String(SELLER.seller_id).trim() === "1") {
-    document.getElementById("admin-dash-card").style.display = "block";
-    document.getElementById("more-admin").style.display = "flex";
     document.getElementById("vip-admin-dash-card").style.display = "block";
     document.getElementById("section-vip-admin").style.display = "block";
     document.getElementById("more-vip-admin").style.display = "flex";
@@ -1116,7 +1106,8 @@ async function deleteEntry(entryId, btn) {
 
 // ── ADMIN EXPORT ──
 function renderAdmin() {
-  if ((SELLER.role||"").toLowerCase()!=="admin") return;
+  const isAdmin = (SELLER.role||"").toLowerCase() === "admin";
+  if (!isAdmin) { wrap.innerHTML=`<div class="empty">Not authorised.</div>`; return; }
   const date = document.getElementById("admin-date").value||today();
   const wrap = document.getElementById("admin-list");
   const myClubs = CLUBS.filter(c => { const admins=String(c.admin_id||"").split(",").map(x=>x.trim()); return admins.includes(String(SELLER.seller_id).trim()); }).map(c=>c.club_id);
@@ -2045,10 +2036,6 @@ function doLogout() {
 
 function openMoreMenu() {
   document.getElementById("more-menu").style.display = "block";
-  // Update notification label
-  const notifEnabled = localStorage.getItem("srz_notif_enabled") === "1" || Notification.permission === "granted";
-  const lbl = document.getElementById("more-notif-label");
-  if (lbl) lbl.textContent = notifEnabled ? "✅ Notifications enabled" : "Enable notifications";
   // Mark nav-more active
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("nav-more").classList.add("active");
