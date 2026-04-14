@@ -2349,17 +2349,7 @@ function renderProducts() {
         ${data.notes?`<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${data.notes}</div>`:""}
         ${data.important?`<div style="margin-top:6px;padding:10px 12px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.25);border-radius:8px;font-size:11px;font-weight:600;color:var(--red);">⚠️ ${data.important}</div>`:""}
 
-        <!-- Emoji legenda -->
-        <div style="margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border);">
-          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">EMOJI LEGEND</div>
-          <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:rgba(255,255,255,0.7);">
-            <div>💎 — VIP &nbsp;&nbsp; 💎💎 — Super VIP &nbsp;&nbsp; 💎💎💎 — Ultra VIP</div>
-            <div>❌🪑 — No chairs (standing table)</div>
-            <div>🎧 — DJ/music setup at table</div>
-            <div>💄 — Only girls allowed</div>
-            <div>💦 — On the boat</div>
-          </div>
-        </div>
+
       </div>
     </div>`;
   }).join("");
