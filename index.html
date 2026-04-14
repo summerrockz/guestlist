@@ -1358,6 +1358,11 @@ function renderMyGL() {
   `).join("");
 }
 
+function clearMyGLDate() {
+  document.getElementById('mygl-date').value = '';
+  renderMyGL();
+}
+
 async function deleteEntry(entryId, btn) {
   if (!confirm("Cancel this entry?")) return;
   btn.textContent = "Cancelling…"; btn.disabled = true;
