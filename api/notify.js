@@ -11,7 +11,6 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
@@ -20,12 +19,19 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { title, body } = req.body;
-
+  const { title, body, sellerId } = req.body;
   const redis = new Redis(process.env.REDIS_URL);
 
   try {
-    const subscriberIds = await redis.smembers('push_subscribers');
+    let subscriberIds;
+
+    if (sellerId) {
+      // Send only to specific seller
+      subscriberIds = [String(sellerId)];
+    } else {
+      // Broadcast to all subscribers
+      subscriberIds = await redis.smembers('push_subscribers');
+    }
 
     await Promise.allSettled(
       subscriberIds.map(async (id) => {
