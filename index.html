@@ -2281,13 +2281,13 @@ function renderProducts() {
               </div>
               ${p.price_total?`<span style="font-size:14px;font-weight:700;color:var(--green);">€${p.price_total}</span>`:""}
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;">
-              ${p.pax_app?`<div><span style="color:var(--muted);">Pax </span><span style="font-weight:600;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?" (max "+p.max_pax+")":""}</span></div>`:""}
-              ${p.deposit?`<div><span style="color:var(--muted);">Deposit </span><span style="font-weight:600;">€${p.deposit}</span></div>`:""}
-              ${p.price_pp?`<div><span style="color:var(--muted);">Per person </span><span style="font-weight:600;">€${p.price_pp}</span></div>`:""}
-              ${p.included?`<div><span style="color:var(--muted);">Included </span><span style="font-weight:600;">${p.included}</span></div>`:""}
-              ${p.com_full?`<div><span style="color:var(--muted);">Com full </span><span style="color:var(--amber);font-weight:600;">${p.com_full}</span></div>`:""}
-              ${p.com_dep?`<div><span style="color:var(--muted);">Com dep </span><span style="color:var(--amber);font-weight:600;">${p.com_dep}</span></div>`:""}
+            <div style="font-size:11px;display:flex;flex-direction:column;gap:5px;">
+              ${p.pax_app?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Pax</span><span style="font-weight:600;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?" (max "+p.max_pax+")":""}</span></div>`:""}
+              ${p.deposit?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Deposit</span><span style="font-weight:600;">€${p.deposit}</span></div>`:""}
+              ${p.price_pp?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Per person</span><span style="font-weight:600;">€${p.price_pp}</span></div>`:""}
+              ${p.included?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Included</span><span style="font-weight:600;">${p.included}</span></div>`:""}
+              ${p.com_full?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Com full paid</span><span style="color:var(--amber);font-weight:600;">${p.com_full}</span></div>`:""}
+              ${p.com_dep?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Com dep paid</span><span style="color:var(--amber);font-weight:600;">${p.com_dep}</span></div>`:""}
             </div>
             ${p.drinks?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">Drinks: <span style="color:var(--text);">${p.drinks}</span></div>`:""}
             ${p.bottles?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Bottles: <span style="color:var(--text);">${p.bottles}</span></div>`:""}
