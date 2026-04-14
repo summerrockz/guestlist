@@ -429,16 +429,18 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div class="section" id="section-events">
       <div class="section-title">Upcoming events</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
-        <div style="flex:1;position:relative;">
-          <input type="date" id="events-date-from" placeholder="From date"
-            style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:12px 16px;font-size:13px;color:var(--text);-webkit-appearance:none;appearance:none;font-family:Poppins,sans-serif;">
-          <div id="events-from-label" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;font-size:13px;color:var(--muted);pointer-events:none;border-radius:999px;">📅 From date</div>
+        <div style="flex:1;position:relative;" onclick="document.getElementById('events-date-from').showPicker ? document.getElementById('events-date-from').showPicker() : document.getElementById('events-date-from').click()">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:46px;">
+            <span id="events-from-label" style="color:var(--muted);">From date</span>
+          </div>
+          <input type="date" id="events-date-from" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;">
         </div>
         <span style="color:var(--muted);font-size:12px;flex-shrink:0;">→</span>
-        <div style="flex:1;position:relative;">
-          <input type="date" id="events-date-to" placeholder="To date"
-            style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:12px 16px;font-size:13px;color:var(--text);-webkit-appearance:none;appearance:none;font-family:Poppins,sans-serif;">
-          <div id="events-to-label" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;font-size:13px;color:var(--muted);pointer-events:none;border-radius:999px;">📅 To date</div>
+        <div style="flex:1;position:relative;" onclick="document.getElementById('events-date-to').showPicker ? document.getElementById('events-date-to').showPicker() : document.getElementById('events-date-to').click()">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:46px;">
+            <span id="events-to-label" style="color:var(--muted);">To date</span>
+          </div>
+          <input type="date" id="events-date-to" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;">
         </div>
       </div>
       <input type="text" class="input-field" id="events-search" placeholder="Search event or venue…" oninput="renderEvents()" style="margin-bottom:16px;">
@@ -565,7 +567,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <span class="nav-icon">🏠</span>Dashboard
     </button>
     <button class="nav-item" onclick="showSection('section-events')" id="nav-events">
-      <span class="nav-icon">🪩</span>Events
+      <span class="nav-icon">🎉</span>Events
     </button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl">
       <span class="nav-icon">📋</span>My GL
@@ -1003,12 +1005,30 @@ async function initApp() {
 
   document.getElementById("events-date-from").onchange = function() {
     const lbl = document.getElementById("events-from-label");
-    if (lbl) lbl.style.display = this.value ? "none" : "flex";
+    if (lbl) {
+      if (this.value) {
+        const d = new Date(this.value + "T12:00:00");
+        lbl.textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"});
+        lbl.style.color = "var(--text)";
+      } else {
+        lbl.textContent = "From date";
+        lbl.style.color = "var(--muted)";
+      }
+    }
     renderEvents();
   };
   document.getElementById("events-date-to").onchange = function() {
     const lbl = document.getElementById("events-to-label");
-    if (lbl) lbl.style.display = this.value ? "none" : "flex";
+    if (lbl) {
+      if (this.value) {
+        const d = new Date(this.value + "T12:00:00");
+        lbl.textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"});
+        lbl.style.color = "var(--text)";
+      } else {
+        lbl.textContent = "To date";
+        lbl.style.color = "var(--muted)";
+      }
+    }
     renderEvents();
   };
   document.getElementById("mygl-date").onchange = renderMyGL;
