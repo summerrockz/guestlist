@@ -2279,26 +2279,65 @@ function renderProducts() {
         </div>` : ""}
 
         ${vips.map(p => `
-          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:8px;">
-            ${p.event_name?`<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">${p.event_name}${p.days?" · "+p.days:""}${p.time?" · "+p.time:""}</div>`:""}
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span>${p.emoji||""}</span>
-                <span style="font-size:12px;font-weight:700;color:${ticketColor(p.ticket_type)};letter-spacing:0.05em;">${(p.ticket_type||"").toUpperCase()}</span>
+          <div style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:10px;">
+
+            <!-- Header: type + prijs -->
+            <div style="background:rgba(255,255,255,0.05);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                ${p.event_name?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">${p.event_name}${p.days?" · "+p.days:""}${p.time?" · "+p.time:""}</div>`:""}
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <span style="font-size:16px;">${p.emoji||""}</span>
+                  <span style="font-size:15px;font-weight:800;color:${ticketColor(p.ticket_type)};">${(p.ticket_type||"").toUpperCase()}</span>
+                </div>
               </div>
-              ${p.price_total?`<span style="font-size:14px;font-weight:700;color:var(--green);">€${p.price_total}</span>`:""}
+              <div style="text-align:right;">
+                ${p.price_total?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_total}</div><div style="font-size:10px;color:var(--muted);">total min. spend</div>`
+                :p.price_pp?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_pp}</div><div style="font-size:10px;color:var(--muted);">per person</div>`:""}
+              </div>
             </div>
-            <div style="font-size:11px;display:flex;flex-direction:column;gap:5px;">
-              ${p.pax_app?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Pax</span><span style="font-weight:600;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?" (max "+p.max_pax+")":""}</span></div>`:""}
-              ${p.deposit?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Deposit</span><span style="font-weight:600;">€${p.deposit}</span></div>`:""}
-              ${p.price_pp?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Per person</span><span style="font-weight:600;">€${p.price_pp}</span></div>`:""}
-              ${p.included?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Included</span><span style="font-weight:600;">${p.included}</span></div>`:""}
-              ${p.com_full?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Com full paid</span><span style="color:var(--amber);font-weight:600;">${p.com_full}</span></div>`:""}
-              ${p.com_dep?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Com dep paid</span><span style="color:var(--amber);font-weight:600;">${p.com_dep}</span></div>`:""}
+
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+
+              <!-- Pax / Deposit / Per person / Included -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                ${p.pax_app?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">PAX</div><div style="font-size:16px;font-weight:700;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?` <span style='font-size:11px;color:var(--muted);font-weight:400;'>max ${p.max_pax}</span>`:""}</div></div>`:""}
+                ${p.deposit?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">DEPOSIT</div><div style="font-size:16px;font-weight:700;">€${p.deposit}</div></div>`:""}
+                ${p.price_pp&&p.price_total?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">PER PERSON</div><div style="font-size:16px;font-weight:700;">€${p.price_pp}</div></div>`:""}
+                ${p.included?`<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:8px 10px;"><div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-bottom:2px;">INCLUDED</div><div style="font-size:13px;font-weight:600;">${p.included}</div></div>`:""}
+              </div>
+
+              <!-- Commissie -->
+              ${p.com_full||p.com_dep?`
+              <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px 14px;">
+                <div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">COMMISSION</div>
+                <div style="display:flex;gap:24px;">
+                  ${p.com_full?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If full paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_full}</div></div>`:""}
+                  ${p.com_dep?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If deposit paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_dep}</div></div>`:""}
+                </div>
+              </div>`:""}
+
+              <!-- Drinks -->
+              ${p.drinks?`
+              <div style="border-top:1px solid var(--border);padding-top:10px;">
+                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">DRINKS INCLUDED</div>
+                <div style="font-size:13px;font-weight:600;">${p.drinks}</div>
+              </div>`:""}
+
+              <!-- Bottles -->
+              ${p.bottles?`
+              <div>
+                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">BOTTLE OPTIONS</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;">${p.bottles}</div>
+              </div>`:""}
+
+              <!-- Big sizes -->
+              ${p.big_sizes?`
+              <div>
+                <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">BIG SIZES</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.8);">${p.big_sizes}</div>
+              </div>`:""}
+
             </div>
-            ${p.drinks?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">Drinks: <span style="color:var(--text);">${p.drinks}</span></div>`:""}
-            ${p.bottles?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Bottles: <span style="color:var(--text);">${p.bottles}</span></div>`:""}
-            ${p.big_sizes?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Big sizes: <span style="color:var(--text);">${p.big_sizes}</span></div>`:""}
           </div>`).join("")}
 
         ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);">${data.dresscode}</span></div>`:""}
