@@ -1306,14 +1306,24 @@ function renderMyGL() {
   const managedIds = SELLERS.filter(s => { const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim()); return mgrs.includes(myId); }).map(s=>String(s.seller_id).trim());
   const mine = ENTRIES.filter(e => {
     const sid=String(e.seller_id||"").trim();
-    const matchesDate=(e.date||"").slice(0,10)===date;
+    const entryDate=(e.date||"").slice(0,10);
+    const matchesDate = entryDate === date;
     const matchesSearch=!search||(e.guest_name||"").toLowerCase().includes(search);
     const isOwn=sid===myId||managedIds.includes(sid);
     const visible=(e.status||"").toLowerCase()!=="deleted";
     if (search) return isOwn&&matchesSearch&&visible;
     return isOwn&&matchesDate&&visible;
   });
-  if (!mine.length) { wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.</div>`; return; }
+  // If no entries for selected date, check if there are entries on other dates
+  const hasOtherEntries = !mine.length && ENTRIES.some(e => {
+    const sid=String(e.seller_id||"").trim();
+    const isOwn=sid===myId||managedIds.includes(sid);
+    return isOwn&&(e.status||"").toLowerCase()!=="deleted";
+  });
+  if (!mine.length) {
+    const hint = hasOtherEntries ? `<div style="font-size:12px;color:var(--muted);margin-top:8px;">You have entries on other dates — use the date picker to find them, or use the search bar.</div>` : "";
+    wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.${hint}</div>`; return;
+  }
   const byClub = {};
   mine.forEach(e => { if(!byClub[e.club_name])byClub[e.club_name]=[]; byClub[e.club_name].push(e); });
   wrap.innerHTML = Object.entries(byClub).map(([clubName,entries]) => `
