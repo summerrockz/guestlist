@@ -405,10 +405,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-card-title">➕ Add to guestlist</div>
           <div class="dash-card-sub">Browse today's events and add guests</div>
         </div>
-        <div class="dash-card" onclick="showSection('section-mygl')">
-          <div class="dash-card-title">📋 My guestlist entries</div>
-          <div class="dash-card-sub">View and manage your submissions</div>
-        </div>
+
         <div class="dash-card" onclick="showSection('section-vip')">
           <div class="dash-card-title">🍾 VIP Table requests</div>
           <div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div>
@@ -428,7 +425,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
     <!-- EVENTS -->
     <div class="section" id="section-events">
-      <div class="section-title">Today's events</div>
+      <div class="section-title">Upcoming events</div>
       <div class="date-bar">
         <input type="date" id="events-date-from">
         <span style="color:var(--muted);font-size:12px;">→</span>
@@ -575,15 +572,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 <!-- MORE MENU OVERLAY -->
 <div id="more-menu" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="if(event.target===this)closeMoreMenu()">
   <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#1c1c1c;border-radius:22px 22px 0 0;border-top:1px solid rgba(255,255,255,0.1);padding-bottom:env(safe-area-inset-bottom,16px);overflow:hidden;animation:slideUp 0.25s ease;">
-
-    <button onclick="moreNav('section-vip')"
-      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
-      <span style="font-size:22px;">🍾</span>
-      <div>
-        <div>VIP Table requests</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Request tables at Hi, Ushuaia & more</div>
-      </div>
-    </button>
 
     <button id="more-admin" onclick="moreNav('section-admin')"
       style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
@@ -1000,8 +988,6 @@ async function initApp() {
     document.getElementById("more-vip-admin").style.display = "flex";
   }
 
-  document.getElementById("events-date-from").value = today();
-  document.getElementById("events-date-to").value = today();
   document.getElementById("mygl-date").value = today();
   document.getElementById("admin-date").value = today();
 
@@ -1109,12 +1095,21 @@ function renderDashboard() {
 
 // ── EVENTS ──
 function renderEvents() {
-  const dateFrom = document.getElementById("events-date-from").value || today();
-  const dateTo = document.getElementById("events-date-to").value || today();
+  const dateFrom = document.getElementById("events-date-from").value;
+  const dateTo = document.getElementById("events-date-to").value;
   const search = (document.getElementById("events-search")?.value || "").toLowerCase().trim();
   const wrap = document.getElementById("events-list");
   const club = id => CLUBS.find(c=>c.club_id===id)||{};
-  let dayEvents = EVENTS.filter(e => { const ed=(e.date||"").slice(0,10); return ed>=dateFrom && ed<=dateTo && (e.status||"").toLowerCase()!=="inactive"; });
+  const todayStr = today();
+  // If no dates set, show all upcoming events from today
+  let dayEvents = EVENTS.filter(e => {
+    const ed=(e.date||"").slice(0,10);
+    if ((e.status||"").toLowerCase()==="inactive") return false;
+    if (dateFrom && dateTo) return ed>=dateFrom && ed<=dateTo;
+    if (dateFrom) return ed>=dateFrom;
+    if (dateTo) return ed<=dateTo;
+    return ed>=todayStr; // default: all upcoming
+  });
   if (search) dayEvents = dayEvents.filter(e => {
     const cl = club(e.club_id);
     return (e.event_name||"").toLowerCase().includes(search) || (cl.club_name||"").toLowerCase().includes(search);
