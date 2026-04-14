@@ -2358,7 +2358,11 @@ function renderProducts() {
 function toggleProduct(vi) {
   const el = document.getElementById("prod-"+vi);
   if (!el) return;
-  el.style.display = el.style.display === "none" ? "block" : "none";
+  const isOpen = el.style.display !== "none";
+  // Close all
+  document.querySelectorAll("[id^='prod-']").forEach(e => e.style.display = "none");
+  // Open this one if it was closed
+  if (!isOpen) el.style.display = "block";
 }
 
 // ── CALENDAR ──
