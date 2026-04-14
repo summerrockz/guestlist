@@ -428,10 +428,18 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <!-- EVENTS -->
     <div class="section" id="section-events">
       <div class="section-title">Upcoming events</div>
-      <div class="date-bar">
-        <input type="date" id="events-date-from">
-        <span style="color:var(--muted);font-size:12px;">→</span>
-        <input type="date" id="events-date-to">
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+        <div style="flex:1;position:relative;">
+          <input type="date" id="events-date-from" placeholder="From date"
+            style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:12px 16px;font-size:13px;color:var(--text);-webkit-appearance:none;appearance:none;font-family:Poppins,sans-serif;">
+          <div id="events-from-label" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;font-size:13px;color:var(--muted);pointer-events:none;border-radius:999px;">📅 From date</div>
+        </div>
+        <span style="color:var(--muted);font-size:12px;flex-shrink:0;">→</span>
+        <div style="flex:1;position:relative;">
+          <input type="date" id="events-date-to" placeholder="To date"
+            style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:12px 16px;font-size:13px;color:var(--text);-webkit-appearance:none;appearance:none;font-family:Poppins,sans-serif;">
+          <div id="events-to-label" style="position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;font-size:13px;color:var(--muted);pointer-events:none;border-radius:999px;">📅 To date</div>
+        </div>
       </div>
       <input type="text" class="input-field" id="events-search" placeholder="Search event or venue…" oninput="renderEvents()" style="margin-bottom:16px;">
       <div id="events-list"><div class="loading">Loading events…</div></div>
@@ -993,8 +1001,16 @@ async function initApp() {
   document.getElementById("mygl-date").value = today();
   document.getElementById("admin-date").value = today();
 
-  document.getElementById("events-date-from").onchange = renderEvents;
-  document.getElementById("events-date-to").onchange = renderEvents;
+  document.getElementById("events-date-from").onchange = function() {
+    const lbl = document.getElementById("events-from-label");
+    if (lbl) lbl.style.display = this.value ? "none" : "flex";
+    renderEvents();
+  };
+  document.getElementById("events-date-to").onchange = function() {
+    const lbl = document.getElementById("events-to-label");
+    if (lbl) lbl.style.display = this.value ? "none" : "flex";
+    renderEvents();
+  };
   document.getElementById("mygl-date").onchange = renderMyGL;
   document.getElementById("admin-date").onchange = renderAdmin;
 
