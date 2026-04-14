@@ -1969,7 +1969,11 @@ function renderVipAdmin() {
   const wrap = document.getElementById("vip-admin-list");
   const adminSearch = (document.getElementById("vip-admin-search")?.value || "").toLowerCase().trim();
   let reqs = [...VIP_REQUESTS];
-  if (vipAdminFilterActive !== "all") reqs = reqs.filter(r => (r.status||"new") === vipAdminFilterActive);
+  if (vipAdminFilterActive === "all") {
+    reqs = reqs.filter(r => (r.status||"new") !== "cancelled");
+  } else {
+    reqs = reqs.filter(r => (r.status||"new") === vipAdminFilterActive);
+  }
   if (adminSearch) reqs = reqs.filter(r =>
     (r.name||"").toLowerCase().includes(adminSearch) ||
     (r.seller_name||"").toLowerCase().includes(adminSearch)
