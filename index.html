@@ -2238,15 +2238,13 @@ function renderProducts() {
   const wrap = document.getElementById("products-list");
   if (!PRODUCTS.length) { wrap.innerHTML = '<div class="empty">No products found.</div>'; return; }
 
-  // Group by venue
   const byVenue = {};
   PRODUCTS.forEach(p => {
     const v = p.venue || "Other";
-    if (!byVenue[v]) byVenue[v] = { image_url: p.image_url || "", code: p.code||"", time: p.time||"", days: p.days||"", music: p.music||"", dresscode: p.dresscode||"", notes_venue: "", items: [] };
+    if (!byVenue[v]) byVenue[v] = { image_url: p.image_url||"", time: p.time||"", days: p.days||"", music: p.music||"", dresscode: p.dresscode||"", notes: p.notes||"", items: [] };
     byVenue[v].items.push(p);
   });
 
-  // Emoji colors per ticket type
   function ticketColor(t) {
     t = (t||"").toLowerCase();
     if (t.includes("ultra")) return "#E8192C";
@@ -2255,54 +2253,58 @@ function renderProducts() {
     return "var(--muted)";
   }
 
-  wrap.innerHTML = Object.entries(byVenue).map(([venue, data]) => {
+  wrap.innerHTML = Object.entries(byVenue).map(([venue, data], vi) => {
     const first = data.items[0] || {};
-    const dresscode = first.dresscode || "";
-    const notes = first.notes || "";
+    const tickets = data.items.filter(p => ["special","normal"].some(t => (p.ticket_type||"").toLowerCase().includes(t)));
+    const vips = data.items.filter(p => (p.ticket_type||"").toLowerCase().includes("vip"));
 
-    return `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;">
-      ${data.image_url ? `<div style="position:relative;"><img src="${data.image_url}" style="width:100%;height:160px;object-fit:cover;display:block;"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);"></div><div style="position:absolute;bottom:0;left:0;padding:16px;"><div style="font-size:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">${venue}</div>${first.time?`<div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">${first.time}${first.days?" · "+first.days:""}</div>`:""}</div></div>` : `<div style="padding:16px 16px 0;"><div style="font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">${venue}</div>${first.time?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${first.time}${first.days?" · "+first.days:""}</div>`:""}</div>`}
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
+      ${data.image_url ? `<div style="position:relative;cursor:pointer;" onclick="toggleProduct(${vi})"><img src="${data.image_url}" style="width:100%;height:140px;object-fit:cover;display:block;"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%);"></div><div style="position:absolute;bottom:12px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;"><div><div style="font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">${venue}</div>${data.time?`<div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;">${data.time}${data.days?" · "+data.days:""}</div>`:""}</div><div style="font-size:18px;">›</div></div></div>`
+      : `<div style="padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleProduct(${vi})"><div><div style="font-size:14px;font-weight:700;">${venue}</div>${data.time?`<div style="font-size:11px;color:var(--muted);">${data.time}${data.days?" · "+data.days:""}</div>`:""}</div><div style="font-size:18px;color:var(--muted);">›</div></div>`}
 
-      <div style="padding:14px 16px;">
-        ${first.music ? `<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Music: ${first.music}</div>` : ""}
+      <div id="prod-${vi}" style="display:none;padding:14px 16px;">
+        ${data.music ? `<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Music: <span style="color:var(--text);">${data.music}</span></div>` : ""}
 
-        ${data.items.map(p => {
-          const isTicket = (p.ticket_type||"").toLowerCase().includes("special") || (p.ticket_type||"").toLowerCase().includes("normal");
-          if (isTicket) return `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
-              <div style="font-size:12px;color:var(--muted);">${p.ticket_type||""} ${p.emoji||""}</div>
-              <div style="font-size:12px;color:var(--text);">€${p.price_pp||p.price_total||""} ${p.drinks?`· ${p.drinks}`:""}</div>
-            </div>`;
+        ${tickets.length ? `<div style="margin-bottom:10px;">
+          ${tickets.map(p => `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+            <div style="font-size:12px;color:var(--muted);">${p.ticket_type||""} ${p.emoji||""}</div>
+            <div style="font-size:12px;color:var(--text);text-align:right;">${p.price_pp?`€${p.price_pp}`:""}${p.drinks?` · ${p.drinks}`:""}</div>
+          </div>`).join("")}
+        </div>` : ""}
 
-          return `
-            <div style="border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;margin-bottom:8px;margin-top:8px;background:rgba(255,255,255,0.03);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:16px;">${p.emoji||""}</span>
-                  <span style="font-size:13px;font-weight:700;color:${ticketColor(p.ticket_type)};">${(p.ticket_type||"").toUpperCase()}</span>
-                </div>
-                ${p.price_total ? `<span style="font-size:14px;font-weight:700;color:var(--green);">€${p.price_total}</span>` : ""}
+        ${vips.map(p => `
+          <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span>${p.emoji||""}</span>
+                <span style="font-size:12px;font-weight:700;color:${ticketColor(p.ticket_type)};letter-spacing:0.05em;">${(p.ticket_type||"").toUpperCase()}</span>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-                ${p.pax_app ? `<div><span style="color:var(--muted);">Pax</span> <span style="color:var(--text);font-weight:600;">${p.pax_app}${p.max_pax&&p.max_pax!==p.pax_app?" (max "+p.max_pax+")":""}</span></div>` : ""}
-                ${p.deposit ? `<div><span style="color:var(--muted);">Deposit</span> <span style="color:var(--text);font-weight:600;">€${p.deposit}</span></div>` : ""}
-                ${p.price_pp ? `<div><span style="color:var(--muted);">Per person</span> <span style="color:var(--text);font-weight:600;">€${p.price_pp}</span></div>` : ""}
-                ${p.included ? `<div><span style="color:var(--muted);">Included</span> <span style="color:var(--text);font-weight:600;">${p.included}</span></div>` : ""}
-                ${p.com_full ? `<div><span style="color:var(--muted);">Com full</span> <span style="color:var(--amber);font-weight:600;">${p.com_full}</span></div>` : ""}
-                ${p.com_dep ? `<div><span style="color:var(--muted);">Com dep</span> <span style="color:var(--amber);font-weight:600;">${p.com_dep}</span></div>` : ""}
-              </div>
-              ${p.drinks ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;"><span style="color:var(--muted);">Drinks: </span><span style="color:var(--text);">${p.drinks}</span></div>` : ""}
-              ${p.bottles ? `<div style="font-size:11px;margin-top:4px;"><span style="color:var(--muted);">Bottles: </span><span style="color:var(--text);">${p.bottles}</span></div>` : ""}
-              ${p.big_sizes ? `<div style="font-size:11px;margin-top:4px;"><span style="color:var(--muted);">Big sizes: </span><span style="color:var(--text);">${p.big_sizes}</span></div>` : ""}
-            </div>`;
-        }).join("")}
+              ${p.price_total?`<span style="font-size:14px;font-weight:700;color:var(--green);">€${p.price_total}</span>`:""}
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;">
+              ${p.pax_app?`<div><span style="color:var(--muted);">Pax </span><span style="font-weight:600;">${p.pax_app}${p.max_pax&&p.max_pax!=p.pax_app?" (max "+p.max_pax+")":""}</span></div>`:""}
+              ${p.deposit?`<div><span style="color:var(--muted);">Deposit </span><span style="font-weight:600;">€${p.deposit}</span></div>`:""}
+              ${p.price_pp?`<div><span style="color:var(--muted);">Per person </span><span style="font-weight:600;">€${p.price_pp}</span></div>`:""}
+              ${p.included?`<div><span style="color:var(--muted);">Included </span><span style="font-weight:600;">${p.included}</span></div>`:""}
+              ${p.com_full?`<div><span style="color:var(--muted);">Com full </span><span style="color:var(--amber);font-weight:600;">${p.com_full}</span></div>`:""}
+              ${p.com_dep?`<div><span style="color:var(--muted);">Com dep </span><span style="color:var(--amber);font-weight:600;">${p.com_dep}</span></div>`:""}
+            </div>
+            ${p.drinks?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);">Drinks: <span style="color:var(--text);">${p.drinks}</span></div>`:""}
+            ${p.bottles?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Bottles: <span style="color:var(--text);">${p.bottles}</span></div>`:""}
+            ${p.big_sizes?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Big sizes: <span style="color:var(--text);">${p.big_sizes}</span></div>`:""}
+          </div>`).join("")}
 
-        ${dresscode ? `<div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;"><span style="color:var(--muted);">Dresscode: </span><span style="color:var(--text);">${dresscode}</span></div>` : ""}
-        ${notes ? `<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${notes}</div>` : ""}
+        ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);">${data.dresscode}</span></div>`:""}
+        ${data.notes?`<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${data.notes}</div>`:""}
       </div>
     </div>`;
   }).join("");
+}
+
+function toggleProduct(vi) {
+  const el = document.getElementById("prod-"+vi);
+  if (!el) return;
+  el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
 // ── CALENDAR ──
