@@ -450,7 +450,16 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <!-- MY GL -->
     <div class="section" id="section-mygl">
       <div class="section-title">My guestlist entries</div>
-      <div class="date-bar"><input type="date" id="mygl-date"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+        <div style="flex:1;position:relative;" onclick="document.getElementById('mygl-date').showPicker ? document.getElementById('mygl-date').showPicker() : document.getElementById('mygl-date').click()">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:46px;">
+            <span id="mygl-date-label" style="color:var(--muted);">All entries</span>
+            <span style="color:var(--muted);font-size:11px;">Filter by date</span>
+          </div>
+          <input type="date" id="mygl-date" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;">
+        </div>
+        <button onclick="clearMyGLDate()" id="mygl-date-clear" style="display:none;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:13px 16px;font-size:12px;cursor:pointer;white-space:nowrap;">Clear</button>
+      </div>
       <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:16px;">
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
@@ -1114,7 +1123,7 @@ async function initApp() {
     document.getElementById("more-vip-admin").style.display = "flex";
   }
 
-  document.getElementById("mygl-date").value = today();
+  // mygl-date starts empty to show all entries
   document.getElementById("admin-date").value = today();
 
   document.getElementById("events-date-from").onchange = function() {
@@ -1146,6 +1155,7 @@ async function initApp() {
     renderEvents();
   };
   document.getElementById("mygl-date").onchange = renderMyGL;
+  document.getElementById("admin-date").value = today();
   document.getElementById("admin-date").onchange = renderAdmin;
 
   await loadData();
@@ -1299,35 +1309,45 @@ async function markEntrySent(entryId, isSent) {
 }
 
 function renderMyGL() {
-  const date = document.getElementById("mygl-date").value||today();
+  const dateFilter = document.getElementById("mygl-date").value;
   const search = (document.getElementById("mygl-search")?.value||"").toLowerCase().trim();
   const wrap = document.getElementById("mygl-list");
   const myId = String(SELLER.seller_id||"").trim();
   const managedIds = SELLERS.filter(s => { const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim()); return mgrs.includes(myId); }).map(s=>String(s.seller_id).trim());
+
+  // Update date label
+  const dateLabel = document.getElementById("mygl-date-label");
+  const clearBtn = document.getElementById("mygl-date-clear");
+  if (dateFilter) {
+    const d = new Date(dateFilter + "T12:00:00");
+    if (dateLabel) { dateLabel.textContent = d.toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"}); dateLabel.style.color = "var(--text)"; }
+    if (clearBtn) clearBtn.style.display = "block";
+  } else {
+    if (dateLabel) { dateLabel.textContent = "All entries"; dateLabel.style.color = "var(--muted)"; }
+    if (clearBtn) clearBtn.style.display = "none";
+  }
+
   const mine = ENTRIES.filter(e => {
     const sid=String(e.seller_id||"").trim();
     const entryDate=(e.date||"").slice(0,10);
-    const matchesDate = entryDate === date;
+    const matchesDate = !dateFilter || entryDate === dateFilter;
     const matchesSearch=!search||(e.guest_name||"").toLowerCase().includes(search);
     const isOwn=sid===myId||managedIds.includes(sid);
     const visible=(e.status||"").toLowerCase()!=="deleted";
-    if (search) return isOwn&&matchesSearch&&visible;
-    return isOwn&&matchesDate&&visible;
-  });
-  // If no entries for selected date, check if there are entries on other dates
-  const hasOtherEntries = !mine.length && ENTRIES.some(e => {
-    const sid=String(e.seller_id||"").trim();
-    const isOwn=sid===myId||managedIds.includes(sid);
-    return isOwn&&(e.status||"").toLowerCase()!=="deleted";
-  });
+    return isOwn&&matchesDate&&matchesSearch&&visible;
+  }).sort((a,b) => (b.date||"").localeCompare(a.date||""));
+  const hasOtherEntries = false;
   if (!mine.length) {
-    const hint = hasOtherEntries ? `<div style="font-size:12px;color:var(--muted);margin-top:8px;">You have entries on other dates — use the date picker to find them, or use the search bar.</div>` : "";
-    wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.${hint}</div>`; return;
+    wrap.innerHTML=`<div class="empty">${dateFilter ? "No entries for " + formatDate(dateFilter) : "No entries yet."}</div>`; return;
   }
-  const byClub = {};
-  mine.forEach(e => { if(!byClub[e.club_name])byClub[e.club_name]=[]; byClub[e.club_name].push(e); });
-  wrap.innerHTML = Object.entries(byClub).map(([clubName,entries]) => `
-    <div class="day-group-label">${clubName} · ${entries.length} entries</div>
+  const byDateClub = {};
+  mine.forEach(e => {
+    const key = (e.date||"").slice(0,10) + "_" + (e.club_name||"");
+    if(!byDateClub[key]) byDateClub[key]={date:(e.date||"").slice(0,10),club:e.club_name,entries:[]};
+    byDateClub[key].entries.push(e);
+  });
+  wrap.innerHTML = Object.values(byDateClub).map(({date:d,club:clubName,entries}) => `
+    <div class="day-group-label">${formatDate(d)} · ${clubName} · ${entries.length} entries</div>
     ${entries.map(e => `<div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled'?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div class="gl-card-top"><div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled'?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</div><div style="display:flex;align-items:center;gap:6px;">${(e.sent_to_club||"").toLowerCase()==="yes"?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);">Sent</span>`:""}<div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div></div><div class="gl-meta">${formatDate(e.date)}${e.email?` · ${e.email}`:""}${e.notes?` · ${e.notes}`:""}</div>${String(e.seller_id||"").trim()!==String(SELLER.seller_id||"").trim()?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">Added by: ${e.seller_name||""}</div>`:""} ${(e.status||'').toLowerCase()==='cancelled'?`<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`:`<button class="gl-delete" onclick="deleteEntry('${e.entry_id}',this)">🗑 Cancel entry</button>`}</div>`).join("")}
   `).join("");
 }
