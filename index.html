@@ -1394,7 +1394,6 @@ function renderEvents() {
   // If no dates set, show all upcoming events from today
   let dayEvents = EVENTS.filter(e => {
     const ed=normalizeDate(e.date||"");
-    if ((e.status||"").toLowerCase()==="inactive") return false;
     if (dateFrom && dateTo) return ed>=dateFrom && ed<=dateTo;
     if (dateFrom) return ed>=dateFrom;
     if (dateTo) return ed<=dateTo;
@@ -1419,7 +1418,7 @@ function renderEvents() {
         const spotsLeft = ev.spots_left !== undefined && ev.spots_left !== '' && ev.spots_left !== null ? parseInt(ev.spots_left) : null;
         const isFull = spotsLeft!==null && spotsLeft<=0;
         const freeText = ev.free_condition ? (ev.free_condition.toLowerCase().startsWith("free")?ev.free_condition:`Free ${ev.free_condition}`) : (ev.price_after?`€${ev.price_after} ${ev.price_type||""}`:"Free");
-        return `<div class="event-card"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull)?"disabled":""} onclick="openModal('${ev.event_id}','${clubId}')">${closed?"Deadline passed":isFull?"Guestlist full":"+ Add to guestlist"}</button></div>`;
+        return `<div class="event-card"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull||(ev.status||"").toLowerCase()==="inactive")?"disabled":""} onclick="openModal('${ev.event_id}','${clubId}')">${closed?"Deadline passed":isFull?"Guestlist full":(ev.status||"").toLowerCase()==="inactive"?"Not available":"+ Add to guestlist"}</button></div>`;
       }).join("");
     }).join("");
   }).join("");
@@ -2558,9 +2557,9 @@ function calShowEvents() {
           ${spotsLeft !== null ? `<span>👥 ${spotsLeft} spots left</span>` : ""}
         </div>
         ${ev.extra_notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>` : ""}
-        <button class="btn-add-gl" ${(closed||isFull)?"disabled":""}
+        <button class="btn-add-gl" ${(closed||isFull||(ev.status||"").toLowerCase()==="inactive")?"disabled":""}
           onclick="openModal('${ev.event_id}','${ev.club_id}')">
-          ${closed?"Deadline passed":isFull?"Guestlist full":"+ Add to guestlist"}
+          ${closed?"Deadline passed":isFull?"Guestlist full":(ev.status||"").toLowerCase()==="inactive"?"Not available":"+ Add to guestlist"}
         </button>
       </div>`;
   }).join("");
