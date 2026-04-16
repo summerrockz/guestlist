@@ -1123,6 +1123,22 @@ const VIP_EVENTS = {
 
 // ── UTILS ──
 function today() { return new Date().toISOString().slice(0,10); }
+function normalizeDate(d) {
+  if (!d) return "";
+  d = String(d).trim();
+  // Handle DD-MM-YYYY format
+  if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
+    const parts = d.split("-");
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  // Handle DD/MM/YYYY format
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(d)) {
+    const parts = d.split("/");
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  // Already YYYY-MM-DD or date object string
+  return d.slice(0,10);
+}
 function formatDate(d) {
   if (!d) return "";
   const dt = new Date(d + 'T12:00:00');
@@ -1377,7 +1393,7 @@ function renderEvents() {
   const todayStr = today();
   // If no dates set, show all upcoming events from today
   let dayEvents = EVENTS.filter(e => {
-    const ed=(e.date||"").slice(0,10);
+    const ed=normalizeDate(e.date||"");
     if ((e.status||"").toLowerCase()==="inactive") return false;
     if (dateFrom && dateTo) return ed>=dateFrom && ed<=dateTo;
     if (dateFrom) return ed>=dateFrom;
@@ -1390,7 +1406,7 @@ function renderEvents() {
   });
   if (!dayEvents.length) { wrap.innerHTML=`<div class="empty">No events for this period.</div>`; return; }
   const byDateClub = {};
-  dayEvents.forEach(e => { const d=(e.date||"").slice(0,10); if(!byDateClub[d])byDateClub[d]={}; if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[]; byDateClub[d][e.club_id].push(e); });
+  dayEvents.forEach(e => { const d=normalizeDate(e.date||""); if(!byDateClub[d])byDateClub[d]={}; if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[]; byDateClub[d][e.club_id].push(e); });
   wrap.innerHTML = Object.keys(byDateClub).sort().map(date => {
     const byClub = byDateClub[date];
     return `<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>` +
@@ -1441,7 +1457,7 @@ function renderMyGL() {
 
   const mine = ENTRIES.filter(e => {
     const sid=String(e.seller_id||"").trim();
-    const entryDate=(e.date||"").slice(0,10);
+    const entryDate=normalizeDate(e.date||"");
     const matchesDate = !dateFilter || entryDate === dateFilter;
     const matchesSearch=!search||(e.guest_name||"").toLowerCase().includes(search);
     const isOwn=sid===myId||managedIds.includes(sid);
@@ -1454,13 +1470,13 @@ function renderMyGL() {
   }
   const byDateClub = {};
   mine.forEach(e => {
-    const key = (e.date||"").slice(0,10) + "_" + (e.club_name||"");
-    if(!byDateClub[key]) byDateClub[key]={date:(e.date||"").slice(0,10),club:e.club_name,entries:[]};
+    const key = normalizeDate(e.date||"") + "_" + (e.club_name||"");
+    if(!byDateClub[key]) byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[]};
     byDateClub[key].entries.push(e);
   });
   wrap.innerHTML = Object.values(byDateClub).map(({date:d,club:clubName,entries}) => `
     <div class="day-group-label">${formatDate(d)} · ${clubName} · ${entries.length} entries</div>
-    ${entries.map(e => `<div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled'?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div class="gl-card-top"><div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled'?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</div><div style="display:flex;align-items:center;gap:6px;">${(e.sent_to_club||"").toLowerCase()==="yes"?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);">Sent</span>`:""}<div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div></div><div class="gl-meta">${formatDate(e.date)}${e.email?` · ${e.email}`:""}${e.notes?` · ${e.notes}`:""}</div>${e.seller_name?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">Seller: ${e.seller_name}</div>`:""} ${(e.status||'').toLowerCase()==='cancelled'?`<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`:`<button onclick="deleteEntry('${e.entry_id}',this)" style="margin-top:8px;padding:6px 16px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;">Cancel entry</button>`}</div>`).join("")}
+    ${entries.map(e => `<div class="gl-card" style="${(e.status||'').toLowerCase()==='cancelled'?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div class="gl-card-top"><div class="gl-guest-name" style="${(e.status||'').toLowerCase()==='cancelled'?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</div><div style="display:flex;align-items:center;gap:6px;">${(e.sent_to_club||"").toLowerCase()==="yes"?`<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);">Sent</span>`:""}<div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div></div><div class="gl-meta">${formatDate(normalizeDate(e.date))}${e.email?` · ${e.email}`:""}${e.notes?` · ${e.notes}`:""}</div>${e.seller_name?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">Seller: ${e.seller_name}</div>`:""} ${(e.status||'').toLowerCase()==='cancelled'?`<div style="font-size:11px;color:var(--red);margin-top:6px;">⚠️ Cancelled — notify the club</div>`:`<button onclick="deleteEntry('${e.entry_id}',this)" style="margin-top:8px;padding:6px 16px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:12px;font-weight:600;cursor:pointer;">Cancel entry</button>`}</div>`).join("")}
   `).join("");
 }
 
@@ -1509,7 +1525,7 @@ function renderAdmin() {
   if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
   const date = document.getElementById("admin-date").value||today();
   const wrap = document.getElementById("admin-list");
-  const dayEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&(e.status||"").toLowerCase()!=="deleted"&&myClubs.includes(e.club_id); });
+  const dayEntries = ENTRIES.filter(e => { const d=normalizeDate(e.date||""); return d===date&&(e.status||"").toLowerCase()!=="deleted"&&myClubs.includes(e.club_id); });
   if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
   if (!dayEntries.length) { wrap.innerHTML=`<div class="empty">No entries for ${formatDate(date)}.</div>`; return; }
   const byClub = {};
@@ -1519,7 +1535,7 @@ function renderAdmin() {
     const format = cl.format||"name";
     const ds = deadlineStatus(cl.deadline,date);
     const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
-    const allEntries = ENTRIES.filter(e => { const d=(e.date||"").slice(0,10); return d===date&&myClubs.includes(e.club_id)&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()); });
+    const allEntries = ENTRIES.filter(e => { const d=normalizeDate(e.date||""); return d===date&&myClubs.includes(e.club_id)&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()); });
 
     // Split entries: normal vs drink package
     const normalEntries = allEntries.filter(e => !(e.notes||"").includes("🍹 Drink package:"));
@@ -2378,7 +2394,7 @@ function renderCalendar() {
   const eventDates = new Set();
   EVENTS.forEach(ev => {
     if ((ev.status||"").toLowerCase() !== "inactive") {
-      const d = (ev.date||"").slice(0,10);
+      const d = normalizeDate(ev.date||"");
       if (d) eventDates.add(d);
     }
   });
@@ -2388,7 +2404,7 @@ function renderCalendar() {
   const myGLDates = new Set();
   ENTRIES.forEach(e => {
     if (String(e.seller_id||"").trim() === myId && (e.status||"").toLowerCase() === "active") {
-      const d = (e.date||"").slice(0,10);
+      const d = normalizeDate(e.date||"");
       if (d) myGLDates.add(d);
     }
   });
@@ -2469,7 +2485,7 @@ function calShowMyGL() {
   const entries = ENTRIES.filter(e => {
     const sid = String(e.seller_id||"").trim();
     const isOwn = sid === myId || managedIds.includes(sid);
-    return (e.date||"").slice(0,10) === calSelectedDate && isOwn && (e.status||"").toLowerCase() !== "deleted";
+    return normalizeDate(e.date||"") === calSelectedDate && isOwn && (e.status||"").toLowerCase() !== "deleted";
   });
 
   const wrap = document.getElementById("cal-detail-content");
@@ -2504,7 +2520,7 @@ function calShowMyGL() {
 function calShowEvents() {
   calActiveView = "events";
   const dayEvents = EVENTS.filter(e =>
-    (e.date||"").slice(0,10) === calSelectedDate &&
+    normalizeDate(e.date||"") === calSelectedDate &&
     (e.status||"").toLowerCase() !== "inactive"
   );
 
