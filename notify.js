@@ -13,11 +13,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  // simple API key check so only Apps Script can trigger
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== process.env.NOTIFY_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -28,7 +26,7 @@ export default async function handler(req, res) {
   try {
     let subscriberIds;
     if (sellerId) {
-      subscriberIds = [sellerId];
+      subscriberIds = [String(sellerId)];
     } else {
       subscriberIds = await redis.smembers('push_subscribers');
     }
