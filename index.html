@@ -605,6 +605,24 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
     </div>
 
+    <!-- VIP PRICES -->
+    <div class="section" id="section-vip-prices">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:0;">VIP Prices</div>
+      </div>
+
+      <!-- Venue tabs -->
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <button onclick="setVipPriceVenue('Hi')" class="prog-month-btn active" id="vpp-Hi">Hi</button>
+        <button onclick="setVipPriceVenue('Ushuaia')" class="prog-month-btn" id="vpp-Ushuaia">Ushuaia</button>
+        <button onclick="setVipPriceVenue('UNVRS')" class="prog-month-btn" id="vpp-UNVRS">UNVRS</button>
+        <button onclick="setVipPriceVenue('Chinois')" class="prog-month-btn" id="vpp-Chinois">Chinois</button>
+        <button onclick="setVipPriceVenue('Lio')" class="prog-month-btn" id="vpp-Lio">Lio</button>
+      </div>
+
+      <div id="vip-prices-list"><div class="loading">Loading…</div></div>
+    </div>
+
     <!-- VIP PROCESS -->
     <div class="section" id="section-vip-process">
       <div class="section-title">VIP Process</div>
@@ -620,8 +638,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           Process
         </button>
         <button onclick="setVipProcessTab('faq')" id="vpt-faq"
-          style="flex:1;padding:8px;border-radius:999px;border:none;font-size:12px;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted);">
+          style="flex:1;padding:8px;border-radius:999px;border:none;font-size:10px;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted);">
           FAQ
+        </button>
+        <button onclick="setVipProcessTab('commissions')" id="vpt-commissions"
+          style="flex:1;padding:8px;border-radius:999px;border:none;font-size:10px;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted);">
+          Rates
         </button>
       </div>
 
@@ -712,6 +734,65 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div style="display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:var(--red);min-width:20px;">9.</div><div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.55;">If the client does not show up, he/she will lose the deposit.</div></div>
         <div style="display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:var(--red);min-width:20px;">10.</div><div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.55;">For Hi, UNVRS &amp; Ushuaia, you receive the payment link from Rowan on WhatsApp.</div></div>
         <div style="display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:var(--red);min-width:20px;">11.</div><div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.55;">For Lio the client receives the payment link by email.</div></div>
+      </div>
+
+      <!-- COMMISSIONS TAB -->
+      <div id="vpt-content-commissions" style="display:none;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:10px 14px;">
+          These are 2025 rates — will be updated for 2026 season.
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">USHUAIA</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;">
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">David Guetta</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">2 - Calvin Harris</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">1.80%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">5 - Calvin Harris</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">1.80%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Tomorrowland</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Martin Garrix</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">ANTS</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Kygo</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Armin van Buuren</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Elrow</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Opening Party</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red);font-weight:600;text-align:right;">No com</div>
+            <div style="font-size:12px;padding:6px 0;color:rgba(255,255,255,0.8);">Closing Party</div><div style="font-size:12px;padding:6px 0;color:var(--red);font-weight:600;text-align:right;">No com</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">HI IBIZA</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;">
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Our House</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">6%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Martinez Brothers</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Dom Dolla</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Hugel</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Black Coffee</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red);font-weight:600;text-align:right;">No com</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Now Here</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">6%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Mestiza</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">6%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Blackworks</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">6%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Opening Party</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red);font-weight:600;text-align:right;">No com</div>
+            <div style="font-size:12px;padding:6px 0;color:rgba(255,255,255,0.8);">Closing Party</div><div style="font-size:12px;padding:6px 0;color:var(--red);font-weight:600;text-align:right;">No com</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">UNVRS</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;">
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Holosphere 2.0</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Anyma</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Fisher</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Galactic Circus</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">1.80%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Carl Cox</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Opening Party</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--red);font-weight:600;text-align:right;">No com</div>
+            <div style="font-size:12px;padding:6px 0;color:rgba(255,255,255,0.8);">Closing Party</div><div style="font-size:12px;padding:6px 0;color:var(--red);font-weight:600;text-align:right;">No com</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">LIO</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px;">
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Nasty Beats</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Blanche</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:rgba(255,255,255,0.8);">Toy Room</div><div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);color:var(--green);font-weight:600;text-align:right;">3%</div>
+            <div style="font-size:12px;padding:6px 0;color:rgba(255,255,255,0.8);">Travieso</div><div style="font-size:12px;padding:6px 0;color:var(--green);font-weight:600;text-align:right;">3%</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -828,12 +909,21 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
     </button>
 
+    <button onclick="moreNav('section-vip-prices')"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">💶</span>
+      <div>
+        <div>VIP Prices</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Current table prices per venue</div>
+      </div>
+    </button>
+
     <button onclick="moreNav('section-vip-process')"
       style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
       <span style="font-size:22px;">🍾</span>
       <div>
-        <div>VIP Process</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">How to request & FAQ</div>
+        <div>VIP Process & Commissions</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">How to request, FAQ & rates</div>
       </div>
     </button>
 
@@ -1190,7 +1280,7 @@ function showSection(id) {
     "section-dashboard":"nav-dashboard","section-events":"nav-events",
     "section-mygl":"nav-mygl","section-admin":"nav-more",
     "section-vip":"nav-more","section-vip-admin":"nav-more",
-    "section-calendar":"nav-calendar","section-programme":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-more"
+    "section-calendar":"nav-calendar","section-programme":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-more","section-vip-prices":"nav-more"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
@@ -1209,6 +1299,7 @@ function showSection(id) {
   if (id === "section-calendar") loadData().then(renderCalendar);
   if (id === "section-products") loadProducts();
   if (id === "section-programme") renderProgramme();
+  if (id === "section-vip-prices") loadVipPrices();
 }
 
 // ── LOGIN ──
@@ -2244,6 +2335,105 @@ async function updateVipRequest(requestId) {
 }
 
 
+
+// ── VIP PRICES ──
+let VIP_PRICES_DATA = [];
+let vipPriceVenue = 'Hi';
+
+async function loadVipPrices() {
+  const wrap = document.getElementById("vip-prices-list");
+  wrap.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    VIP_PRICES_DATA = await fetchSheet("VIP_PRICES");
+    renderVipPrices();
+  } catch(e) {
+    wrap.innerHTML = '<div class="empty">Could not load prices.</div>';
+  }
+}
+
+function setVipPriceVenue(venue) {
+  vipPriceVenue = venue;
+  ['Hi','Ushuaia','UNVRS','Chinois','Lio'].forEach(v => {
+    const btn = document.getElementById("vpp-"+v);
+    if (btn) {
+      btn.classList.toggle("active", v === venue);
+    }
+  });
+  renderVipPrices();
+}
+
+function renderVipPrices() {
+  const wrap = document.getElementById("vip-prices-list");
+  const isAdmin = String(SELLER.seller_id||"").trim() === "1";
+  const todayStr = today();
+
+  const prices = VIP_PRICES_DATA.filter(p => (p.venue||"").toLowerCase() === vipPriceVenue.toLowerCase())
+    .sort((a,b) => normalizeDate(a.event_date||"").localeCompare(normalizeDate(b.event_date||"")));
+
+  if (!prices.length) {
+    wrap.innerHTML = `<div class="empty">No prices available for ${vipPriceVenue} yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = prices.map((p, i) => {
+    const eventDate = normalizeDate(p.event_date||"");
+    const receivedDate = normalizeDate(p.received_date||"");
+
+    // Check validity — 5 days from received_date
+    let daysOld = null;
+    let isExpired = false;
+    let isExpiringSoon = false;
+    if (receivedDate) {
+      const received = new Date(receivedDate + "T12:00:00");
+      const now = new Date();
+      daysOld = Math.floor((now - received) / (1000*60*60*24));
+      isExpired = daysOld > 5;
+      isExpiringSoon = daysOld >= 4 && !isExpired;
+    }
+
+    const priceInfo = (p.price_info||"").trim();
+
+    return `<div style="background:var(--card);border:1px solid ${isExpired?"rgba(232,25,44,0.3)":isExpiringSoon?"rgba(245,158,11,0.3)":"var(--border)"};border-radius:var(--radius);padding:16px;margin-bottom:12px;${isExpired?"opacity:0.6;":""}">
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;">${p.event_name||""}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${eventDate?formatDate(eventDate):""}</div>
+        </div>
+        <div style="text-align:right;">
+          ${receivedDate ? `<div style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;${isExpired?"background:rgba(232,25,44,0.15);color:var(--red);":isExpiringSoon?"background:rgba(245,158,11,0.15);color:var(--amber);":"background:rgba(34,197,94,0.1);color:var(--green);"}">
+            ${isExpired ? `Expired (${daysOld}d)` : `Valid · ${5-daysOld}d left`}
+          </div>` : ""}
+          ${receivedDate ? `<div style="font-size:10px;color:var(--muted);margin-top:3px;">Received ${formatDate(receivedDate)}</div>` : ""}
+        </div>
+      </div>
+
+      <!-- Price info -->
+      ${priceInfo ? `<div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,0.85);white-space:pre-wrap;line-height:1.6;margin-bottom:10px;">${priceInfo}</div>` : `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px;">No price info yet.</div>`}
+
+      ${p.notes ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${p.notes}</div>` : ""}
+
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;">
+        ${priceInfo ? `<button class="btn-copy" onclick="copyVipPrice(${i})" id="copy-price-${i}" style="flex:1;padding:8px;font-size:12px;">📋 Copy prices</button>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function copyVipPrice(index) {
+  const prices = VIP_PRICES_DATA.filter(p => (p.venue||"").toLowerCase() === vipPriceVenue.toLowerCase())
+    .sort((a,b) => normalizeDate(a.event_date||"").localeCompare(normalizeDate(b.event_date||"")));
+  const p = prices[index];
+  if (!p) return;
+  const text = `${p.venue} — ${p.event_name}\n${p.event_date ? formatDate(normalizeDate(p.event_date)) : ""}\n\n${p.price_info||""}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copy-price-"+index);
+    if (btn) { btn.textContent = "✓ Copied!"; btn.classList.add("copied"); setTimeout(()=>{ btn.textContent="📋 Copy prices"; btn.classList.remove("copied"); },2000); }
+  });
+}
+
 // ── PRODUCTS ──
 let PRODUCTS = [];
 
@@ -2588,7 +2778,7 @@ function copyVipTemplate(type) {
 }
 
 function setVipProcessTab(tab) {
-  ['request','process','faq'].forEach(t => {
+  ['request','process','faq','commissions'].forEach(t => {
     const btn = document.getElementById('vpt-'+t);
     const content = document.getElementById('vpt-content-'+t);
     if (btn) {
