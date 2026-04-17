@@ -1616,7 +1616,11 @@ function openModal(eventId, clubId) {
   document.getElementById("modal-msg").textContent="";
 
   // Drink package — show for Chinois & Lio
-  const hasDrink = ["club_chinois","lio"].includes(clubId);
+  // Lio: drink package only on Wednesday (3) and Sunday (0)
+  const eventDate = CURRENT_EVENT?.date ? new Date(normalizeDate(CURRENT_EVENT.date) + "T12:00:00") : null;
+  const eventDow = eventDate ? eventDate.getDay() : -1; // 0=Sun, 3=Wed
+  const lioNeedsPackage = clubId === "lio" && (eventDow === 0 || eventDow === 3);
+  const hasDrink = clubId === "club_chinois" || lioNeedsPackage;
   document.getElementById("modal-drink-group").style.display = hasDrink ? "block" : "none";
   if (hasDrink) {
     // Reset drink package state
