@@ -1616,10 +1616,10 @@ function openModal(eventId, clubId) {
   document.getElementById("modal-msg").textContent="";
 
   // Drink package — show for Chinois & Lio
-  // Lio: drink package only on Wednesday (3) and Sunday (0)
+  // Lio: drink package only on Wednesday (Toy Room) — women free, men €40 incl. 1 drink
   const eventDate = CURRENT_EVENT?.date ? new Date(normalizeDate(CURRENT_EVENT.date) + "T12:00:00") : null;
-  const eventDow = eventDate ? eventDate.getDay() : -1; // 0=Sun, 3=Wed
-  const lioNeedsPackage = clubId === "lio" && (eventDow === 0 || eventDow === 3);
+  const eventDow = eventDate ? eventDate.getDay() : -1; // 3=Wed
+  const lioNeedsPackage = clubId === "lio" && eventDow === 3;
   const hasDrink = clubId === "club_chinois" || lioNeedsPackage;
   document.getElementById("modal-drink-group").style.display = hasDrink ? "block" : "none";
   if (hasDrink) {
@@ -1638,7 +1638,8 @@ function openModal(eventId, clubId) {
       "3x beer/wine/soft drinks — €45",
       "5x beer/wine/soft drinks — €60"
     ] : [
-      "Drink package (TBC)"
+      "Women — Free entry",
+      "Men — €40 incl. 1 drink"
     ];
     packages.forEach(p => { const o = document.createElement("option"); o.value = p; o.textContent = p; pkgSel.appendChild(o); });
   }
