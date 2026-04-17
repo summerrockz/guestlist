@@ -2353,64 +2353,149 @@ function setVipPriceVenue(venue) {
   renderVipPrices();
 }
 
+let vipPriceCalYear = null;
+let vipPriceCalMonth = null;
+let vipPriceOpenDate = null;
+
 function renderVipPrices() {
   const wrap = document.getElementById("vip-prices-list");
-  const isAdmin = String(SELLER.seller_id||"").trim() === "1";
   const todayStr = today();
+  const now = new Date();
+  if (!vipPriceCalYear) { vipPriceCalYear = now.getFullYear(); vipPriceCalMonth = now.getMonth(); }
 
-  const prices = VIP_PRICES_DATA.filter(p => (p.venue||"").toLowerCase() === vipPriceVenue.toLowerCase())
-    .sort((a,b) => normalizeDate(a.event_date||"").localeCompare(normalizeDate(b.event_date||"")));
+  const prices = VIP_PRICES_DATA.filter(p => (p.venue||"").toLowerCase() === vipPriceVenue.toLowerCase());
 
-  if (!prices.length) {
-    wrap.innerHTML = `<div class="empty">No prices available for ${vipPriceVenue} yet.</div>`;
-    return;
+  // Build date map
+  const priceByDate = {};
+  prices.forEach(p => {
+    const d = normalizeDate(p.event_date||"");
+    if (d) priceByDate[d] = p;
+  });
+
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const firstDay = new Date(vipPriceCalYear, vipPriceCalMonth, 1);
+  const daysInMonth = new Date(vipPriceCalYear, vipPriceCalMonth+1, 0).getDate();
+  const startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay()-1;
+  const daysInPrev = new Date(vipPriceCalYear, vipPriceCalMonth, 0).getDate();
+
+  let calHtml = "";
+  // prev month
+  for (let i = startDow-1; i >= 0; i--) {
+    calHtml += `<div class="cal-day-cell other-month"><div class="cal-day-num">${daysInPrev-i}</div></div>`;
+  }
+  // current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${vipPriceCalYear}-${String(vipPriceCalMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === vipPriceOpenDate;
+    const hasPrice = !!priceByDate[dateStr];
+    const p = priceByDate[dateStr];
+    let dotColor = "";
+    if (hasPrice && p) {
+      const rec = normalizeDate(p.received_date||"");
+      if (rec) {
+        const daysOld = Math.floor((new Date() - new Date(rec+"T12:00:00")) / (1000*60*60*24));
+        dotColor = daysOld > 5 ? "#E8192C" : daysOld >= 4 ? "#F59E0B" : "#22C55E";
+      } else {
+        dotColor = "#3B82F6";
+      }
+    }
+    calHtml += `<div class="cal-day-cell${isToday?" today":""}${isSelected?" selected":""}" onclick="toggleVipPriceDay('${dateStr}')">
+      <div class="cal-day-num">${d}</div>
+      ${hasPrice ? `<div class="cal-dots"><div class="cal-dot" style="background:${dotColor};"></div></div>` : ""}
+    </div>`;
+  }
+  // next month padding
+  const total = startDow + daysInMonth;
+  const rem = total % 7 === 0 ? 0 : 7-(total%7);
+  for (let i = 1; i <= rem; i++) {
+    calHtml += `<div class="cal-day-cell other-month"><div class="cal-day-num">${i}</div></div>`;
   }
 
-  wrap.innerHTML = prices.map((p, i) => {
-    const eventDate = normalizeDate(p.event_date||"");
+  // Selected day card
+  let cardHtml = "";
+  if (vipPriceOpenDate && priceByDate[vipPriceOpenDate]) {
+    const p = priceByDate[vipPriceOpenDate];
     const receivedDate = normalizeDate(p.received_date||"");
-
-    // Check validity — 5 days from received_date
-    let daysOld = null;
-    let isExpired = false;
-    let isExpiringSoon = false;
+    let daysOld = null, isExpired = false, isExpiringSoon = false;
     if (receivedDate) {
-      const received = new Date(receivedDate + "T12:00:00");
-      const now = new Date();
-      daysOld = Math.floor((now - received) / (1000*60*60*24));
+      daysOld = Math.floor((new Date() - new Date(receivedDate+"T12:00:00")) / (1000*60*60*24));
       isExpired = daysOld > 5;
       isExpiringSoon = daysOld >= 4 && !isExpired;
     }
-
     const priceInfo = (p.price_info||"").trim();
-
-    return `<div style="background:var(--card);border:1px solid ${isExpired?"rgba(232,25,44,0.3)":isExpiringSoon?"rgba(245,158,11,0.3)":"var(--border)"};border-radius:var(--radius);padding:16px;margin-bottom:12px;${isExpired?"opacity:0.6;":""}">
-
-      <!-- Header -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+    cardHtml = `<div style="background:var(--card);border:1px solid ${isExpired?"rgba(232,25,44,0.4)":isExpiringSoon?"rgba(245,158,11,0.4)":"rgba(34,197,94,0.3)"};border-radius:var(--radius);padding:16px;margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
         <div>
-          <div style="font-size:14px;font-weight:700;">${p.event_name||""}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${eventDate?formatDate(eventDate):""}</div>
+          <div style="font-size:15px;font-weight:700;">${p.event_name||""}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${formatDate(vipPriceOpenDate)}</div>
         </div>
-        <div style="text-align:right;">
-          ${receivedDate ? `<div style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;${isExpired?"background:rgba(232,25,44,0.15);color:var(--red);":isExpiringSoon?"background:rgba(245,158,11,0.15);color:var(--amber);":"background:rgba(34,197,94,0.1);color:var(--green);"}">
-            ${isExpired ? `Expired (${daysOld}d)` : `Valid · ${5-daysOld}d left`}
-          </div>` : ""}
-          ${receivedDate ? `<div style="font-size:10px;color:var(--muted);margin-top:3px;">Received ${formatDate(receivedDate)}</div>` : ""}
-        </div>
+        ${receivedDate ? `<div style="text-align:right;"><div style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;${isExpired?"background:rgba(232,25,44,0.15);color:var(--red);":isExpiringSoon?"background:rgba(245,158,11,0.15);color:var(--amber);":"background:rgba(34,197,94,0.1);color:var(--green);}"}">
+          ${isExpired?`Expired (${daysOld}d)`:`Valid · ${5-daysOld}d left`}
+        </div><div style="font-size:10px;color:var(--muted);margin-top:3px;">Received ${formatDate(receivedDate)}</div></div>` : ""}
       </div>
-
-      <!-- Price info -->
-      ${priceInfo ? `<div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,0.85);white-space:pre-wrap;line-height:1.6;margin-bottom:10px;">${priceInfo}</div>` : `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px;">No price info yet.</div>`}
-
+      ${priceInfo ? `<div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,0.9);white-space:pre-wrap;line-height:1.7;margin-bottom:12px;">${priceInfo}</div>` : `<div style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:12px;">No price info yet.</div>`}
       ${p.notes ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${p.notes}</div>` : ""}
-
-      <!-- Actions -->
-      <div style="display:flex;gap:8px;">
-        ${priceInfo ? `<button class="btn-copy" onclick="copyVipPrice(${i})" id="copy-price-${i}" style="flex:1;padding:8px;font-size:12px;">📋 Copy prices</button>` : ""}
-      </div>
+      ${priceInfo ? `<button class="btn-copy" onclick="copyVipPriceByDate('${vipPriceOpenDate}')" id="copy-price-date" style="width:100%;padding:10px;font-size:12px;">📋 Copy prices</button>` : ""}
     </div>`;
-  }).join("");
+  } else if (vipPriceOpenDate && !priceByDate[vipPriceOpenDate]) {
+    cardHtml = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;margin-top:12px;">No prices available for this date yet.</div>`;
+  }
+
+  wrap.innerHTML = `
+    <!-- Cal nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <button onclick="vipPriceCalPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">‹</button>
+      <div style="font-size:13px;font-weight:600;">${MONTHS[vipPriceCalMonth]} ${vipPriceCalYear}</div>
+      <button onclick="vipPriceCalNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">›</button>
+    </div>
+    <!-- Weekday headers -->
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
+      ${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);">${d}</div>`).join("")}
+    </div>
+    <!-- Cal grid -->
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${calHtml}</div>
+    <!-- Legend -->
+    <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:var(--muted);">
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22C55E;margin-right:3px;vertical-align:middle;"></span>Valid</span>
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#F59E0B;margin-right:3px;vertical-align:middle;"></span>Expiring</span>
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E8192C;margin-right:3px;vertical-align:middle;"></span>Expired</span>
+    </div>
+    ${cardHtml}
+  `;
+}
+
+function toggleVipPriceDay(dateStr) {
+  vipPriceOpenDate = vipPriceOpenDate === dateStr ? null : dateStr;
+  renderVipPrices();
+  if (vipPriceOpenDate) setTimeout(() => {
+    const card = document.querySelector("#vip-prices-list .btn-copy, #vip-prices-list [style*='margin-top:16px']");
+    if (card) card.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }, 50);
+}
+
+function vipPriceCalPrev() {
+  vipPriceCalMonth--;
+  if (vipPriceCalMonth < 0) { vipPriceCalMonth = 11; vipPriceCalYear--; }
+  vipPriceOpenDate = null;
+  renderVipPrices();
+}
+
+function vipPriceCalNext() {
+  vipPriceCalMonth++;
+  if (vipPriceCalMonth > 11) { vipPriceCalMonth = 0; vipPriceCalYear++; }
+  vipPriceOpenDate = null;
+  renderVipPrices();
+}
+
+function copyVipPriceByDate(dateStr) {
+  const p = VIP_PRICES_DATA.find(p => normalizeDate(p.event_date||"") === dateStr && (p.venue||"").toLowerCase() === vipPriceVenue.toLowerCase());
+  if (!p) return;
+  const text = `${p.venue} — ${p.event_name}\n${formatDate(dateStr)}\n\n${p.price_info||""}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copy-price-date");
+    if (btn) { btn.textContent = "✓ Copied!"; btn.classList.add("copied"); setTimeout(()=>{ btn.textContent="📋 Copy prices"; btn.classList.remove("copied"); },2000); }
+  });
 }
 
 function copyVipPrice(index) {
