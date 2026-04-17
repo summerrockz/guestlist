@@ -2519,8 +2519,7 @@ function calShowMyGL() {
 function calShowEvents() {
   calActiveView = "events";
   const dayEvents = EVENTS.filter(e =>
-    normalizeDate(e.date||"") === calSelectedDate &&
-    (e.status||"").toLowerCase() !== "inactive"
+    normalizeDate(e.date||"") === calSelectedDate
   );
 
   const wrap = document.getElementById("cal-detail-content");
