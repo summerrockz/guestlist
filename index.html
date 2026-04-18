@@ -1692,7 +1692,17 @@ function renderAdmin() {
     const format = cl.format||"name";
     const ds = deadlineStatus(cl.deadline,date);
     const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
-    const allEntries = ENTRIES.filter(e => { const d=normalizeDate(e.date||""); return d===date&&myClubs.includes(e.club_id)&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()); });
+    const allEntries = ENTRIES.filter(e => {
+      const d=normalizeDate(e.date||"");
+      if (!d===date||!myClubs.includes(e.club_id)||e.club_id!==clubId) return false;
+      if (!["active","cancelled"].includes((e.status||"").toLowerCase())) return false;
+      // Apply same time filter
+      if (adminTimeFilter === '2h') return isRecent(e.created_at, 2);
+      if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
+      if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
+      if (adminTimeFilter === 'date') return d === date;
+      return true;
+    });
 
     // Split entries: normal vs drink package
     const normalEntries = allEntries.filter(e => !(e.notes||"").includes("🍹 Drink package:"));
