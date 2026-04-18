@@ -1750,7 +1750,19 @@ function renderAdmin() {
 
 function copyExport(clubId, btn) {
   const box = document.getElementById(`export-${clubId}`);
-  const lines = Array.from(box.querySelectorAll("span")).filter(s=>!s.style.textDecoration.includes("line-through")).map(s=>s.textContent.trim()).filter(Boolean).join("\n");
+  // Only copy lines that are NOT checked (not sent) and NOT cancelled
+  const lines = Array.from(box.querySelectorAll("div")).filter(row => {
+    const cb = row.querySelector("input[type=checkbox]");
+    const span = row.querySelector("span[style*='font-family:monospace']");
+    if (!span) return false;
+    if (span.style.textDecoration && span.style.textDecoration.includes("line-through")) return false; // cancelled
+    if (cb && cb.checked) return false; // already sent
+    return true;
+  }).map(row => {
+    const span = row.querySelector("span[style*='font-family:monospace']");
+    return span ? span.textContent.trim() : "";
+  }).filter(Boolean).join("\n");
+  if (!lines) { btn.textContent="Nothing to copy"; setTimeout(()=>{ btn.textContent="📋 Copy list"; },2000); return; }
   navigator.clipboard.writeText(lines).then(()=>{ btn.textContent="✓ Copied!"; btn.classList.add("copied"); setTimeout(()=>{ btn.textContent="📋 Copy list"; btn.classList.remove("copied"); },2000); });
 }
 
