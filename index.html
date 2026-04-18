@@ -1619,13 +1619,12 @@ async function deleteEntry(entryId, btn) {
 }
 
 // ── ADMIN EXPORT ──
-let adminTimeFilter = 'all';
+let adminTimeFilter = '2h';
 
 function setAdminFilter(f, btn) {
   adminTimeFilter = f;
   document.querySelectorAll('[id^="admin-filter-"]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Show date picker only for date filter
   const dateWrap = document.getElementById('admin-date-wrap');
   if (dateWrap) dateWrap.style.display = f === 'date' ? 'block' : 'none';
   renderAdmin();
@@ -1654,10 +1653,13 @@ function renderAdmin() {
     const adminIds = String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
     return adminIds.includes(myId);
   }).map(c=>c.club_id);
-  if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
   const date = document.getElementById("admin-date").value||today();
   const wrap = document.getElementById("admin-list");
-  let dayEntries = ENTRIES.filter(e => {
+
+  if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
+
+  // Get filtered entries
+  let filteredEntries = ENTRIES.filter(e => {
     const notDeleted = (e.status||"").toLowerCase() !== "deleted";
     const inClub = myClubs.includes(e.club_id);
     if (!notDeleted || !inClub) return false;
@@ -1665,55 +1667,51 @@ function renderAdmin() {
     if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
     if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
-    return true; // all
+    return true;
   });
-  // Sort newest first
-  dayEntries = dayEntries.sort((a, b) => {
-    const parse = s => {
-      if (!s) return 0;
-      if (String(s).includes('/')) {
-        const [dp, tp] = String(s).split(' ');
-        const [dd, mm, yy] = dp.split('/');
-        return new Date(`${yy}-${mm}-${dd}T${tp||'00:00:00'}`).getTime();
-      }
-      return new Date(s).getTime();
-    };
-    return parse(b.created_at) - parse(a.created_at);
-  });
-  if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
-  if (!dayEntries.length) {
+
+  if (!filteredEntries.length) {
     const msgs = {'2h':'No entries in the last 2 hours.','4h':'No entries in the last 4 hours.','today':'No entries today.','date':'No entries for '+formatDate(date)+'.','all':'No entries found.'};
     wrap.innerHTML=`<div class="empty">${msgs[adminTimeFilter]||'No entries found.'}</div>`; return;
   }
-  const byClub = {};
-  dayEntries.forEach(e => { const key=e.club_id||e.club_name; if(!byClub[key])byClub[key]={name:e.club_name,entries:[]}; byClub[key].entries.push(e); });
-  wrap.innerHTML = Object.entries(byClub).map(([clubId,data]) => {
+
+  // Group by club_id + event date — each combination = separate card
+  const byClubEvent = {};
+  filteredEntries.forEach(e => {
+    const eventDate = normalizeDate(e.date||"");
+    const key = (e.club_id||e.club_name) + "||" + eventDate;
+    if (!byClubEvent[key]) byClubEvent[key] = { clubId: e.club_id, clubName: e.club_name, eventDate, entries: [] };
+    byClubEvent[key].entries.push(e);
+  });
+
+  // Sort by event date ascending
+  const sorted = Object.values(byClubEvent).sort((a,b) => a.eventDate.localeCompare(b.eventDate));
+
+  wrap.innerHTML = sorted.map(({clubId, clubName, eventDate, entries}) => {
     const cl = CLUBS.find(c=>c.club_id===clubId)||{};
     const format = cl.format||"name";
-    const ds = deadlineStatus(cl.deadline,date);
+    const ds = deadlineStatus(cl.deadline, eventDate);
     const dsClass = {ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
-    const allEntries = ENTRIES.filter(e => {
-      const d=normalizeDate(e.date||"");
-      if (!d===date||!myClubs.includes(e.club_id)||e.club_id!==clubId) return false;
-      if (!["active","cancelled"].includes((e.status||"").toLowerCase())) return false;
-      // Apply same time filter
-      if (adminTimeFilter === '2h') return isRecent(e.created_at, 2);
-      if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
-      if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
-      if (adminTimeFilter === 'date') return d === date;
-      return true;
-    });
+    const cardKey = clubId + "_" + eventDate;
 
-    // Split entries: normal vs drink package
+    // All entries for this club+date combo (including cancelled)
+    const allEntries = ENTRIES.filter(e =>
+      normalizeDate(e.date||"") === eventDate &&
+      e.club_id === clubId &&
+      ["active","cancelled"].includes((e.status||"").toLowerCase())
+    );
+
     const normalEntries = allEntries.filter(e => !(e.notes||"").includes("🍹 Drink package:"));
     const drinkEntries = allEntries.filter(e => (e.notes||"").includes("🍹 Drink package:"));
+
+    const totalPax = allEntries.filter(e=>(e.status||"").toLowerCase()==="active").reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
 
     const entryRows = normalEntries.map(e => {
       const isCancelled=(e.status||"").toLowerCase()==="cancelled";
       const paxNum=parseInt(e.pax)||1; const plusPax=paxNum>1?` +${paxNum-1}`:"";
       const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
       const line=`${e.guest_name}${plusPax}${emailPart}`;
-      const sentKey="sent_"+clubId+"_"+date+"_"+e.entry_id;
+      const sentKey="sent_"+cardKey+"_"+e.entry_id;
       const isSent=localStorage.getItem(sentKey)==="1";
       const rowOpacity=isCancelled?"0.5":(isSent?"0.4":"1");
       const checkbox=!isCancelled?`<input type="checkbox" ${isSent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1';markEntrySent('${e.entry_id}',this.checked)" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
@@ -1725,7 +1723,6 @@ function renderAdmin() {
       return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${sellerTag}</div>`;
     }).join("");
 
-    // Drink package rows — shown separately in amber box
     const drinkRows = drinkEntries.length ? `
       <div style="margin-top:12px;padding:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:12px;">
         <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">🍹 Drink packages</div>
@@ -1737,7 +1734,7 @@ function renderAdmin() {
           const phoneMatch=notes.match(/📞 ([^|]+)/);
           const pkg=pkgMatch?pkgMatch[1].trim():"";
           const phone=phoneMatch?phoneMatch[1].trim():"";
-          const sentKey="sent_drink_"+clubId+"_"+date+"_"+e.entry_id;
+          const sentKey="sent_drink_"+cardKey+"_"+e.entry_id;
           const isSent=localStorage.getItem(sentKey)==="1";
           const checkbox=!isCancelled?`<input type="checkbox" ${isSent?"checked":""} style="width:16px;height:16px;accent-color:#F59E0B;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
           const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
@@ -1745,7 +1742,7 @@ function renderAdmin() {
           return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(245,158,11,0.1);opacity:${isCancelled?"0.5":isSent?"0.4":"1"};">
             ${checkbox}
             <div style="${textStyle}">
-              <span style="font-family:monospace;font-size:13px;">${e.guest_name}${plusPax>""?" "+plusPax:""}${emailPart}</span>
+              <span style="font-family:monospace;font-size:11px;">${e.guest_name}${plusPax>""?" "+plusPax:""}${emailPart}</span>
               ${pkg?`<div style="font-size:11px;color:var(--amber);margin-top:2px;">${pkg}</div>`:""}
               ${phone?`<div style="font-size:11px;color:var(--muted);">📞 ${phone}</div>`:""}
               ${isCancelled?`<div style="font-size:11px;color:var(--red);">⚠️ CANCELLED</div>`:""}
@@ -1754,7 +1751,21 @@ function renderAdmin() {
         }).join("")}
       </div>` : "";
 
-    return `<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${data.name}</div><div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline)||"No deadline"}${date?" · "+formatDate(date):""}</div></div><div class="admin-count">${data.entries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0)} pax</div></div><div class="export-box" id="export-${clubId}" style="font-family:inherit;">${entryRows}</div>${drinkRows}<button class="btn-copy" onclick="copyExport('${clubId}',this)" style="margin-top:10px;">📋 Copy list</button></div>`;
+    return `<div class="admin-club-card">
+      <div class="admin-club-header">
+        <div>
+          <div class="admin-club-name">${clubName}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap;">
+            <div class="deadline-badge ${dsClass}">${formatDate(eventDate)}</div>
+            ${cl.deadline?`<div class="deadline-badge ${dsClass}">${deadlineLabel(cl.deadline)}</div>`:""}
+          </div>
+        </div>
+        <div class="admin-count">${totalPax} pax</div>
+      </div>
+      <div class="export-box" id="export-${cardKey}" style="font-family:inherit;">${entryRows}</div>
+      ${drinkRows}
+      <button class="btn-copy" onclick="copyExport('${cardKey}',this)" style="margin-top:10px;">📋 Copy list</button>
+    </div>`;
   }).join("");
 }
 
