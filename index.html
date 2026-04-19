@@ -1496,12 +1496,15 @@ function renderEvents() {
   const club = id => CLUBS.find(c=>c.club_id===id)||{};
   const todayStr = today();
   // If no dates set, show all upcoming events from today
+  // Max 5 weeks ahead
+  const maxDate = new Date(); maxDate.setDate(maxDate.getDate() + 35);
+  const maxDateStr = maxDate.toISOString().slice(0,10);
   let dayEvents = EVENTS.filter(e => {
     const ed=normalizeDate(e.date||"");
     if (dateFrom && dateTo) return ed>=dateFrom && ed<=dateTo;
-    if (dateFrom) return ed>=dateFrom;
-    if (dateTo) return ed<=dateTo;
-    return ed>=todayStr; // default: all upcoming
+    if (dateFrom) return ed>=dateFrom && ed<=maxDateStr;
+    if (dateTo) return ed<=dateTo && ed>=todayStr;
+    return ed>=todayStr && ed<=maxDateStr; // default: today + 5 weeks
   });
   if (search) dayEvents = dayEvents.filter(e => {
     const cl = club(e.club_id);
@@ -1914,8 +1917,16 @@ async function notifyClubAdmins(clubId, clubName, guestName, pax) {
   try {
     const cl=CLUBS.find(c=>c.club_id===clubId)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    const eventName = CURRENT_EVENT?.event_name || "";
+    const eventDate = CURRENT_EVENT?.date ? formatDate(normalizeDate(CURRENT_EVENT.date)) : "";
+    const eventInfo = [eventDate, eventName].filter(Boolean).join(" · ");
+    const paxStr = parseInt(pax)>1?" +"+(parseInt(pax)-1):"";
     for (const adminId of adminIds) {
-      await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"🎉 New entry — "+clubName,body:guestName+(parseInt(pax)>1?" +"+(parseInt(pax)-1):"")+" — added by "+SELLER.seller_name,sellerId:adminId})});
+      await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({
+        title:"🔔 New entry: "+clubName,
+        body:`${guestName}${paxStr} · ${eventInfo} — added by ${SELLER.seller_name}`,
+        sellerId:adminId
+      })});
     }
   } catch(e) { console.log("Notify failed:",e); }
 }
