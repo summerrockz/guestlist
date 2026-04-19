@@ -1752,11 +1752,10 @@ function renderAdmin() {
       </div>` : "";
 
     return `<div class="admin-club-card">
-      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">${formatDate(eventDate)}</div>
       <div class="admin-club-header">
         <div>
           <div class="admin-club-name">${clubName}</div>
-          ${cl.deadline?`<div class="deadline-badge ${dsClass}" style="margin-top:4px;">${deadlineLabel(cl.deadline)}</div>`:""}
+          <div style="font-size:13px;color:var(--muted);margin-top:2px;">${formatDate(eventDate)}${cl.deadline?" · "+deadlineLabel(cl.deadline):""}</div>
         </div>
         <div class="admin-count">${totalPax} pax</div>
       </div>
