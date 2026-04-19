@@ -128,6 +128,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .modal-overlay.open { display: flex; }
 .modal-box { background: #1a1a1a; border-radius: 22px 22px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
 .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
 .modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; }
@@ -900,7 +901,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
 <!-- NOTIFICATION INBOX -->
 <div id="notif-inbox" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.75);" onclick="if(event.target===this)closeNotifInbox()">
-  <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#1c1c1c;border-radius:22px 22px 0 0;border-top:1px solid rgba(255,255,255,0.1);padding-bottom:env(safe-area-inset-bottom,16px);max-height:80vh;display:flex;flex-direction:column;animation:slideUp 0.25s ease;">
+  <div style="position:absolute;top:0;left:0;right:0;max-width:480px;margin:0 auto;background:#1c1c1c;border-radius:0 0 22px 22px;border-bottom:1px solid rgba(255,255,255,0.1);padding-top:env(safe-area-inset-top,16px);max-height:80vh;display:flex;flex-direction:column;animation:slideDown 0.25s ease;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.07);">
       <div style="font-size:15px;font-weight:700;">🔔 Notifications</div>
       <div style="display:flex;gap:10px;align-items:center;">
@@ -3366,7 +3367,15 @@ function renderNotifInbox() {
   wrap.innerHTML = NOTIFICATIONS_DATA.map((n, i) => {
     const isUnread = (n.read||"").toLowerCase() !== "yes";
     const icon = typeIcon[n.type] || "🔔";
-    const ts = n.timestamp ? new Date(n.timestamp) : null;
+    // Parse timestamp safely — handles both Google Sheets format and ISO
+    let ts = null;
+    if (n.timestamp) {
+      const s = String(n.timestamp).trim();
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{2}:\d{2}:\d{2})?/);
+      if (m) { ts = new Date(`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}T${m[4]||'00:00:00'}`); }
+      else { ts = new Date(s); }
+      if (isNaN(ts)) ts = null;
+    }
     const timeStr = ts ? ts.toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
     return `<div onclick="markRead(${i})" style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;background:${isUnread?"rgba(255,255,255,0.03)":"transparent"};transition:background 0.2s;">
       <div style="font-size:22px;flex-shrink:0;">${icon}</div>
