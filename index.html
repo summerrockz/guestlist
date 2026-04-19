@@ -1940,7 +1940,7 @@ document.getElementById("modal-submit").onclick = async () => {
       ENTRIES.push(entry); post({action:"add_entry",...entry});
     });
     closeModal(); renderMyGL(); renderDashboard(); btn.disabled=false; btn.textContent="Add to guestlist";
-    notifyClubAdmins(CURRENT_EVENT.club_id,cl.club_name||CURRENT_EVENT.club_id,names.join(", "),names.length);
+    notifyClubAdmins(CURRENT_EVENT.club_id,cl.club_name||CURRENT_EVENT.club_id,names.join(", "),names.length,CURRENT_EVENT.event_name||"",formatDate(normalizeDate(CURRENT_EVENT.date||"")));
     // Write notification to admin
     const cl2 = CLUBS.find(c=>c.club_id===CURRENT_EVENT.club_id)||{};
     const adminIds2 = String(cl2.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
@@ -1956,7 +1956,7 @@ document.getElementById("modal-submit").onclick = async () => {
   const btn=document.getElementById("modal-submit"); btn.disabled=true; btn.textContent="Adding…"; msg.textContent="";
   ENTRIES.push(entry); closeModal(); renderMyGL(); renderDashboard();
   post({action:"add_entry",...entry}).finally(()=>{btn.disabled=false;btn.textContent="Add to guestlist";});
-  notifyClubAdmins(entry.club_id,entry.club_name,entry.guest_name,entry.pax);
+  notifyClubAdmins(entry.club_id,entry.club_name,entry.guest_name,entry.pax,entry.event_name||"",formatDate(normalizeDate(entry.date||"")));
   // Write notification to admin
   const clNotif = CLUBS.find(c=>c.club_id===entry.club_id)||{};
   const adminIdsNotif = String(clNotif.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
@@ -1966,13 +1966,13 @@ document.getElementById("modal-submit").onclick = async () => {
   }));
 };
 
-async function notifyClubAdmins(clubId, clubName, guestName, pax) {
+async function notifyClubAdmins(clubId, clubName, guestName, pax, eventName, eventDate) {
   try {
     const cl=CLUBS.find(c=>c.club_id===clubId)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
-    const eventName = CURRENT_EVENT?.event_name || "";
-    const eventDate = CURRENT_EVENT?.date ? formatDate(normalizeDate(CURRENT_EVENT.date)) : "";
-    const eventInfo = [eventDate, eventName].filter(Boolean).join(" · ");
+    const evName = eventName || CURRENT_EVENT?.event_name || "";
+    const evDate = eventDate || (CURRENT_EVENT?.date ? formatDate(normalizeDate(CURRENT_EVENT.date)) : "");
+    const eventInfo = [evDate, evName].filter(Boolean).join(" · ");
     const paxStr = parseInt(pax)>1?" +"+(parseInt(pax)-1):"";
     for (const adminId of adminIds) {
       await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({
