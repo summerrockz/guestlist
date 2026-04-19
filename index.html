@@ -1489,9 +1489,10 @@ function renderDashboard() {
   const t = today();
   const myId = String(SELLER.seller_id||"").trim();
   const myEntries = ENTRIES.filter(e => String(e.seller_id||"").trim()===myId && (e.status||"").toLowerCase()==="active");
-  const todayEntries = myEntries.filter(e => (e.date||"").slice(0,10)===t);
-  const weekStart = new Date(); weekStart.setDate(weekStart.getDate()-7);
-  const weekEntries = myEntries.filter(e => new Date(e.date)>=weekStart);
+  // Today = entries created today (created_at)
+  const todayEntries = myEntries.filter(e => isRecent(e.created_at, 24));
+  // This week = entries created in last 7 days (created_at)
+  const weekEntries = myEntries.filter(e => isRecent(e.created_at, 168));
   document.getElementById("stat-today").textContent = todayEntries.length;
   document.getElementById("stat-total").textContent = weekEntries.length;
 
