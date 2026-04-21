@@ -1590,15 +1590,23 @@ function renderMyGL() {
   const myId = String(SELLER.seller_id||"").trim();
   const managedIds = SELLERS.filter(s => { const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim()); return mgrs.includes(myId); }).map(s=>String(s.seller_id).trim());
 
-  // Show seller filter only if manager has managed sellers
+  // Show seller filter for managers and admins
+  const myRole = (SELLER.role||"").toLowerCase();
+  const isManagerOrAdmin = myRole === "manager" || myRole === "admin";
   const sellerFilterWrap = document.getElementById("mygl-seller-filter");
   if (sellerFilterWrap) {
-    if (managedIds.length > 0) {
+    if (isManagerOrAdmin) {
       sellerFilterWrap.style.display = "block";
-      // Populate dropdown once — only managed sellers, not yourself
       const sel = document.getElementById("mygl-seller-select");
       if (sel && sel.options.length <= 1) {
-        SELLERS.filter(s => managedIds.includes(String(s.seller_id||"").trim()))
+        // Show all sellers that have entries visible to this user
+        const visibleSellerIds = new Set(
+          ENTRIES.filter(e => {
+            const sid = String(e.seller_id||"").trim();
+            return sid === myId || managedIds.includes(sid);
+          }).map(e => String(e.seller_id||"").trim())
+        );
+        SELLERS.filter(s => visibleSellerIds.has(String(s.seller_id||"").trim()))
           .forEach(s => {
             const opt = document.createElement("option");
             opt.value = String(s.seller_id).trim();
