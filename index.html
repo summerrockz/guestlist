@@ -467,7 +467,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         </div>
         <button onclick="clearMyGLDate()" id="mygl-date-clear" style="display:none;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:13px 16px;font-size:12px;cursor:pointer;white-space:nowrap;">Clear</button>
       </div>
-      <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:16px;">
+      <input type="text" class="input-field" id="mygl-search" placeholder="Search by client name..." style="margin-bottom:10px;">
+      <div id="mygl-seller-filter" style="display:none;margin-bottom:16px;">
+        <select class="input-field" id="mygl-seller-select" onchange="renderMyGL()" style="margin-bottom:0;">
+          <option value="">All sellers</option>
+        </select>
+      </div>
       <div id="mygl-list"><div class="loading">Loading…</div></div>
     </div>
 
@@ -1580,9 +1585,31 @@ async function markEntrySent(entryId, isSent) {
 function renderMyGL() {
   const dateFilter = document.getElementById("mygl-date").value;
   const search = (document.getElementById("mygl-search")?.value||"").toLowerCase().trim();
+  const sellerFilter = (document.getElementById("mygl-seller-select")?.value||"").trim();
   const wrap = document.getElementById("mygl-list");
   const myId = String(SELLER.seller_id||"").trim();
   const managedIds = SELLERS.filter(s => { const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim()); return mgrs.includes(myId); }).map(s=>String(s.seller_id).trim());
+
+  // Show seller filter only if manager has managed sellers
+  const sellerFilterWrap = document.getElementById("mygl-seller-filter");
+  if (sellerFilterWrap) {
+    if (managedIds.length > 0) {
+      sellerFilterWrap.style.display = "block";
+      // Populate dropdown once — only managed sellers, not yourself
+      const sel = document.getElementById("mygl-seller-select");
+      if (sel && sel.options.length <= 1) {
+        SELLERS.filter(s => managedIds.includes(String(s.seller_id||"").trim()))
+          .forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = String(s.seller_id).trim();
+            opt.textContent = s.seller_name;
+            sel.appendChild(opt);
+          });
+      }
+    } else {
+      sellerFilterWrap.style.display = "none";
+    }
+  }
 
   // Update date label
   const dateLabel = document.getElementById("mygl-date-label");
@@ -1602,8 +1629,9 @@ function renderMyGL() {
     const matchesDate = !dateFilter || entryDate === dateFilter;
     const matchesSearch=!search||(e.guest_name||"").toLowerCase().includes(search);
     const isOwn=sid===myId||managedIds.includes(sid);
+    const matchesSeller=!sellerFilter||sid===sellerFilter;
     const visible=(e.status||"").toLowerCase()!=="deleted";
-    return isOwn&&matchesDate&&matchesSearch&&visible;
+    return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible;
   }).sort((a,b) => (b.date||"").localeCompare(a.date||""));
   const hasOtherEntries = false;
   if (!mine.length) {
