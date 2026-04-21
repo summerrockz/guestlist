@@ -2823,7 +2823,14 @@ function toggleProduct(vi) {
   // Close all
   document.querySelectorAll("[id^='prod-']").forEach(e => e.style.display = "none");
   // Open this one if it was closed
-  if (!isOpen) el.style.display = "block";
+  if (!isOpen) {
+    el.style.display = "block";
+    // Scroll to the top of this card
+    setTimeout(() => {
+      const card = el.closest("div[style*='overflow:hidden']") || el.parentElement;
+      if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  }
 }
 
 // ── CALENDAR ──
