@@ -1449,7 +1449,7 @@ async function setupPushNotifications() {
 }
 
 async function enableNotifications() {
-  if (!("serviceWorker" in navigator)||!("PushManager" in window)) { alert("Push notifications not supported on this browser."); return; }
+  if (!("serviceWorker" in navigator)||!("PushManager" in window)) { alert("To enable notifications, first add this app to your Home Screen via Safari (Share → Add to Home Screen), then open it from there."); return; }
   try {
     const reg = await navigator.serviceWorker.ready;
     const permission = await Notification.requestPermission();
@@ -2706,7 +2706,7 @@ function renderProducts() {
   const byVenue = {};
   PRODUCTS.forEach(p => {
     const v = p.venue || "Other";
-    if (!byVenue[v]) byVenue[v] = { image_url: p.image_url||"", time: p.time||"", days: p.days||"", music: p.music||"", dresscode: p.dresscode||"", notes: p.notes||"", items: [] };
+    if (!byVenue[v]) byVenue[v] = { image_url: p.image_url||"", time: p.time||"", days: p.days||"", music: p.music||"", dresscode: p.dresscode||"", notes: p.notes||"", important: p.important||"", table_image: p.table_image||"", items: [] };
     byVenue[v].items.push(p);
   });
   // Sort items by event_name so same events are grouped
@@ -2809,7 +2809,7 @@ function renderProducts() {
         ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);font-weight:600;">${data.dresscode}</span></div>`:""}
         ${data.notes?`<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${data.notes}</div>`:""}
         ${data.important?`<div style="margin-top:6px;padding:10px 12px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.25);border-radius:8px;font-size:11px;font-weight:600;color:var(--red);">⚠️ ${data.important}</div>`:""}
-
+        ${data.table_image?`<img src="${data.table_image}" style="width:100%;border-radius:12px;margin-top:12px;object-fit:cover;max-height:200px;" onerror="this.style.display='none'">`:""}
 
       </div>
     </div>`;
