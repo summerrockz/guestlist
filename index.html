@@ -3378,23 +3378,53 @@ function getWeekStart(date) {
 }
 
 function renderProgramme() {
+  const progSearch = (document.getElementById("prog-search")?.value||"").toLowerCase().trim();
+  const source = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
+  const todayStr = today();
+
+  // SEARCH MODE — show all matching days as a list
+  if (progSearch) {
+    const allDates = Object.keys(source).sort();
+    const results = allDates.map(dateStr => {
+      const clubs = source[dateStr].filter(c => c.toLowerCase().includes(progSearch));
+      if (!clubs.length) return "";
+      const d = new Date(dateStr + "T12:00:00");
+      const isToday = dateStr === todayStr;
+      return `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:56px;flex-shrink:0;text-align:center;">
+            <div style="font-size:11px;font-weight:600;color:var(--muted);">${d.toLocaleDateString("en-GB",{weekday:"short"})}</div>
+            <div style="font-size:13px;font-weight:700;">${d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</div>
+          </div>
+          <div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;">
+            ${clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}
+          </div>
+        </div>
+      </div>`;
+    }).filter(Boolean);
+
+    document.getElementById("prog-week").innerHTML = results.length
+      ? results.join("")
+      : `<div class="empty">No results for "${progSearch}"</div>`;
+    
+    // Hide week nav, show result count
+    document.getElementById("prog-title").textContent = results.length + " dates found";
+    return;
+  }
+
+  // NORMAL MODE — weekly view
   if (!progWeekStart) progWeekStart = getWeekStart(new Date());
   const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const todayStr = today();
   const weekEnd = new Date(progWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
   document.getElementById("prog-title").textContent =
     `${progWeekStart.getDate()} ${months[progWeekStart.getMonth()]} — ${weekEnd.getDate()} ${months[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
-  const progSearch = (document.getElementById("prog-search")?.value||"").toLowerCase().trim();
   let html = "";
   for (let i = 0; i < 7; i++) {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
     const dateStr = d.toISOString().slice(0,10);
     const isToday = dateStr === todayStr;
-    const progSource = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
-    let clubs = progSource[dateStr] || [];
-    if (progSearch) clubs = clubs.filter(c => c.toLowerCase().includes(progSearch));
-    if (progSearch && clubs.length === 0) return "";
+    const clubs = source[dateStr] || [];
     html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
@@ -3409,35 +3439,9 @@ function renderProgramme() {
       </div>
     </div>`;
   }
-  // When searching, show all matching days across all weeks
-  if (progSearch) {
-    const allSource = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
-    const allDates = Object.keys(allSource).sort();
-    html = allDates.map(dateStr => {
-      let clubs = allSource[dateStr].filter(c => c.toLowerCase().includes(progSearch));
-      if (!clubs.length) return "";
-      const d = new Date(dateStr + "T12:00:00");
-      const isToday = dateStr === todayStr;
-      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-      return `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
-            <div style="font-size:9px;font-weight:600;color:${isToday?"#fff":"var(--muted)"};text-transform:uppercase;">${days[d.getDay()]}</div>
-            <div style="font-size:14px;font-weight:700;color:${isToday?"#fff":"var(--text)"};">${d.getDate()}</div>
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">${formatDate(dateStr)}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px;">${clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}</div>
-          </div>
-        </div>
-      </div>`;
-    }).filter(Boolean).join("");
-    if (!html) html = `<div class="empty">No results for "${progSearch}"</div>`;
-  }
   document.getElementById("prog-week").innerHTML = html;
   updateMonthButtons();
 }
-
 function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgramme(); }
 
 function progJumpMonth(monthIndex) {
