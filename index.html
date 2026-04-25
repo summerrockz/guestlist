@@ -428,6 +428,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-card-sub">All incoming table requests</div>
         </div>
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
+        <button class="btn-secondary" style="width:100%; margin-top:8px;" onclick="refreshAll(this)" id="refresh-btn">🔄 Refresh</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
       </div>
     </div>
@@ -1499,6 +1500,24 @@ function urlBase64ToUint8Array(base64String) {
   const outputArray = new Uint8Array(rawData.length);
   for (let i=0;i<rawData.length;++i) outputArray[i]=rawData.charCodeAt(i);
   return outputArray;
+}
+
+async function refreshAll(btn) {
+  if (btn) { btn.style.opacity = "0.4"; btn.style.pointerEvents = "none"; }
+  await loadData();
+  await loadNotifications();
+  const active = document.querySelector(".section.active");
+  if (active) {
+    const id = active.id;
+    if (id === "section-events") renderEvents();
+    if (id === "section-mygl") renderMyGL();
+    if (id === "section-admin") renderAdmin();
+    if (id === "section-dashboard") renderDashboard();
+    if (id === "section-vip") { await loadVipRequests(); renderVipSeller(); }
+    if (id === "section-vip-admin") { await loadVipRequests(); renderVipAdmin(); }
+    if (id === "section-calendar") renderCalendar();
+  }
+  if (btn) { btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; }
 }
 
 async function loadData() {
