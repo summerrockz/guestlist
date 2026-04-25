@@ -3457,7 +3457,16 @@ async function loadNotifications() {
     const all = await fetchSheet("NOTIFICATIONS");
     const myId = String(SELLER.seller_id||"").trim();
     NOTIFICATIONS_DATA = all.filter(n => String(n.seller_id||"").trim() === myId)
-      .sort((a,b) => new Date(b.timestamp||0) - new Date(a.timestamp||0));
+      .sort((a,b) => {
+        const parseTs = s => {
+          if (!s) return 0;
+          s = String(s).trim();
+          const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{2}:\d{2}:\d{2})?/);
+          if (m) return new Date(`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}T${m[4]||'00:00:00'}`).getTime();
+          return new Date(s).getTime() || 0;
+        };
+        return parseTs(b.timestamp) - parseTs(a.timestamp);
+      });
     updateNotifBadge();
   } catch(e) { console.log("Notif load failed:", e); }
 }
