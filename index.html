@@ -3391,7 +3391,8 @@ function renderProgramme() {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
     const dateStr = d.toISOString().slice(0,10);
     const isToday = dateStr === todayStr;
-    let clubs = (Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME)[dateStr] || [];
+    const progSource = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
+    let clubs = progSource[dateStr] || [];
     if (progSearch) clubs = clubs.filter(c => c.toLowerCase().includes(progSearch));
     if (progSearch && clubs.length === 0) return "";
     html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
@@ -3410,7 +3411,7 @@ function renderProgramme() {
   }
   // When searching, show all matching days across all weeks
   if (progSearch) {
-    const allSource = Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME;
+    const allSource = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
     const allDates = Object.keys(allSource).sort();
     html = allDates.map(dateStr => {
       let clubs = allSource[dateStr].filter(c => c.toLowerCase().includes(progSearch));
