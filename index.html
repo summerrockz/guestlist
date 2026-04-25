@@ -862,6 +862,24 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="progJumpMonth(8)" class="prog-month-btn" id="prog-m-8">Sep</button>
         <button onclick="progJumpMonth(9)" class="prog-month-btn" id="prog-m-9">Oct</button>
       </div>
+      <!-- Date range -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+        <div style="flex:1;position:relative;" onclick="document.getElementById('prog-date-from').showPicker ? document.getElementById('prog-date-from').showPicker() : document.getElementById('prog-date-from').click()">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;">
+            <span id="prog-from-label" style="color:var(--muted);">Arrival</span>
+          </div>
+          <input type="date" id="prog-date-from" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="onProgDateChange()">
+        </div>
+        <span style="color:var(--muted);font-size:12px;flex-shrink:0;">→</span>
+        <div style="flex:1;position:relative;" onclick="document.getElementById('prog-date-to').showPicker ? document.getElementById('prog-date-to').showPicker() : document.getElementById('prog-date-to').click()">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;">
+            <span id="prog-to-label" style="color:var(--muted);">Departure</span>
+          </div>
+          <input type="date" id="prog-date-to" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="onProgDateChange()">
+        </div>
+        <button onclick="clearProgDates()" id="prog-date-clear" style="display:none;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:13px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">Clear</button>
+      </div>
+
       <!-- Search -->
       <input type="text" class="input-field" id="prog-search" placeholder="Search event or venue…" oninput="renderProgramme()" style="margin-bottom:12px;">
 
@@ -3377,16 +3395,41 @@ function getWeekStart(date) {
   d.setDate(d.getDate() + diff); d.setHours(0,0,0,0); return d;
 }
 
+function onProgDateChange() {
+  const from = document.getElementById("prog-date-from").value;
+  const to = document.getElementById("prog-date-to").value;
+  const fromLbl = document.getElementById("prog-from-label");
+  const toLbl = document.getElementById("prog-to-label");
+  const clearBtn = document.getElementById("prog-date-clear");
+  if (from) { const d = new Date(from+"T12:00:00"); fromLbl.textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}); fromLbl.style.color="var(--text)"; }
+  else { fromLbl.textContent = "Arrival"; fromLbl.style.color="var(--muted)"; }
+  if (to) { const d = new Date(to+"T12:00:00"); toLbl.textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}); toLbl.style.color="var(--text)"; }
+  else { toLbl.textContent = "Departure"; toLbl.style.color="var(--muted)"; }
+  if (clearBtn) clearBtn.style.display = (from||to) ? "block" : "none";
+  renderProgramme();
+}
+
+function clearProgDates() {
+  document.getElementById("prog-date-from").value = "";
+  document.getElementById("prog-date-to").value = "";
+  onProgDateChange();
+}
+
 function renderProgramme() {
   const progSearch = (document.getElementById("prog-search")?.value||"").toLowerCase().trim();
   const source = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
   const todayStr = today();
 
-  // SEARCH MODE — show all matching days as a list
-  if (progSearch) {
+  const progFrom = document.getElementById("prog-date-from")?.value || "";
+  const progTo = document.getElementById("prog-date-to")?.value || "";
+
+  // SEARCH or DATE RANGE MODE
+  if (progSearch || progFrom || progTo) {
     const allDates = Object.keys(source).sort();
     const results = allDates.map(dateStr => {
-      const clubs = source[dateStr].filter(c => c.toLowerCase().includes(progSearch));
+      if (progFrom && dateStr < progFrom) return "";
+      if (progTo && dateStr > progTo) return "";
+      const clubs = progSearch ? source[dateStr].filter(c => c.toLowerCase().includes(progSearch)) : source[dateStr];
       if (!clubs.length) return "";
       const d = new Date(dateStr + "T12:00:00");
       const isToday = dateStr === todayStr;
@@ -3405,10 +3448,12 @@ function renderProgramme() {
 
     document.getElementById("prog-week").innerHTML = results.length
       ? results.join("")
-      : `<div class="empty">No results for "${progSearch}"</div>`;
+      : `<div class="empty">No results found.</div>`;
     
-    // Hide week nav, show result count
-    document.getElementById("prog-title").textContent = results.length + " dates found";
+    const label = progFrom && progTo 
+      ? `${formatDate(progFrom)} — ${formatDate(progTo)} · ${results.length} days`
+      : results.length + " dates found";
+    document.getElementById("prog-title").textContent = label;
     return;
   }
 
