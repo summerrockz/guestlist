@@ -1360,7 +1360,7 @@ function showSection(id) {
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
   if (id === "section-calendar") loadData().then(renderCalendar);
   if (id === "section-products") loadProducts();
-  if (id === "section-programme") renderProgramme();
+  if (id === "section-programme") loadProgramme().then(renderProgramme);
   if (id === "section-vip-prices") loadVipPrices();
 }
 
@@ -1521,6 +1521,21 @@ async function loadData() {
     fetchSheet("SELLERS"), fetchSheet("CLUBS"),
     fetchSheet("EVENTS"), fetchSheet("GL_ENTRIES")
   ]);
+}
+
+let PROGRAMME_SHEET = {};
+
+async function loadProgramme() {
+  try {
+    const rows = await fetchSheet("PROGRAMME");
+    PROGRAMME_SHEET = {};
+    rows.forEach(r => {
+      const date = normalizeDate(r.date||"");
+      if (!date) return;
+      const venues = (r.venues||"").split(",").map(v=>v.trim()).filter(Boolean);
+      PROGRAMME_SHEET[date] = venues;
+    });
+  } catch(e) { console.log("Programme load failed:", e); }
 }
 
 async function loadVipRequests() {
@@ -3372,7 +3387,7 @@ function renderProgramme() {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
     const dateStr = d.toISOString().slice(0,10);
     const isToday = dateStr === todayStr;
-    const clubs = PROGRAMME[dateStr] || [];
+    const clubs = (Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME)[dateStr] || [];
     html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
