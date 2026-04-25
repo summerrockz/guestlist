@@ -862,6 +862,9 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="progJumpMonth(8)" class="prog-month-btn" id="prog-m-8">Sep</button>
         <button onclick="progJumpMonth(9)" class="prog-month-btn" id="prog-m-9">Oct</button>
       </div>
+      <!-- Search -->
+      <input type="text" class="input-field" id="prog-search" placeholder="Search event or venue…" oninput="renderProgramme()" style="margin-bottom:12px;">
+
       <!-- Week nav -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <button onclick="progPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">‹</button>
@@ -3382,12 +3385,15 @@ function renderProgramme() {
   const weekEnd = new Date(progWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
   document.getElementById("prog-title").textContent =
     `${progWeekStart.getDate()} ${months[progWeekStart.getMonth()]} — ${weekEnd.getDate()} ${months[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  const progSearch = (document.getElementById("prog-search")?.value||"").toLowerCase().trim();
   let html = "";
   for (let i = 0; i < 7; i++) {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
     const dateStr = d.toISOString().slice(0,10);
     const isToday = dateStr === todayStr;
-    const clubs = (Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME)[dateStr] || [];
+    let clubs = (Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME)[dateStr] || [];
+    if (progSearch) clubs = clubs.filter(c => c.toLowerCase().includes(progSearch));
+    if (progSearch && clubs.length === 0) return "";
     html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
@@ -3402,6 +3408,31 @@ function renderProgramme() {
       </div>
     </div>`;
   }
+  // When searching, show all matching days across all weeks
+  if (progSearch) {
+    const allSource = Object.keys(PROGRAMME_SHEET).length ? PROGRAMME_SHEET : PROGRAMME;
+    const allDates = Object.keys(allSource).sort();
+    html = allDates.map(dateStr => {
+      let clubs = allSource[dateStr].filter(c => c.toLowerCase().includes(progSearch));
+      if (!clubs.length) return "";
+      const d = new Date(dateStr + "T12:00:00");
+      const isToday = dateStr === todayStr;
+      const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      return `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:${isToday?"var(--red)":"var(--input-bg)"};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+            <div style="font-size:9px;font-weight:600;color:${isToday?"#fff":"var(--muted)"};text-transform:uppercase;">${days[d.getDay()]}</div>
+            <div style="font-size:14px;font-weight:700;color:${isToday?"#fff":"var(--text)"};">${d.getDate()}</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">${formatDate(dateStr)}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">${clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}</div>
+          </div>
+        </div>
+      </div>`;
+    }).filter(Boolean).join("");
+    if (!html) html = `<div class="empty">No results for "${progSearch}"</div>`;
+  }
   document.getElementById("prog-week").innerHTML = html;
   updateMonthButtons();
 }
@@ -3409,9 +3440,14 @@ function renderProgramme() {
 function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgramme(); }
 
 function progJumpMonth(monthIndex) {
-  // Jump to first week of that month
-  const d = new Date(2026, monthIndex, 1);
-  progWeekStart = getWeekStart(d);
+  // Find the week that contains the 1st of that month
+  const first = new Date(2026, monthIndex, 1);
+  // Go back to Monday of that week
+  const dow = first.getDay();
+  const monday = new Date(first);
+  monday.setDate(first.getDate() - (dow === 0 ? 6 : dow - 1));
+  monday.setHours(0,0,0,0);
+  progWeekStart = monday;
   renderProgramme();
 }
 
