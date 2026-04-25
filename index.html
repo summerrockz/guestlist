@@ -3450,7 +3450,7 @@ function renderProgramme() {
           const closed = ds === "closed";
           const disabled = closed || isFull || (ev.status||"").toLowerCase() === "inactive";
           return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div style="min-width:0;flex:1;"><span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>${ev.event_name?`<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>`:""}${ev.time?`<span style="font-size:10px;color:var(--muted);"> · ${ev.time}</span>`:""}</div>
+            <div style="min-width:0;flex:1;"><span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>${ev.event_name?`<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>`:""}${ev.time?`<span style="font-size:10px;color:var(--muted);"> · ${ev.time}</span>`:""}${ev.free_condition?`<span style="font-size:10px;color:var(--amber);"> · ${ev.free_condition}</span>`:ev.price_after?`<span style="font-size:10px;color:var(--amber);"> · €${ev.price_after} after ${ev.price_type||""}</span>`:""}</div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               ${!disabled ? `<span onclick="openModal('${ev.event_id}','${ev.club_id}')" style="font-size:11px;font-weight:600;color:var(--red);cursor:pointer;">+ GL</span>` : `<span style="font-size:11px;color:var(--muted);">${closed?"Closed":isFull?"Full":""}</span>`}
               ${!disabled ? `<input type="checkbox" class="multi-gl-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;">` : `<div style="width:16px;"></div>`}
@@ -3524,6 +3524,7 @@ function renderProgramme() {
                 <span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>
                 ${ev.event_name ? `<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>` : ""}
                 ${ev.time ? `<span style="font-size:10px;color:var(--muted);"> · ${ev.time}</span>` : ""}
+                ${ev.free_condition ? `<span style="font-size:10px;color:var(--amber);"> · ${ev.free_condition}</span>` : ev.price_after ? `<span style="font-size:10px;color:var(--amber);"> · €${ev.price_after} after ${ev.price_type||""}</span>` : ""}
               </div>
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                 ${!disabled ? `<span onclick="openModal('${ev.event_id}','${ev.club_id}')" style="font-size:11px;font-weight:600;color:var(--red);cursor:pointer;">+ GL</span>` : `<span style="font-size:11px;color:var(--muted);">${closed?"Closed":isFull?"Full":""}</span>`}
