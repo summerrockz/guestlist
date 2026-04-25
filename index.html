@@ -3457,6 +3457,13 @@ async function loadNotifications() {
     const all = await fetchSheet("NOTIFICATIONS");
     const myId = String(SELLER.seller_id||"").trim();
     NOTIFICATIONS_DATA = all.filter(n => String(n.seller_id||"").trim() === myId)
+      .map(n => {
+        // Apply locally cached read status
+        if (n.timestamp && localStorage.getItem("notif_read_" + String(n.timestamp).trim()) === "yes") {
+          n.read = "yes";
+        }
+        return n;
+      })
       .sort((a,b) => {
         const parseTs = s => {
           if (!s) return 0;
@@ -3530,14 +3537,18 @@ async function markRead(index) {
   const n = NOTIFICATIONS_DATA[index];
   if (!n || (n.read||"").toLowerCase() === "yes") return;
   n.read = "yes";
+  if (n.timestamp) localStorage.setItem("notif_read_" + String(n.timestamp).trim(), "yes");
   renderNotifInbox();
   updateNotifBadge();
-  // Mark in sheet via Apps Script
   post({ action: "mark_notification_read", timestamp: n.timestamp, seller_id: SELLER.seller_id }).catch(()=>{});
 }
 
 async function markAllRead() {
-  NOTIFICATIONS_DATA.forEach(n => n.read = "yes");
+  NOTIFICATIONS_DATA.forEach(n => {
+    n.read = "yes";
+    // Cache in localStorage so reopening doesn't show them as unread
+    if (n.timestamp) localStorage.setItem("notif_read_" + String(n.timestamp).trim(), "yes");
+  });
   renderNotifInbox();
   updateNotifBadge();
   post({ action: "mark_all_notifications_read", seller_id: SELLER.seller_id }).catch(()=>{});
