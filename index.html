@@ -925,6 +925,13 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
   </div>
 
+  <!-- FLOATING MULTI-GL BUTTON -->
+  <div id="multi-gl-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;max-width:480px;margin:0 auto;padding:0 16px;z-index:250;">
+    <button onclick="openMultiGLModal()" style="width:100%;padding:14px;border-radius:999px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(232,25,44,0.4);">
+      <span id="multi-gl-count">+ Add to guestlist (0)</span>
+    </button>
+  </div>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="showSection('section-dashboard')" id="nav-dashboard">
@@ -2033,7 +2040,7 @@ function toggleDrinkPackage() {
 
 function closeModal() { document.getElementById("gl-modal").classList.remove("open"); CURRENT_EVENT=null; }
 
-document.getElementById("modal-submit").onclick = async () => {
+const originalModalSubmit = async () => {
   const guestName=document.getElementById("modal-guest-name").value.trim();
   const pax=document.getElementById("modal-pax").value;
   const email=document.getElementById("modal-email").value.trim();
@@ -3445,6 +3452,7 @@ function renderProgramme() {
           return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <div style="min-width:0;"><span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>${ev.event_name?`<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>`:""}</div>
             <button onclick="openModal('${ev.event_id}','${ev.club_id}')" ${disabled?"disabled":""} style="flex-shrink:0;padding:3px 10px;border-radius:999px;background:${disabled?"rgba(255,255,255,0.05)":"var(--red)"};color:${disabled?"var(--muted)":"#fff"};border:none;font-size:10px;font-weight:600;cursor:${disabled?"not-allowed":"pointer"};">${closed?"Closed":isFull?"Full":"+ GL"}</button>
+            ${!disabled ? `<input type="checkbox" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" onchange="toggleMultiGL(this,'${ev.event_id}','${ev.club_id}')" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0;">` : ""}
           </div>`;
         }).join("")}
       </div>` : "";
@@ -3517,6 +3525,7 @@ function renderProgramme() {
               <button onclick="openModal('${ev.event_id}','${ev.club_id}')" ${disabled?"disabled":""} style="flex-shrink:0;padding:3px 10px;border-radius:999px;background:${disabled?"rgba(255,255,255,0.05)":"var(--red)"};color:${disabled?"var(--muted)":"#fff"};border:none;font-size:10px;font-weight:600;cursor:${disabled?"not-allowed":"pointer"};">
                 ${closed?"Closed":isFull?"Full":"+ GL"}
               </button>
+              ${!disabled ? `<input type="checkbox" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" onchange="toggleMultiGL(this,'${ev.event_id}','${ev.club_id}')" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0;">` : ""}
             </div>`;
           }).join("")}
         </div>`;
@@ -3581,6 +3590,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   else { document.getElementById("access-page").style.display = "flex"; }
 });
 
+document.getElementById("modal-submit").onclick = originalModalSubmit;
 document.getElementById("gl-modal").addEventListener("click", function(e) { if(e.target===this) closeModal(); });
 document.getElementById("vip-modal").addEventListener("click", function(e) { if(e.target===this) closeVipModal(); });
 
@@ -3705,6 +3715,143 @@ async function addNotification(type, recipientId, data) {
     // Reload badge if it's for me
     if (String(recipientId) === String(SELLER.seller_id)) loadNotifications();
   } catch(e) { console.log("addNotification failed:", e); }
+}
+
+// ── MULTI GL ──
+let SELECTED_EVENTS = [];
+
+function toggleMultiGL(checkbox, eventId, clubId) {
+  const event = EVENTS.find(e => e.event_id === eventId);
+  const club = CLUBS.find(c => c.club_id === clubId) || {};
+  const format = club.format || "name";
+
+  if (checkbox.checked) {
+    // Check format compatibility
+    if (SELECTED_EVENTS.length > 0) {
+      const firstClub = CLUBS.find(c => c.club_id === SELECTED_EVENTS[0].club_id) || {};
+      const firstFormat = firstClub.format || "name";
+      if (format !== firstFormat) {
+        checkbox.checked = false;
+        alert(`"${club.club_name}" has a different format and cannot be combined. Add it separately.`);
+        return;
+      }
+    }
+    SELECTED_EVENTS.push({ eventId, clubId, event, club });
+  } else {
+    SELECTED_EVENTS = SELECTED_EVENTS.filter(e => e.eventId !== eventId);
+  }
+
+  // Update floating button
+  const bar = document.getElementById("multi-gl-bar");
+  const count = document.getElementById("multi-gl-count");
+  if (SELECTED_EVENTS.length > 0) {
+    bar.style.display = "block";
+    count.textContent = `+ Add to guestlist (${SELECTED_EVENTS.length})`;
+  } else {
+    bar.style.display = "none";
+  }
+}
+
+function openMultiGLModal() {
+  if (!SELECTED_EVENTS.length) return;
+  const firstClub = SELECTED_EVENTS[0].club;
+  const format = firstClub.format || "name";
+  const needsEmail = format.includes("email");
+  const needsPax = format.includes("pax");
+  const nameOnly = !needsPax && !needsEmail;
+
+  // Reuse existing modal
+  CURRENT_EVENT = SELECTED_EVENTS[0].event;
+  const cl = firstClub;
+
+  document.getElementById("modal-club-name").textContent = 
+    SELECTED_EVENTS.length === 1 
+      ? cl.club_name 
+      : `${cl.club_name} + ${SELECTED_EVENTS.length - 1} more`;
+  
+  document.getElementById("modal-event-info").textContent = 
+    SELECTED_EVENTS.map(e => (e.event?.event_name||"") + " · " + formatDate(normalizeDate(e.event?.date||""))).join("
+");
+
+  document.getElementById("modal-single-name-group").style.display = nameOnly ? "none" : "block";
+  document.getElementById("modal-pax-group").style.display = needsPax ? "block" : "none";
+  document.getElementById("modal-email-group").style.display = needsEmail ? "block" : "none";
+  document.getElementById("modal-multi-name-group").style.display = nameOnly ? "block" : "none";
+  if (nameOnly) { document.getElementById("modal-pax-count").value = "1"; renderNameFields(); }
+
+  document.getElementById("modal-drink-group").style.display = "none";
+  document.getElementById("modal-guest-name").value = "";
+  document.getElementById("modal-email").value = "";
+  document.getElementById("modal-notes").value = "";
+  document.getElementById("modal-msg").textContent = "";
+
+  // Override submit button for multi-add
+  const btn = document.getElementById("modal-submit");
+  btn.textContent = `Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length > 1 ? "s" : ""}`;
+  btn.onclick = submitMultiGL;
+
+  document.getElementById("gl-modal").classList.add("open");
+}
+
+async function submitMultiGL() {
+  const cl = SELECTED_EVENTS[0].club;
+  const format = cl.format || "name";
+  const needsEmail = format.includes("email");
+  const needsPax = format.includes("pax");
+  const nameOnly = !needsPax && !needsEmail;
+  const msg = document.getElementById("modal-msg");
+  const notes = document.getElementById("modal-notes").value.trim();
+
+  const btn = document.getElementById("modal-submit");
+  btn.disabled = true; btn.textContent = "Adding…";
+
+  if (nameOnly) {
+    const nameFields = Array.from(document.querySelectorAll(".modal-multi-name"));
+    const names = nameFields.map(f => f.value.trim()).filter(Boolean);
+    if (!names.length) { msg.textContent = "Enter at least one name."; btn.disabled = false; btn.textContent = `Add to ${SELECTED_EVENTS.length} guestlists`; return; }
+
+    for (const sel of SELECTED_EVENTS) {
+      const cl2 = sel.club;
+      names.forEach(name => {
+        const entry = { entry_id: "GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5), seller_id: SELLER.seller_id, seller_name: SELLER.seller_name, club_id: sel.clubId, club_name: cl2.club_name||sel.clubId, event_id: sel.eventId, event_name: sel.event?.event_name||"", date: sel.event?.date||"", guest_name: name, pax: 1, email: "", notes, created_at: new Date().toISOString(), status: "active" };
+        ENTRIES.push(entry);
+        post({ action: "add_entry", ...entry });
+      });
+      // Notify
+      const adminIds = String(cl2.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+      adminIds.forEach(adminId => addNotification("new_entry", adminId, { club: cl2.club_name, guest: names.join(", "), event: sel.event?.event_name||"", date: sel.event?.date||"", by: SELLER.seller_name }));
+      notifyClubAdmins(sel.clubId, cl2.club_name, names.join(", "), names.length, sel.event?.event_name||"", formatDate(normalizeDate(sel.event?.date||"")));
+    }
+  } else {
+    const guestName = document.getElementById("modal-guest-name").value.trim();
+    const pax = document.getElementById("modal-pax").value;
+    const email = document.getElementById("modal-email").value.trim();
+    if (!guestName) { msg.textContent = "Name is required."; btn.disabled = false; return; }
+    if (needsEmail && !email) { msg.textContent = "Email is required."; btn.disabled = false; return; }
+
+    for (const sel of SELECTED_EVENTS) {
+      const cl2 = sel.club;
+      const entry = { entry_id: "GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5), seller_id: SELLER.seller_id, seller_name: SELLER.seller_name, club_id: sel.clubId, club_name: cl2.club_name||sel.clubId, event_id: sel.eventId, event_name: sel.event?.event_name||"", date: sel.event?.date||"", guest_name: guestName, pax, email, notes, created_at: new Date().toISOString(), status: "active" };
+      ENTRIES.push(entry);
+      post({ action: "add_entry", ...entry });
+      const adminIds = String(cl2.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+      adminIds.forEach(adminId => addNotification("new_entry", adminId, { club: cl2.club_name, guest: guestName, event: sel.event?.event_name||"", date: sel.event?.date||"", by: SELLER.seller_name }));
+      notifyClubAdmins(sel.clubId, cl2.club_name, guestName, pax, sel.event?.event_name||"", formatDate(normalizeDate(sel.event?.date||"")));
+    }
+  }
+
+  // Reset
+  SELECTED_EVENTS = [];
+  document.getElementById("multi-gl-bar").style.display = "none";
+  document.querySelectorAll("input[data-event-id]").forEach(cb => cb.checked = false);
+  closeModal();
+  renderMyGL(); renderDashboard();
+
+  // Reset submit button back to original
+  const submitBtn = document.getElementById("modal-submit");
+  submitBtn.textContent = "Add to guestlist";
+  submitBtn.disabled = false;
+  submitBtn.onclick = originalModalSubmit;
 }
 
 // ── DEADLINES ──
