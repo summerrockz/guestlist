@@ -3502,14 +3502,17 @@ function renderNotifInbox() {
       if (isNaN(ts)) ts = null;
     }
     const timeStr = ts ? ts.toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
-    return `<div onclick="markRead(${i})" style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;background:${isUnread?"rgba(255,255,255,0.03)":"transparent"};transition:background 0.2s;">
+    return `<div onclick="markRead(${i})" style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;background:${isUnread?"rgba(232,25,44,0.06)":"transparent"};border-left:${isUnread?"3px solid var(--red)":"3px solid transparent"};transition:background 0.2s;">
       <div style="font-size:22px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:${isUnread?"600":"400"};color:${isUnread?"var(--text)":"var(--muted)"};">${n.guest||""} ${n.club?`· ${n.club}`:""}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${n.event||""} ${n.date?`· ${formatDate(normalizeDate(n.date))}`:""}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          ${isUnread ? `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:var(--red);color:#fff;">NEW</span>` : ""}
+          <span style="font-size:13px;font-weight:${isUnread?"600":"400"};color:${isUnread?"var(--text)":"var(--muted)"};">${n.club||""}</span>
+        </div>
+        <div style="font-size:12px;font-weight:500;color:${isUnread?"var(--text)":"var(--muted)"};">${n.guest||""}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${[n.event, n.date?formatDate(normalizeDate(n.date)):""].filter(Boolean).join(" · ")}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:1px;">${n.by||""} · ${timeStr}</div>
       </div>
-      ${isUnread ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:6px;"></div>` : ""}
     </div>`;
   }).join("");
 }
