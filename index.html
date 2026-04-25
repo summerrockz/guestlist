@@ -3450,7 +3450,7 @@ function renderProgramme() {
           const closed = ds === "closed";
           const disabled = closed || isFull || (ev.status||"").toLowerCase() === "inactive";
           return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div style="min-width:0;flex:1;"><span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>${ev.event_name?`<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>`:""}</div>
+            <div style="min-width:0;flex:1;"><span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>${ev.event_name?`<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>`:""}${ev.time?`<span style="font-size:10px;color:var(--muted);"> · ${ev.time}</span>`:""}</div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               ${!disabled ? `<span onclick="openModal('${ev.event_id}','${ev.club_id}')" style="font-size:11px;font-weight:600;color:var(--red);cursor:pointer;">+ GL</span>` : `<span style="font-size:11px;color:var(--muted);">${closed?"Closed":isFull?"Full":""}</span>`}
               ${!disabled ? `<input type="checkbox" class="multi-gl-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;">` : `<div style="width:16px;"></div>`}
@@ -3523,6 +3523,7 @@ function renderProgramme() {
               <div style="min-width:0;flex:1;">
                 <span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>
                 ${ev.event_name ? `<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>` : ""}
+                ${ev.time ? `<span style="font-size:10px;color:var(--muted);"> · ${ev.time}</span>` : ""}
               </div>
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                 ${!disabled ? `<span onclick="openModal('${ev.event_id}','${ev.club_id}')" style="font-size:11px;font-weight:600;color:var(--red);cursor:pointer;">+ GL</span>` : `<span style="font-size:11px;color:var(--muted);">${closed?"Closed":isFull?"Full":""}</span>`}
@@ -3540,13 +3541,17 @@ function renderProgramme() {
 function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgramme(); }
 
 function progJumpMonth(monthIndex) {
-  // Find the week that contains the 1st of that month
+  // Find first day of month, then find the Monday of that week
+  // If that Monday is in the previous month, jump to next Monday instead
   const first = new Date(2026, monthIndex, 1);
-  // Go back to Monday of that week
-  const dow = first.getDay();
-  const monday = new Date(first);
+  const dow = first.getDay(); // 0=Sun, 1=Mon...
+  let monday = new Date(first);
   monday.setDate(first.getDate() - (dow === 0 ? 6 : dow - 1));
   monday.setHours(0,0,0,0);
+  // If Monday is in previous month, use the Monday of the next week (7th of month week)
+  if (monday.getMonth() !== monthIndex) {
+    monday.setDate(monday.getDate() + 7);
+  }
   progWeekStart = monday;
   renderProgramme();
 }
