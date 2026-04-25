@@ -1612,10 +1612,22 @@ async function markEntrySent(entryId, isSent) {
     if (isSent) {
       const entry = ENTRIES.find(e => e.entry_id === entryId);
       if (entry) {
+        // Inbox notification
         addNotification("confirmed", entry.seller_id, {
           club: entry.club_name, guest: entry.guest_name+(parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):""),
           event: entry.event_name||"", date: entry.date, by: SELLER.seller_name
         });
+        // Push notification
+        const paxStr = parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"";
+        fetch(VERCEL_URL+"/api/notify", {
+          method: "POST",
+          headers: {"Content-Type":"application/json","x-api-key":"srz2026secret"},
+          body: JSON.stringify({
+            title: "✅ Confirmed: " + entry.club_name,
+            body: entry.guest_name + paxStr + " · " + (entry.event_name||"") + " — confirmed by " + SELLER.seller_name,
+            sellerId: entry.seller_id
+          })
+        }).catch(()=>{});
       }
     }
   } catch(e) {
