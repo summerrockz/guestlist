@@ -393,6 +393,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div class="header-user" id="header-user"></div>
       </div>
     </div>
+    <div id="ptr-hint" style="text-align:center;font-size:11px;color:rgba(255,255,255,0.2);padding:4px 0;letter-spacing:0.05em;">↓ Pull down to refresh</div>
     <div id="deadline-banner" style="display:none;background:var(--red);color:#fff;font-size:12px;font-weight:600;padding:8px 16px;text-align:center;letter-spacing:0.05em;"></div>
 
     <!-- DASHBOARD -->
@@ -428,7 +429,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-card-sub">All incoming table requests</div>
         </div>
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
-        <button class="btn-secondary" style="width:100%; margin-top:8px;" onclick="refreshAll(this)" id="refresh-btn">🔄 Refresh</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
       </div>
     </div>
@@ -3580,8 +3580,8 @@ document.addEventListener("touchstart",e=>{ if(window.scrollY===0) pullStartY=e.
 document.addEventListener("touchend",async e=>{
   const dist=e.changedTouches[0].clientY-pullStartY; if(dist<80) return;
   const ind=document.createElement("div");
-  ind.style.cssText="position:fixed;top:0;left:50%;transform:translateX(-50%);background:#E8192C;color:#fff;font-size:12px;font-weight:600;padding:8px 20px;border-radius:0 0 16px 16px;z-index:9999;";
-  ind.textContent="Refreshing..."; document.body.appendChild(ind);
+  ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:8px;";
+  ind.innerHTML="🔄 Refreshing…"; document.body.appendChild(ind);
   await loadData();
   const active=document.querySelector(".section.active");
   if (active) {
