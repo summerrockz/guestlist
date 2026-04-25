@@ -3482,6 +3482,29 @@ function renderProgramme() {
             : clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}
         </div>
       </div>
+      ${(()=>{
+        const dayGl = EVENTS.filter(ev => normalizeDate(ev.date||"") === dateStr && (ev.status||"").toLowerCase() !== "inactive");
+        if (!dayGl.length) return "";
+        return `<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;display:flex;flex-direction:column;gap:4px;">
+          ${dayGl.map(ev => {
+            const cl = CLUBS.find(c=>c.club_id===ev.club_id)||{};
+            const spots = ev.spots_left !== undefined && ev.spots_left !== "" ? parseInt(ev.spots_left) : null;
+            const isFull = spots !== null && spots <= 0;
+            const ds = deadlineStatus(cl.deadline, dateStr);
+            const closed = ds === "closed";
+            const disabled = closed || isFull || (ev.status||"").toLowerCase() === "inactive";
+            return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <div style="min-width:0;">
+                <span style="font-size:11px;font-weight:600;color:var(--text);">${cl.club_name||ev.club_id}</span>
+                ${ev.event_name ? `<span style="font-size:10px;color:var(--muted);"> · ${ev.event_name}</span>` : ""}
+              </div>
+              <button onclick="openModal('${ev.event_id}','${ev.club_id}')" ${disabled?"disabled":""} style="flex-shrink:0;padding:3px 10px;border-radius:999px;background:${disabled?"rgba(255,255,255,0.05)":"var(--red)"};color:${disabled?"var(--muted)":"#fff"};border:none;font-size:10px;font-weight:600;cursor:${disabled?"not-allowed":"pointer"};">
+                ${closed?"Closed":isFull?"Full":"+ GL"}
+              </button>
+            </div>`;
+          }).join("")}
+        </div>`;
+      })()}
     </div>`;
   }
   document.getElementById("prog-week").innerHTML = html;
