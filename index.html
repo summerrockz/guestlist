@@ -1842,6 +1842,7 @@ function renderAdmin() {
     if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
     if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
+    if (adminTimeFilter === 'all') return (e.status||"").toLowerCase() !== "deleted";
     return true;
   });
 
