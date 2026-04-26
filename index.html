@@ -1823,14 +1823,14 @@ function renderAdmin() {
 
   // Get filtered entries
   let filteredEntries = ENTRIES.filter(e => {
-    const notDeleted = (e.status||"").toLowerCase() !== "deleted";
-    const inClub = myClubs.includes(e.club_id);
-    if (!notDeleted || !inClub) return false;
+    const status = (e.status||"").toLowerCase();
+    if (status === "deleted") return false;
+    if (!myClubs.includes(e.club_id)) return false;
+    if (adminTimeFilter === 'all') return true;
     if (adminTimeFilter === '2h') return isRecent(e.created_at, 2);
     if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
     if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
-    if (adminTimeFilter === 'all') return (e.status||"").toLowerCase() !== "deleted";
     return true;
   });
 
