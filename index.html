@@ -856,7 +856,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     </div>
 
     <!-- PROGRAMME 2026 -->
-    <div class="section" id="section-programme">
+    <div class="section" id="section-program">
       <!-- Month quick-select -->
       <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
         <button onclick="progJumpMonth(4)" class="prog-month-btn" id="prog-m-4">May</button>
@@ -885,7 +885,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
 
       <!-- Search -->
-      <input type="text" class="input-field" id="prog-search" placeholder="Search event or venue…" oninput="renderProgramme()" style="margin-bottom:12px;">
+      <input type="text" class="input-field" id="prog-search" placeholder="Search event or venue…" oninput="renderProgram()" style="margin-bottom:12px;">
 
       <!-- Week nav -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -976,7 +976,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 <div id="more-menu" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="if(event.target===this)closeMoreMenu()">
   <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#1c1c1c;border-radius:22px 22px 0 0;border-top:1px solid rgba(255,255,255,0.1);padding-bottom:env(safe-area-inset-bottom,16px);overflow:hidden;animation:slideUp 0.25s ease;">
 
-    <button onclick="moreNav('section-programme')"
+    <button onclick="moreNav('section-program')"
       style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
       <span style="font-size:22px;">📆</span>
       <div>
@@ -1358,7 +1358,7 @@ function showSection(id) {
     "section-dashboard":"nav-dashboard","section-events":"nav-events",
     "section-mygl":"nav-mygl","section-admin":"nav-more",
     "section-vip":"nav-more","section-vip-admin":"nav-more",
-    "section-calendar":"nav-calendar","section-programme":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-more","section-vip-prices":"nav-more"
+    "section-calendar":"nav-calendar","section-program":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-more","section-vip-prices":"nav-more"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
@@ -1376,7 +1376,7 @@ function showSection(id) {
   if (id === "section-vip-admin") loadVipRequests().then(renderVipAdmin);
   if (id === "section-calendar") loadData().then(renderCalendar);
   if (id === "section-products") loadProducts();
-  if (id === "section-programme") loadProgramme().then(renderProgramme);
+  if (id === "section-program") loadProgram().then(renderProgram);
   if (id === "section-vip-prices") loadVipPrices();
 }
 
@@ -1542,7 +1542,7 @@ async function loadData() {
 
 let PROGRAMME_SHEET = {};
 
-async function loadProgramme() {
+async function loadProgram() {
   try {
     const rows = await fetchSheet("PROGRAMME");
     PROGRAMME_SHEET = {};
@@ -1552,7 +1552,7 @@ async function loadProgramme() {
       const venues = (r.venues||"").split(",").map(v=>v.trim()).filter(Boolean);
       PROGRAMME_SHEET[date] = venues;
     });
-  } catch(e) { console.log("Programme load failed:", e); }
+  } catch(e) { console.log("Program load failed:", e); }
 }
 
 async function loadVipRequests() {
@@ -1766,8 +1766,8 @@ async function deleteEntry(entryId, btn) {
         method:"POST",
         headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
         body: JSON.stringify({
-          title: "🔔 Entry cancelled: " + (cl.club_name||entry.club_name),
-          body: (entry.guest_name||"") + (parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"") + " — cancelled by " + SELLER.seller_name + urgentFlag,
+          title: wasSent ? "🚨 URGENT: Entry cancelled — " + (cl.club_name||entry.club_name) : "🔔 Entry cancelled: " + (cl.club_name||entry.club_name),
+          body: (entry.guest_name||"") + (parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"") + " · " + formatDate(normalizeDate(entry.date||"")) + " — cancelled by " + SELLER.seller_name + urgentFlag,
           sellerId: adminId
         })
       }).catch(()=>{});
@@ -3407,7 +3407,7 @@ function onProgDateChange() {
   if (to) { const d = new Date(to+"T12:00:00"); toLbl.textContent = d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}); toLbl.style.color="var(--text)"; }
   else { toLbl.textContent = "Departure"; toLbl.style.color="var(--muted)"; }
   if (clearBtn) clearBtn.style.display = (from||to) ? "block" : "none";
-  renderProgramme();
+  renderProgram();
 }
 
 function clearProgDates() {
@@ -3416,7 +3416,7 @@ function clearProgDates() {
   onProgDateChange();
 }
 
-function renderProgramme() {
+function renderProgram() {
   const progSearch = (document.getElementById("prog-search")?.value||"").toLowerCase().trim();
   const source = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
   const todayStr = today();
@@ -3533,7 +3533,7 @@ function renderProgramme() {
   document.getElementById("prog-week").innerHTML = html;
   updateMonthButtons();
 }
-function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgramme(); }
+function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgram(); }
 
 function progJumpMonth(monthIndex) {
   // Find first day of month, then find the Monday of that week
@@ -3548,7 +3548,7 @@ function progJumpMonth(monthIndex) {
     monday.setDate(monday.getDate() + 7);
   }
   progWeekStart = monday;
-  renderProgramme();
+  renderProgram();
 }
 
 function updateMonthButtons() {
@@ -3559,7 +3559,7 @@ function updateMonthButtons() {
     if (btn) btn.classList.toggle("active", m === currentMonth);
   });
 }
-function progNext() { progWeekStart.setDate(progWeekStart.getDate()+7); renderProgramme(); }
+function progNext() { progWeekStart.setDate(progWeekStart.getDate()+7); renderProgram(); }
 
 document.getElementById("logout-btn").onclick = doLogout;
 
@@ -3948,18 +3948,19 @@ async function saveEditedEntry(entryId, cl, nameOnly, needsEmail, needsPax) {
   if (entry) {
     const adminIds = String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
     const paxStr = parseInt(pax)>1?" +"+(parseInt(pax)-1):"";
+    const wasConfirmed = (entry.sent_to_club||"").toLowerCase() === "yes";
     for (const adminId of adminIds) {
       fetch(VERCEL_URL+"/api/notify", {
         method:"POST", headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
         body: JSON.stringify({
-          title: "✏️ Entry modified: " + (cl.club_name||entry.club_name),
+          title: wasConfirmed ? "🚨 MODIFIED (already confirmed!): " + (cl.club_name||entry.club_name) : "✏️ Entry modified: " + (cl.club_name||entry.club_name),
           body: guestName + paxStr + " · " + (entry.event_name||"") + " · " + formatDate(normalizeDate(entry.date||"")) + " — modified by " + SELLER.seller_name,
           sellerId: adminId
         })
       }).catch(()=>{});
       addNotification("modified", adminId, {
         club: cl.club_name||entry.club_name,
-        guest: guestName + paxStr,
+        guest: guestName + paxStr + (wasConfirmed ? " ⚠️ Was confirmed!" : ""),
         event: entry.event_name||"", date: entry.date, by: SELLER.seller_name
       });
     }
@@ -3990,6 +3991,27 @@ function checkDeadlines() {
   });
   if (warnings.length) { banner.textContent=warnings.join("  ·  "); banner.style.display="block"; }
   else { banner.style.display="none"; }
+
+  // Also notify sellers about upcoming deadlines for their entries
+  CLUBS.forEach(cl => {
+    if (!cl.deadline) return;
+    const [h,m] = cl.deadline.split(":").map(Number);
+    const deadline = new Date(); deadline.setHours(h,m,0,0);
+    if (h<6) deadline.setDate(deadline.getDate()+1);
+    const diff = deadline-now;
+    const minsLeft = Math.round(diff/60000);
+    if (minsLeft !== 60 && minsLeft !== 30) return;
+    const hasMyEntry = ENTRIES.some(ev => 
+      ev.club_id === cl.club_id && 
+      (ev.date||"").slice(0,10) === todayStr && 
+      String(ev.seller_id||"").trim() === myId &&
+      (ev.status||"").toLowerCase() === "active"
+    );
+    if (hasMyEntry) {
+      const msg = `⏰ Deadline in ${minsLeft} min: ${cl.club_name}`;
+      if (!warnings.includes(msg)) warnings.push(msg);
+    }
+  });
 }
 setInterval(checkDeadlines, 60000);
 
