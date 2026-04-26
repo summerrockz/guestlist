@@ -411,18 +411,22 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
             <div class="dash-stat-label">Total this week</div>
           </div>
         </div>
-        <div class="dash-card" onclick="showSection('section-events')">
+        <div id="addgl-dash-card" class="dash-card" onclick="showSection('section-events')">
           <div class="dash-card-title">➕ Add to guestlist</div>
           <div class="dash-card-sub">Browse today's events and add guests</div>
         </div>
 
-        <div class="dash-card" onclick="showSection('section-vip')">
+        <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')">
           <div class="dash-card-title">🍾 VIP Table requests</div>
           <div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div>
         </div>
         <div id="admin-dash-card" class="dash-card" onclick="showSection('section-admin')" style="display:none;">
           <div class="dash-card-title">📤 Admin export</div>
           <div class="dash-card-sub">Export guestlists per club</div>
+        </div>
+        <div id="vip-admin-dash-card" class="dash-card" onclick="showSection('section-vip-admin')" style="display:none;">
+          <div class="dash-card-title">💼 VIP Requests — Manage</div>
+          <div class="dash-card-sub">All incoming table requests</div>
         </div>
 
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
@@ -1008,23 +1012,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
     </button>
 
-    <button id="more-admin" onclick="moreNav('section-admin')"
-      style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
-      <span style="font-size:22px;">📤</span>
-      <div>
-        <div>Export guestlist</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Copy lists per club</div>
-      </div>
-    </button>
 
-    <button id="more-vip-admin" onclick="moreNav('section-vip-admin')"
-      style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
-      <span style="font-size:22px;">💼</span>
-      <div>
-        <div>VIP Requests — Manage</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">All incoming table requests</div>
-      </div>
-    </button>
 
     <button onclick="doLogout()"
       style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;color:rgba(232,25,44,0.85);cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
@@ -1428,7 +1416,8 @@ async function initApp() {
   // VIP Manage — ONLY seller_id 1 (info@theibizaexpert.com)
   if (String(SELLER.seller_id).trim() === "1") {
     document.getElementById("section-vip-admin").style.display = "block";
-    document.getElementById("more-vip-admin").style.display = "flex";
+    const vipAdminDash = document.getElementById("vip-admin-dash-card");
+    if (vipAdminDash) vipAdminDash.style.display = "block";
   }
 
   // mygl-date starts empty to show all entries
@@ -1588,14 +1577,15 @@ function renderDashboard() {
     return adminIds.includes(myId);
   });
   const exportCard = document.getElementById("admin-dash-card");
-  const moreAdmin = document.getElementById("more-admin");
-  if (isClubAdmin) {
-    if (exportCard) exportCard.style.display = "block";
-    if (moreAdmin) moreAdmin.style.display = "flex";
-  } else {
-    if (exportCard) exportCard.style.display = "none";
-    if (moreAdmin) moreAdmin.style.display = "none";
-  }
+  if (exportCard) exportCard.style.display = isClubAdmin ? "block" : "none";
+
+  // Add GL and VIP requests only for sellers (not pure admins)
+  const myRole = (SELLER.role||"").toLowerCase();
+  const isSeller = myRole === "seller" || myRole === "manager";
+  const addGlCard = document.getElementById("addgl-dash-card");
+  const vipCard = document.getElementById("vip-dash-card");
+  if (addGlCard) addGlCard.style.display = isSeller ? "block" : "none";
+  if (vipCard) vipCard.style.display = isSeller ? "block" : "none";
 }
 
 // ── EVENTS ──
