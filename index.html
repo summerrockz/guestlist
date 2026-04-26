@@ -1877,15 +1877,14 @@ function renderAdmin() {
       const line=`${e.guest_name}${plusPax}${emailPart}`;
       const sentKey="sent_"+cardKey+"_"+e.entry_id;
       const isSent=localStorage.getItem(sentKey)==="1";
+      const isNew = isRecent(e.created_at, 2);
+      const isModified = !!(e.modified_at && isRecent(e.modified_at, 24));
+      const effectivelySent = isSent && !isModified;
       const rowOpacity=isCancelled?"0.5":(effectivelySent?"0.4":"1");
       const checkbox=!isCancelled?`<input type="checkbox" ${effectivelySent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1';markEntrySent('${e.entry_id}',this.checked)" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
       const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
       const text=isCancelled?line+" ⚠️ CANCELLED":line;
-      const isNew = isRecent(e.created_at, 2);
-      const isModified = e.modified_at && isRecent(e.modified_at, 24);
       const newBadge = isModified && !isCancelled ? `<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(59,130,246,0.2);color:var(--blue);border:1px solid rgba(59,130,246,0.4);flex-shrink:0;">MODIFIED</span>` : isNew && !isCancelled ? `<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.4);flex-shrink:0;">NEW</span>` : "";
-      // Modified entries should show as unchecked
-      const effectivelySent = isSent && !isModified;
       const sellerTag = e.seller_name ? `<span style="font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;">${e.seller_name}</span>` : "";
       return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${sellerTag}</div>`;
     }).join("");
