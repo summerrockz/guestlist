@@ -1579,13 +1579,11 @@ function renderDashboard() {
   const exportCard = document.getElementById("admin-dash-card");
   if (exportCard) exportCard.style.display = isClubAdmin ? "block" : "none";
 
-  // Add GL and VIP requests only for sellers (not pure admins)
-  const myRole = (SELLER.role||"").toLowerCase();
-  const isSeller = myRole === "seller" || myRole === "manager";
+  // Add GL and VIP requests visible for everyone
   const addGlCard = document.getElementById("addgl-dash-card");
   const vipCard = document.getElementById("vip-dash-card");
-  if (addGlCard) addGlCard.style.display = isSeller ? "block" : "none";
-  if (vipCard) vipCard.style.display = isSeller ? "block" : "none";
+  if (addGlCard) addGlCard.style.display = "block";
+  if (vipCard) vipCard.style.display = "block";
 }
 
 // ── EVENTS ──
