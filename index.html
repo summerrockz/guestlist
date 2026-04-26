@@ -424,10 +424,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-card-title">📤 Admin export</div>
           <div class="dash-card-sub">Export guestlists per club</div>
         </div>
-        <div id="vip-admin-dash-card" class="dash-card" onclick="showSection('section-vip-admin')" style="display:none;">
-          <div class="dash-card-title">💼 VIP Requests — Manage</div>
-          <div class="dash-card-sub">All incoming table requests</div>
-        </div>
+
 
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
@@ -1415,9 +1412,8 @@ async function initApp() {
   // We defer this check to after data loads
   // VIP Manage — ONLY seller_id 1 (info@theibizaexpert.com)
   if (String(SELLER.seller_id).trim() === "1") {
-    document.getElementById("section-vip-admin").style.display = "block";
-    const vipAdminDash = document.getElementById("vip-admin-dash-card");
-    if (vipAdminDash) vipAdminDash.style.display = "block";
+    // VIP admin section accessible via More menu only
+
   }
 
   // mygl-date starts empty to show all entries
