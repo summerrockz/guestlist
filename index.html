@@ -489,6 +489,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button class="vip-filter-btn" id="admin-filter-date" onclick="setAdminFilter('date',this)">📅 By date</button>
         <button class="vip-filter-btn" id="admin-filter-club" onclick="setAdminFilter('club',this)">By club</button>
         <button class="vip-filter-btn" id="admin-filter-all" onclick="setAdminFilter('all',this)">All</button>
+        <button class="vip-filter-btn" id="admin-filter-history" onclick="setAdminFilter('history',this)">History</button>
       </div>
       <div id="admin-date-wrap" style="display:none;margin-bottom:12px;">
         <div class="date-bar"><input type="date" id="admin-date" onchange="renderAdmin()"></div>
@@ -1871,7 +1872,8 @@ function renderAdmin() {
     const status = (e.status||"").toLowerCase();
     if (status === "deleted") return false;
     if (!myClubs.includes(e.club_id)) return false;
-    if (adminTimeFilter === 'all') return true;
+    if (adminTimeFilter === 'all') return normalizeDate(e.date||"") >= today();
+    if (adminTimeFilter === 'history') return normalizeDate(e.date||"") < today();
     if (adminTimeFilter === 'today') {
       const parseGSDate = (s) => {
         if (!s) return "";
@@ -1895,7 +1897,7 @@ function renderAdmin() {
   });
 
   if (!filteredEntries.length) {
-    const msgs = {'2h':'No entries in the last 2 hours.','4h':'No entries in the last 4 hours.','today':'No entries today.','date':'No entries for '+formatDate(date)+'.','all':'No entries found.'};
+    const msgs = {'today':'No entries today.','date':'No entries for '+formatDate(date)+'.','all':'No upcoming entries.','history':'No past entries.','club':'No entries found.'};
     wrap.innerHTML=`<div class="empty">${msgs[adminTimeFilter]||'No entries found.'}</div>`; return;
   }
 
