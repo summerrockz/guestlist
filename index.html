@@ -947,8 +947,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <button class="nav-item active" onclick="showSection('section-dashboard')" id="nav-dashboard">
       <span class="nav-icon">🏠</span>Dashboard
     </button>
-    <button class="nav-item" onclick="showSection('section-events')" id="nav-events">
-      <span class="nav-icon">🎉</span>Add GL
+    <button class="nav-item" onclick="showSection('section-program')" id="nav-program">
+      <span class="nav-icon">📆</span>Program
     </button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl">
       <span class="nav-icon">📋</span>Entries
@@ -982,12 +982,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 <div id="more-menu" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);" onclick="if(event.target===this)closeMoreMenu()">
   <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#1c1c1c;border-radius:22px 22px 0 0;border-top:1px solid rgba(255,255,255,0.1);padding-bottom:env(safe-area-inset-bottom,16px);overflow:hidden;animation:slideUp 0.25s ease;">
 
-    <button onclick="moreNav('section-program')"
+    <button onclick="moreNav('section-events')"
       style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
-      <span style="font-size:22px;">📆</span>
+      <span style="font-size:22px;">🎉</span>
       <div>
-        <div>Program SR 2026 + GL</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Weekly schedule Summerrockz</div>
+        <div>Add GL</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Add guests to guestlist</div>
       </div>
     </button>
 
@@ -1361,7 +1361,7 @@ function showSection(id) {
   const sec = document.getElementById(id);
   if (sec) { sec.classList.add("active"); sec.style.display = "block"; }
   const navMap = {
-    "section-dashboard":"nav-dashboard","section-events":"nav-events",
+    "section-dashboard":"nav-dashboard","section-events":"nav-more","section-program":"nav-program",
     "section-mygl":"nav-mygl","section-admin":"nav-more",
     "section-vip":"nav-more","section-vip-admin":"nav-more",
     "section-calendar":"nav-calendar","section-program":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-more","section-vip-prices":"nav-more"
