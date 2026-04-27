@@ -1583,8 +1583,8 @@ function renderDashboard() {
 
   // Show export if this seller is admin_id of at least one club
   const isClubAdmin = CLUBS.some(c => {
-    const adminIds = String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
-    return adminIds.includes(myId);
+    const adminIds = String(c.admin_id||"").split(",").map(x=>String(x).trim()).filter(Boolean);
+    return adminIds.includes(String(myId));
   });
   const exportCard = document.getElementById("admin-dash-card");
   if (exportCard) exportCard.style.display = isClubAdmin ? "block" : "none";
