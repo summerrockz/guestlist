@@ -893,6 +893,9 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div id="prog-title" style="font-size:13px;font-weight:600;letter-spacing:0.08em;text-align:center;"></div>
         <button onclick="progNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">›</button>
       </div>
+      <div id="prog-sticky-month" style="display:none;position:sticky;top:52px;z-index:50;background:var(--dark);padding:6px 0;margin-bottom:4px;border-bottom:1px solid var(--border);">
+        <span id="prog-sticky-month-text" style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);"></span>
+      </div>
       <div id="prog-week" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
@@ -3555,6 +3558,24 @@ function renderProgram() {
   }
   document.getElementById("prog-week").innerHTML = html;
   updateMonthButtons();
+  updateStickyMonth();
+}
+
+function updateStickyMonth() {
+  const sticky = document.getElementById("prog-sticky-month");
+  const text = document.getElementById("prog-sticky-month-text");
+  const progSearch = (document.getElementById("prog-search")?.value||"").trim();
+  const progFrom = document.getElementById("prog-date-from")?.value || "";
+  if (!sticky || !text) return;
+  if (progSearch || progFrom) { sticky.style.display = "none"; return; }
+  if (!progWeekStart) { sticky.style.display = "none"; return; }
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const weekEnd = new Date(progWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
+  const startMonth = months[progWeekStart.getMonth()];
+  const endMonth = months[weekEnd.getMonth()];
+  const year = progWeekStart.getFullYear();
+  text.textContent = startMonth === endMonth ? `${startMonth} ${year}` : `${startMonth} — ${endMonth} ${year}`;
+  sticky.style.display = "block";
 }
 function progPrev() { progWeekStart.setDate(progWeekStart.getDate()-7); renderProgram(); }
 
