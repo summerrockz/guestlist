@@ -455,7 +455,10 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
     <!-- MY GL -->
     <div class="section" id="section-mygl">
-      <div class="section-title">My entries</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:0;">My entries</div>
+        <button id="mygl-history-btn" onclick="toggleMyGLHistory()" style="font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;">History</button>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
         <div style="flex:1;position:relative;" onclick="document.getElementById('mygl-date').showPicker ? document.getElementById('mygl-date').showPicker() : document.getElementById('mygl-date').click()">
           <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:46px;">
@@ -1673,6 +1676,15 @@ async function markEntrySent(entryId, isSent) {
   }
 }
 
+let myglShowHistory = false;
+
+function toggleMyGLHistory() {
+  myglShowHistory = !myglShowHistory;
+  const btn = document.getElementById("mygl-history-btn");
+  if (btn) btn.textContent = myglShowHistory ? "Hide history" : "History";
+  renderMyGL();
+}
+
 function renderMyGL() {
   const dateFilter = document.getElementById("mygl-date").value;
   const search = (document.getElementById("mygl-search")?.value||"").toLowerCase().trim();
@@ -1730,7 +1742,11 @@ function renderMyGL() {
     const isOwn=sid===myId||managedIds.includes(sid);
     const matchesSeller=!sellerFilter||sid===sellerFilter;
     const visible=(e.status||"").toLowerCase()!=="deleted";
-    return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible;
+    // History filter: hide entries older than yesterday unless history is shown
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+    const notTooOld = myglShowHistory || dateFilter || entryDate >= yStr;
+    return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible&&notTooOld;
   }).sort((a,b) => (b.date||"").localeCompare(a.date||""));
   const hasOtherEntries = false;
   if (!mine.length) {
