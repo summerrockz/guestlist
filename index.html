@@ -1379,7 +1379,7 @@ function showSection(id) {
 
   if (id === "section-events") loadData().then(renderEvents);
   if (id === "section-mygl") { loadData().then(renderMyGL); setTimeout(()=>{ const s=document.getElementById("mygl-search"); if(s) s.oninput=renderMyGL; },100); }
-  if (id === "section-admin") { if (ENTRIES.length) { renderAdmin(); startAdminRefresh(); } else { loadData().then(() => { renderAdmin(); startAdminRefresh(); }); } }
+  if (id === "section-admin") { renderAdmin(); startAdminRefresh(); }
   if (id === "section-dashboard") loadData().then(renderDashboard);
   if (id === "section-vip") loadVipRequests().then(renderVipSeller);
   if (id === "section-vip-admin" && String(SELLER.seller_id).trim() !== "1") return;
