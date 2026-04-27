@@ -1872,7 +1872,11 @@ function renderAdmin() {
     if (status === "deleted") return false;
     if (!myClubs.includes(e.club_id)) return false;
     if (adminTimeFilter === 'all') return true;
-    if (adminTimeFilter === 'today') return normalizeDate(e.date||"") === todayStr;
+    if (adminTimeFilter === 'today') {
+      const createdDate = normalizeDate(e.created_at||"");
+      const modifiedDate = e.modified_at ? normalizeDate(e.modified_at) : "";
+      return createdDate === todayStr || modifiedDate === todayStr;
+    }
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
     if (adminTimeFilter === 'club') return selectedClub ? e.club_id === selectedClub : true;
     return true;
