@@ -948,7 +948,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <span class="nav-icon">🏠</span>Dashboard
     </button>
     <button class="nav-item" onclick="showSection('section-program')" id="nav-program">
-      <span class="nav-icon">📆</span>Program
+      <span class="nav-icon">🤝</span>Program
     </button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl">
       <span class="nav-icon">📋</span>Entries
@@ -1888,7 +1888,7 @@ function renderAdmin() {
       const isModified = !!(e.modified_at && isRecent(e.modified_at, 24));
       const effectivelySent = isSent && !isModified;
       const rowOpacity=isCancelled?"0.5":(effectivelySent?"0.4":"1");
-      const checkbox=!isCancelled?`<input type="checkbox" ${effectivelySent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1';markEntrySent('${e.entry_id}',this.checked)" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
+      const checkbox=!isCancelled?`<input type="checkbox" ${effectivelySent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1';markEntrySent('${e.entry_id}',this.checked)" data-key="${sentKey}" class="admin-entry-cb">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
       const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
       const text=isCancelled?line+" ⚠️ CANCELLED":line;
       const newBadge = isModified && !isCancelled ? `<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(59,130,246,0.2);color:var(--blue);border:1px solid rgba(59,130,246,0.4);flex-shrink:0;">MODIFIED</span>` : isNew && !isCancelled ? `<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.4);flex-shrink:0;">NEW</span>` : "";
@@ -4005,8 +4005,18 @@ function startAdminRefresh() {
   adminRefreshTimer = setInterval(async () => {
     const newEntries = await fetchSheet("GL_ENTRIES");
     if (newEntries) {
+      // Save current checkbox states before re-render
+      const checked = {};
+      document.querySelectorAll(".admin-entry-cb").forEach(cb => { checked[cb.dataset.key] = cb.checked; });
       ENTRIES = newEntries;
       renderAdmin();
+      // Restore checkbox states after re-render
+      document.querySelectorAll(".admin-entry-cb").forEach(cb => {
+        if (checked[cb.dataset.key] !== undefined) {
+          cb.checked = checked[cb.dataset.key];
+          cb.closest("div").style.opacity = cb.checked ? "0.4" : "1";
+        }
+      });
       const el = document.getElementById("admin-last-updated");
       if (el) {
         const now = new Date();
