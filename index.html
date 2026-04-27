@@ -1537,7 +1537,7 @@ async function refreshAll(btn) {
     const id = active.id;
     if (id === "section-events") renderEvents();
     if (id === "section-mygl") renderMyGL();
-    if (id === "section-admin") { renderAdmin(); startAdminRefresh(); }
+    if (id === "section-admin") { renderAdminAndRestore(); startAdminRefresh(); }
   else { stopAdminRefresh(); }
     if (id === "section-dashboard") renderDashboard();
     if (id === "section-vip") { await loadVipRequests(); renderVipSeller(); }
@@ -1835,7 +1835,7 @@ function setAdminFilter(f, btn) {
       }
     }
   }
-  renderAdmin();
+  renderAdminAndRestore();
 }
 
 function isRecent(createdAt, hours) {
@@ -4216,7 +4216,7 @@ document.addEventListener("touchend",async e=>{
     const id=active.id;
     if(id==="section-events") renderEvents();
     if(id==="section-mygl") renderMyGL();
-    if(id==="section-admin") renderAdmin();
+    if(id==="section-admin") renderAdminAndRestore();
     if(id==="section-dashboard") renderDashboard();
     if(id==="section-vip") { await loadVipRequests(); renderVipSeller(); }
     if(id==="section-vip-admin") { await loadVipRequests(); renderVipAdmin(); }
