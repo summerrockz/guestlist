@@ -4107,6 +4107,27 @@ function updateEntryField(entryId, field, value) {
   }
   ENTRIES = ENTRIES.map(e => e.entry_id === entryId ? {...e, [field]: value} : e);
   post({ action: "mark_sent", entry_id: entryId, sent_to_club: value });
+
+  // Notify seller when confirmed
+  if (field === 'sent_to_club' && value === 'yes') {
+    const entry = ENTRIES.find(e => e.entry_id === entryId);
+    if (entry) {
+      const paxStr = parseInt(entry.pax) > 1 ? " +" + (parseInt(entry.pax) - 1) : "";
+      addNotification("confirmed", entry.seller_id, {
+        club: entry.club_name, guest: entry.guest_name + paxStr,
+        event: entry.event_name || "", date: entry.date, by: SELLER.seller_name
+      });
+      fetch(VERCEL_URL + "/api/notify", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "x-api-key": "srz2026secret"},
+        body: JSON.stringify({
+          title: "✅ Confirmed: " + entry.club_name,
+          body: entry.guest_name + paxStr + " · " + (entry.event_name || "") + " — confirmed by " + SELLER.seller_name,
+          sellerId: entry.seller_id
+        })
+      }).catch(() => {});
+    }
+  }
 }
 
 // ── ADMIN AUTO REFRESH ──
