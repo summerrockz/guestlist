@@ -1873,9 +1873,20 @@ function renderAdmin() {
     if (!myClubs.includes(e.club_id)) return false;
     if (adminTimeFilter === 'all') return true;
     if (adminTimeFilter === 'today') {
-      const createdDate = normalizeDate(e.created_at||"");
-      const modifiedDate = e.modified_at ? normalizeDate(e.modified_at) : "";
-      return createdDate === todayStr || modifiedDate === todayStr;
+      const parseGSDate = (s) => {
+        if (!s) return "";
+        const str = String(s).trim();
+        // DD/MM/YYYY format from Google Sheets
+        const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        // Already YYYY-MM-DD
+        const m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m2) return `${m2[1]}-${m2[2]}-${m2[3]}`;
+        return "";
+      };
+      const createdDate = parseGSDate(e.created_at);
+      const modifiedDate = parseGSDate(e.modified_at);
+      return createdDate === todayStr || (modifiedDate && modifiedDate === todayStr);
     }
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
     if (adminTimeFilter === 'club') return selectedClub ? e.club_id === selectedClub : true;
