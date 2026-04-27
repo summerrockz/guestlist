@@ -482,14 +482,18 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div id="admin-last-updated" style="font-size:11px;color:var(--muted);"></div>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;">
-        <button class="vip-filter-btn active" id="admin-filter-2h" onclick="setAdminFilter('2h',this)">🆕 Last 2h</button>
-        <button class="vip-filter-btn" id="admin-filter-4h" onclick="setAdminFilter('4h',this)">Last 4h</button>
-        <button class="vip-filter-btn" id="admin-filter-today" onclick="setAdminFilter('today',this)">Today</button>
+        <button class="vip-filter-btn active" id="admin-filter-today" onclick="setAdminFilter('today',this)">Today</button>
         <button class="vip-filter-btn" id="admin-filter-date" onclick="setAdminFilter('date',this)">📅 By date</button>
+        <button class="vip-filter-btn" id="admin-filter-club" onclick="setAdminFilter('club',this)">By club</button>
         <button class="vip-filter-btn" id="admin-filter-all" onclick="setAdminFilter('all',this)">All</button>
       </div>
       <div id="admin-date-wrap" style="display:none;margin-bottom:12px;">
         <div class="date-bar"><input type="date" id="admin-date" onchange="renderAdmin()"></div>
+      </div>
+      <div id="admin-club-wrap" style="display:none;margin-bottom:12px;">
+        <select class="input-field" id="admin-club-picker" onchange="renderAdmin()">
+          <option value="">All my clubs</option>
+        </select>
       </div>
       <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
@@ -1789,14 +1793,31 @@ async function deleteEntry(entryId, btn) {
 }
 
 // ── ADMIN EXPORT ──
-let adminTimeFilter = '2h';
+let adminTimeFilter = 'today';
 
 function setAdminFilter(f, btn) {
   adminTimeFilter = f;
   document.querySelectorAll('[id^="admin-filter-"]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const dateWrap = document.getElementById('admin-date-wrap');
+  const clubWrap = document.getElementById('admin-club-wrap');
   if (dateWrap) dateWrap.style.display = f === 'date' ? 'block' : 'none';
+  if (clubWrap) {
+    clubWrap.style.display = f === 'club' ? 'block' : 'none';
+    if (f === 'club') {
+      const myId = String(SELLER.seller_id||"").trim();
+      const myClubs = CLUBS.filter(c => String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));
+      const picker = document.getElementById("admin-club-picker");
+      if (picker && picker.options.length <= 1) {
+        myClubs.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c.club_id;
+          opt.textContent = c.club_name;
+          picker.appendChild(opt);
+        });
+      }
+    }
+  }
   renderAdmin();
 }
 
@@ -1829,15 +1850,15 @@ function renderAdmin() {
   if (!myClubs.length) { wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`; return; }
 
   // Get filtered entries
+  const selectedClub = adminTimeFilter === 'club' ? (document.getElementById("admin-club-picker")?.value || "") : "";
   let filteredEntries = ENTRIES.filter(e => {
     const status = (e.status||"").toLowerCase();
     if (status === "deleted") return false;
     if (!myClubs.includes(e.club_id)) return false;
     if (adminTimeFilter === 'all') return true;
-    if (adminTimeFilter === '2h') return isRecent(e.created_at, 2);
-    if (adminTimeFilter === '4h') return isRecent(e.created_at, 4);
-    if (adminTimeFilter === 'today') return isRecent(e.created_at, 24);
+    if (adminTimeFilter === 'today') return normalizeDate(e.date||"") === todayStr;
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
+    if (adminTimeFilter === 'club') return selectedClub ? e.club_id === selectedClub : true;
     return true;
   });
 
