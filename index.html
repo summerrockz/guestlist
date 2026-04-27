@@ -3740,13 +3740,13 @@ function toggleMultiGL(checkbox, eventId, clubId) {
   if (checkbox.checked) {
     // Check format compatibility - normalize before comparing
     if (SELECTED_EVENTS.length > 0) {
-      const firstClub = CLUBS.find(c => c.club_id === SELECTED_EVENTS[0].club_id) || {};
+      const firstClub = CLUBS.find(c => c.club_id === SELECTED_EVENTS[0].clubId) || {};
       const normalize = f => (f||"name").trim().toLowerCase().replace(/\s+/g," ");
       const firstFormat = normalize(firstClub.format);
       const thisFormat = normalize(club.format);
       if (firstFormat !== thisFormat) {
         checkbox.checked = false;
-        alert(club.club_name + " heeft een ander format (" + thisFormat + " vs " + firstFormat + "). Voeg apart toe.");
+        alert(club.club_name + " has a different format (" + thisFormat + " vs " + firstFormat + "). Please add separately.");
         return;
       }
     }
