@@ -477,7 +477,10 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
     <!-- ADMIN EXPORT -->
     <div class="section" id="section-admin">
-      <div class="section-title">Export per club</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:0;">Export per club</div>
+        <div id="admin-last-updated" style="font-size:11px;color:var(--muted);"></div>
+      </div>
       <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;">
         <button class="vip-filter-btn active" id="admin-filter-2h" onclick="setAdminFilter('2h',this)">🆕 Last 2h</button>
         <button class="vip-filter-btn" id="admin-filter-4h" onclick="setAdminFilter('4h',this)">Last 4h</button>
@@ -1526,7 +1529,8 @@ async function refreshAll(btn) {
     const id = active.id;
     if (id === "section-events") renderEvents();
     if (id === "section-mygl") renderMyGL();
-    if (id === "section-admin") renderAdmin();
+    if (id === "section-admin") { renderAdmin(); startAdminRefresh(); }
+  else { stopAdminRefresh(); }
     if (id === "section-dashboard") renderDashboard();
     if (id === "section-vip") { await loadVipRequests(); renderVipSeller(); }
     if (id === "section-vip-admin") { await loadVipRequests(); renderVipAdmin(); }
@@ -3984,6 +3988,29 @@ async function saveEditedEntry(entryId, cl, nameOnly, needsEmail, needsPax) {
   btn.disabled = false;
   btn.textContent = "Add to guestlist";
   btn.onclick = originalModalSubmit;
+}
+
+// ── ADMIN AUTO REFRESH ──
+let adminRefreshTimer = null;
+
+function startAdminRefresh() {
+  stopAdminRefresh();
+  adminRefreshTimer = setInterval(async () => {
+    const newEntries = await fetchSheet("GL_ENTRIES");
+    if (newEntries) {
+      ENTRIES = newEntries;
+      renderAdmin();
+      const el = document.getElementById("admin-last-updated");
+      if (el) {
+        const now = new Date();
+        el.textContent = "Updated " + now.getHours() + ":" + String(now.getMinutes()).padStart(2,"0") + ":" + String(now.getSeconds()).padStart(2,"0");
+      }
+    }
+  }, 20000);
+}
+
+function stopAdminRefresh() {
+  if (adminRefreshTimer) { clearInterval(adminRefreshTimer); adminRefreshTimer = null; }
 }
 
 // ── DEADLINES ──
