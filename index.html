@@ -3484,7 +3484,7 @@ function renderProgram() {
   let html = "";
   for (let i = 0; i < 7; i++) {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
-    const dateStr = d.toISOString().slice(0,10);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isToday = dateStr === todayStr;
     const clubs = source[dateStr] || [];
     html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:12px 14px;">
@@ -3732,11 +3732,17 @@ function toggleMultiGL(checkbox, eventId, clubId) {
   const format = club.format || "name";
 
   if (checkbox.checked) {
-    // Check format compatibility
+    // Check format compatibility - only block if truly different
     if (SELECTED_EVENTS.length > 0) {
       const firstClub = CLUBS.find(c => c.club_id === SELECTED_EVENTS[0].club_id) || {};
-      const firstFormat = firstClub.format || "name";
-      if (format !== firstFormat) {
+      const firstFormat = (firstClub.format || "name").trim().toLowerCase();
+      const thisFormat = (club.format || "name").trim().toLowerCase();
+      // Only block if one needs email and other doesn't, or one needs pax and other doesn't
+      const firstNeedsEmail = firstFormat.includes("email");
+      const thisNeedsEmail = thisFormat.includes("email");
+      const firstNameOnly = !firstFormat.includes("email") && !firstFormat.includes("pax");
+      const thisNameOnly = !thisFormat.includes("email") && !thisFormat.includes("pax");
+      if (firstNeedsEmail !== thisNeedsEmail || firstNameOnly !== thisNameOnly) {
         checkbox.checked = false;
         alert(`"${club.club_name}" has a different format and cannot be combined. Add it separately.`);
         return;
@@ -3752,7 +3758,8 @@ function toggleMultiGL(checkbox, eventId, clubId) {
   const count = document.getElementById("multi-gl-count");
   if (SELECTED_EVENTS.length > 0) {
     bar.style.display = "block";
-    count.textContent = `+ Add to guestlist (${SELECTED_EVENTS.length})`;
+    const names = SELECTED_EVENTS.map(e => (e.club?.club_name||e.clubId) + " · " + formatDate(normalizeDate(e.event?.date||""))).join("  |  ");
+    count.textContent = `+ Add to guestlist (${SELECTED_EVENTS.length}): ${names}`;
   } else {
     bar.style.display = "none";
   }
