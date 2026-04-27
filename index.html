@@ -1548,22 +1548,18 @@ async function refreshAll(btn) {
 }
 
 async function loadData() {
-  const prevEntries = ENTRIES;
+  const saved = {};
+  ENTRIES.forEach(e => { if ((e.sent_to_club||"").toLowerCase()==="yes") saved[e.entry_id] = true; });
   [SELLERS,CLUBS,EVENTS,ENTRIES] = await Promise.all([
     fetchSheet("SELLERS"), fetchSheet("CLUBS"),
     fetchSheet("EVENTS"), fetchSheet("GL_ENTRIES")
   ]);
-  // Preserve locally-set sent_to_club values that haven't been saved yet
-  if (prevEntries && prevEntries.length) {
-    const prevMap = {};
-    prevEntries.forEach(e => { if ((e.sent_to_club||"").toLowerCase()==="yes") prevMap[e.entry_id] = "yes"; });
-    ENTRIES = ENTRIES.map(e => {
-      if (prevMap[e.entry_id] && (e.sent_to_club||"").toLowerCase() !== "yes") {
-        return {...e, sent_to_club: "yes"};
-      }
-      return e;
-    });
-  }
+  ENTRIES = ENTRIES.map(e => {
+    if (saved[e.entry_id] && (e.sent_to_club||"").toLowerCase() !== "yes") {
+      return {...e, sent_to_club: "yes"};
+    }
+    return e;
+  });
 }
 
 let PROGRAMME_SHEET = {};
