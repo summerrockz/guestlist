@@ -928,9 +928,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
   <!-- FLOATING MULTI-GL BUTTON -->
   <div id="multi-gl-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;max-width:480px;margin:0 auto;padding:0 16px;z-index:250;">
-    <button onclick="openMultiGLModal()" style="width:100%;padding:14px;border-radius:999px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(232,25,44,0.4);">
-      <span id="multi-gl-count">+ Add to guestlist (0)</span>
-    </button>
+    <div style="background:#1c1c1c;border-radius:16px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);">
+      <div id="multi-gl-list" style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:8px;line-height:1.8;"></div>
+      <button onclick="openMultiGLModal()" style="width:100%;padding:12px;border-radius:999px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;">
+        <span id="multi-gl-count">+ Add to guestlist (0)</span>
+      </button>
+    </div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -3756,10 +3759,13 @@ function toggleMultiGL(checkbox, eventId, clubId) {
   // Update floating button
   const bar = document.getElementById("multi-gl-bar");
   const count = document.getElementById("multi-gl-count");
+  const list = document.getElementById("multi-gl-list");
   if (SELECTED_EVENTS.length > 0) {
     bar.style.display = "block";
-    const names = SELECTED_EVENTS.map(e => (e.club?.club_name||e.clubId) + " · " + formatDate(normalizeDate(e.event?.date||""))).join("  |  ");
-    count.textContent = `+ Add to guestlist (${SELECTED_EVENTS.length}): ${names}`;
+    count.textContent = `+ Add to guestlist (${SELECTED_EVENTS.length})`;
+    if (list) list.innerHTML = SELECTED_EVENTS.map(e => 
+      `<span style="display:inline-block;margin-right:8px;">✓ ${e.club?.club_name||e.clubId} · ${formatDate(normalizeDate(e.event?.date||""))}</span>`
+    ).join("");
   } else {
     bar.style.display = "none";
   }
