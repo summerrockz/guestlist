@@ -3735,19 +3735,15 @@ function toggleMultiGL(checkbox, eventId, clubId) {
   const format = club.format || "name";
 
   if (checkbox.checked) {
-    // Check format compatibility - only block if truly different
+    // Check format compatibility - normalize before comparing
     if (SELECTED_EVENTS.length > 0) {
       const firstClub = CLUBS.find(c => c.club_id === SELECTED_EVENTS[0].club_id) || {};
-      const firstFormat = (firstClub.format || "name").trim().toLowerCase();
-      const thisFormat = (club.format || "name").trim().toLowerCase();
-      // Only block if one needs email and other doesn't, or one needs pax and other doesn't
-      const firstNeedsEmail = firstFormat.includes("email");
-      const thisNeedsEmail = thisFormat.includes("email");
-      const firstNameOnly = !firstFormat.includes("email") && !firstFormat.includes("pax");
-      const thisNameOnly = !thisFormat.includes("email") && !thisFormat.includes("pax");
-      if (firstNeedsEmail !== thisNeedsEmail || firstNameOnly !== thisNameOnly) {
+      const normalize = f => (f||"name").trim().toLowerCase().replace(/\s+/g," ");
+      const firstFormat = normalize(firstClub.format);
+      const thisFormat = normalize(club.format);
+      if (firstFormat !== thisFormat) {
         checkbox.checked = false;
-        alert(`"${club.club_name}" has a different format and cannot be combined. Add it separately.`);
+        alert(club.club_name + " heeft een ander format (" + thisFormat + " vs " + firstFormat + "). Voeg apart toe.");
         return;
       }
     }
