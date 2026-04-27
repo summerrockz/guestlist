@@ -1378,7 +1378,7 @@ function showSection(id) {
 
   if (id === "section-events") loadData().then(renderEvents);
   if (id === "section-mygl") { loadData().then(renderMyGL); setTimeout(()=>{ const s=document.getElementById("mygl-search"); if(s) s.oninput=renderMyGL; },100); }
-  if (id === "section-admin") { adminTimeFilter='2h'; document.querySelectorAll('[id^="admin-filter-"]').forEach(b=>b.classList.remove('active')); const d=document.getElementById('admin-filter-2h'); if(d)d.classList.add('active'); loadData().then(renderAdmin); }
+  if (id === "section-admin") { loadData().then(() => { renderAdmin(); startAdminRefresh(); }); }
   if (id === "section-dashboard") loadData().then(renderDashboard);
   if (id === "section-vip") loadVipRequests().then(renderVipSeller);
   if (id === "section-vip-admin" && String(SELLER.seller_id).trim() !== "1") return;
@@ -1884,9 +1884,10 @@ function renderAdmin() {
         if (m2) return `${m2[1]}-${m2[2]}-${m2[3]}`;
         return "";
       };
+      const _todayStr = today();
       const createdDate = parseGSDate(e.created_at);
       const modifiedDate = parseGSDate(e.modified_at);
-      return createdDate === todayStr || (modifiedDate && modifiedDate === todayStr);
+      return createdDate === _todayStr || (modifiedDate && modifiedDate === _todayStr);
     }
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
     if (adminTimeFilter === 'club') return selectedClub ? e.club_id === selectedClub : true;
