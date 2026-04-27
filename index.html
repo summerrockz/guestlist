@@ -1892,7 +1892,7 @@ function renderAdmin() {
       return createdDate === _todayStr || (modifiedDate && modifiedDate === _todayStr);
     }
     if (adminTimeFilter === 'date') return normalizeDate(e.date||"") === date;
-    if (adminTimeFilter === 'club') return selectedClub ? e.club_id === selectedClub : true;
+    if (adminTimeFilter === 'club') return (selectedClub ? e.club_id === selectedClub : true) && normalizeDate(e.date||"") >= today();
     return true;
   });
 
