@@ -1548,10 +1548,22 @@ async function refreshAll(btn) {
 }
 
 async function loadData() {
+  const prevEntries = ENTRIES;
   [SELLERS,CLUBS,EVENTS,ENTRIES] = await Promise.all([
     fetchSheet("SELLERS"), fetchSheet("CLUBS"),
     fetchSheet("EVENTS"), fetchSheet("GL_ENTRIES")
   ]);
+  // Preserve locally-set sent_to_club values that haven't been saved yet
+  if (prevEntries && prevEntries.length) {
+    const prevMap = {};
+    prevEntries.forEach(e => { if ((e.sent_to_club||"").toLowerCase()==="yes") prevMap[e.entry_id] = "yes"; });
+    ENTRIES = ENTRIES.map(e => {
+      if (prevMap[e.entry_id] && (e.sent_to_club||"").toLowerCase() !== "yes") {
+        return {...e, sent_to_club: "yes"};
+      }
+      return e;
+    });
+  }
 }
 
 let PROGRAMME_SHEET = {};
@@ -1963,7 +1975,7 @@ function renderAdmin() {
           const pkg=pkgMatch?pkgMatch[1].trim():"";
           const phone=phoneMatch?phoneMatch[1].trim():"";
           const sentKey="sent_drink_"+cardKey+"_"+e.entry_id;
-          const isSent=(e.sent_to_club||"").toLowerCase()==="yes";
+          const isSent=localStorage.getItem(sentKey)==="1";
           const checkbox=!isCancelled?`<input type="checkbox" ${isSent?"checked":""} style="width:16px;height:16px;accent-color:#F59E0B;cursor:pointer;flex-shrink:0;" onchange="localStorage.setItem(this.dataset.key,this.checked?'1':'0');this.closest('div').style.opacity=this.checked?'0.4':'1'" data-key="${sentKey}">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
           const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
           const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
