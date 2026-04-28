@@ -3543,6 +3543,7 @@ function buildGLHtml(dayGl, dateStr) {
           ${spots!==null?`<span style="color:${spotsColor};font-weight:600;">👥 Spots left: ${spots}</span>`:""}
         </div>
         ${ev.extra_notes?`<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 ${ev.extra_notes}</div>`:""}
+        ${(()=>{if(!cl.deadline)return "";const ds=deadlineStatus(cl.deadline,dateStr);const bg=ds==="closed"?"rgba(232,25,44,0.15)":ds==="warn"?"rgba(245,158,11,0.15)":"rgba(34,197,94,0.15)";const col=ds==="closed"?"var(--red)":ds==="warn"?"var(--amber)":"var(--green)";return `<div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;display:inline-block;margin-bottom:6px;background:${bg};color:${col};">${ds==="closed"?"⛔ Deadline passed":"⏰ Deadline: "+cl.deadline}</div>`})()}
         ${!disabled
           ? `<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-${ev.event_id}" onclick="toggleGLCard('${ev.event_id}','${ev.club_id}',this)">
               <input type="checkbox" class="gl-card-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}">
@@ -4325,27 +4326,16 @@ function stopAdminRefresh() {
 }
 
 // ── DEADLINES ──
+// Track which deadline notifications have been sent this session
+const _deadlineNotifSent = {};
+
 function checkDeadlines() {
-  if (!CLUBS||!EVENTS) return;
+  if (!CLUBS||!EVENTS||!SELLER) return;
   const now = new Date(); const todayStr = now.toISOString().slice(0,10);
   const banner = document.getElementById("deadline-banner"); if (!banner) return;
   const warnings = [];
-  CLUBS.forEach(cl => {
-    if (!cl.deadline) return;
-    const [h,m] = cl.deadline.split(":").map(Number);
-    const deadline = new Date(); deadline.setHours(h,m,0,0);
-    if (h<6) deadline.setDate(deadline.getDate()+1);
-    const diff = deadline-now;
-    if (diff>0&&diff<60*60*1000) {
-      const minsLeft = Math.round(diff/60000);
-      const hasEvent = EVENTS.some(ev=>ev.club_id===cl.club_id&&(ev.date||"").slice(0,10)===todayStr&&(ev.status||"").toLowerCase()!=="inactive");
-      if (hasEvent) warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);
-    }
-  });
-  if (warnings.length) { banner.textContent=warnings.join("  ·  "); banner.style.display="block"; }
-  else { banner.style.display="none"; }
+  const myId = String(SELLER.seller_id||"").trim();
 
-  // Also notify sellers about upcoming deadlines for their entries
   CLUBS.forEach(cl => {
     if (!cl.deadline) return;
     const [h,m] = cl.deadline.split(":").map(Number);
@@ -4353,18 +4343,43 @@ function checkDeadlines() {
     if (h<6) deadline.setDate(deadline.getDate()+1);
     const diff = deadline-now;
     const minsLeft = Math.round(diff/60000);
-    if (minsLeft !== 60 && minsLeft !== 30) return;
-    const hasMyEntry = ENTRIES.some(ev => 
-      ev.club_id === cl.club_id && 
-      (ev.date||"").slice(0,10) === todayStr && 
-      String(ev.seller_id||"").trim() === myId &&
-      (ev.status||"").toLowerCase() === "active"
-    );
-    if (hasMyEntry) {
-      const msg = `⏰ Deadline in ${minsLeft} min: ${cl.club_name}`;
-      if (!warnings.includes(msg)) warnings.push(msg);
+
+    // Banner warning for admin
+    if (diff>0&&diff<60*60*1000) {
+      const hasEvent = EVENTS.some(ev=>ev.club_id===cl.club_id&&normalizeDate(ev.date||"")===todayStr&&(ev.status||"").toLowerCase()!=="inactive");
+      if (hasEvent) warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);
     }
+
+    // Push notification to seller at 60min and 30min
+    if (minsLeft !== 60 && minsLeft !== 30) return;
+    const notifKey = cl.club_id + "_" + minsLeft;
+    if (_deadlineNotifSent[notifKey]) return; // already sent this session
+
+    // Notify ALL active sellers
+    const hasEventToday = EVENTS.some(ev =>
+      ev.club_id === cl.club_id &&
+      normalizeDate(ev.date||"") === todayStr &&
+      (ev.status||"").toLowerCase() !== "inactive"
+    );
+    if (!hasEventToday) return;
+
+    _deadlineNotifSent[notifKey] = true;
+    const dateFormatted = new Date(todayStr+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"long"});
+    SELLERS.filter(s => (s.status||"").toLowerCase() === "active").forEach(s => {
+      fetch(VERCEL_URL+"/api/notify", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},
+        body: JSON.stringify({
+          title: minsLeft === 60 ? `⏰ 1 hour left for ${cl.club_name}` : `🚨 30 minutes left for ${cl.club_name}`,
+          body: `Guestlist ${cl.club_name} on ${dateFormatted} closes in ${minsLeft} minutes. Last chance to add guests!`,
+          sellerId: String(s.seller_id)
+        })
+      }).catch(()=>{});
+    });
   });
+
+  if (warnings.length) { banner.textContent=warnings.join("  ·  "); banner.style.display="block"; }
+  else { banner.style.display="none"; }
 }
 setInterval(checkDeadlines, 60000);
 
