@@ -60,7 +60,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .msg { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
 
 /* ── MAIN LAYOUT ── */
-.app-wrap { max-width: 480px; margin: 0 auto; padding: 0 0 120px; }
+.app-wrap { max-width: 480px; margin: 0 auto; padding: 0 0 180px; }
 
 /* ── HEADER ── */
 .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 100; }
@@ -1011,8 +1011,18 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <label class="form-label">Date</label>
           <input type="date" class="input-field" id="cp-custom-date" style="margin-bottom:8px;">
           <label class="form-label">Note</label>
-          <input type="text" class="input-field" id="cp-custom-note" placeholder="e.g. Private dinner at Nobu, 20:00">
-          <button onclick="cpAddCustom()" class="btn-secondary" style="width:100%;margin-top:4px;">Add</button>
+          <input type="text" class="input-field" id="cp-custom-note" placeholder="e.g. Private dinner at Nobu">
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <label class="form-label">Start time <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+              <input type="time" class="input-field" id="cp-custom-start">
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">End time <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+              <input type="time" class="input-field" id="cp-custom-end">
+            </div>
+          </div>
+          <button onclick="cpAddCustom()" class="btn-secondary" style="width:100%;margin-top:8px;">Add</button>
           <div id="cp-custom-list" style="margin-top:10px;"></div>
         </div>
 
@@ -4512,7 +4522,24 @@ function cpBuildEventsList() {
     if (!progVenues.length && !glEvents.length) return '';
 
     const progItems = progVenues.map(venue => {
-      const prod = PRODUCTS.find(p => (p.venue||'').toUpperCase() === venue.toUpperCase());
+      // Map PROGRAMME venue names to PRODUCTS venue names
+    const VENUE_MAP = {
+      'Tantra Bar': 'TANTRA - VIP EXPERIENCE',
+      'Tantra VIP': 'TANTRA - VIP EXPERIENCE',
+      'Zoo Bar': 'ZOO BAR',
+      'Nobu': 'NOBU',
+      'Nobu Opening': 'NOBU',
+      'Nobu Closing': 'NOBU',
+      'The Site': 'THE SITE ROOF',
+      'Ushuaia': 'USHUAÏA',
+      'Bam-Bu-Ku': 'BAMBUKU POOLPARTY',
+      'Jabeque': 'JABEQUE POOLPARTY',
+      'Cafe del Mar': 'CAFE DEL MAR',
+      'Boat Party': 'VIP CATAMARAN',
+    };
+    const mappedVenue = VENUE_MAP[venue] || venue.toUpperCase();
+    const prod = PRODUCTS.find(p => (p.venue||'').toUpperCase() === mappedVenue.toUpperCase()) ||
+                 PRODUCTS.find(p => (p.venue||'').toUpperCase().includes(venue.toUpperCase().split(' ')[0]));
       const time = prod ? prod.time : '';
       const key = dateStr + '|prog|' + venue;
       const isSelected = CP_SELECTED[key];
@@ -4691,9 +4718,14 @@ function cpAddCustom() {
   const date = document.getElementById('cp-custom-date').value;
   const note = document.getElementById('cp-custom-note').value.trim();
   if (!date || !note) { alert('Please select a date and enter a note.'); return; }
+  const startT = document.getElementById('cp-custom-start').value;
+  const endT = document.getElementById('cp-custom-end').value;
+  const timeStr = startT && endT ? startT + ' - ' + endT : startT || endT || '';
   const key = date + '|custom|' + Date.now();
-  CP_SELECTED[key] = { name: note, time: '', type: 'custom', dateStr: date };
+  CP_SELECTED[key] = { name: note, time: timeStr, type: 'custom', dateStr: date };
   document.getElementById('cp-custom-note').value = '';
+  document.getElementById('cp-custom-start').value = '';
+  document.getElementById('cp-custom-end').value = '';
   // Update custom list display
   cpRenderCustomList();
   cpUpdateCount();
