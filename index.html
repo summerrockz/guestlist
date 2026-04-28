@@ -989,9 +989,19 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div id="cp-page-2" style="display:none;">
         <div class="section-title">Trip dates</div>
         <label class="form-label">Arrival date</label>
-        <input type="date" class="input-field" id="cp-date-from">
-        <label class="form-label">Departure date</label>
-        <input type="date" class="input-field" id="cp-date-to">
+          <div style="position:relative;margin-bottom:16px;" onclick="document.getElementById('cp-date-from').showPicker ? document.getElementById('cp-date-from').showPicker() : document.getElementById('cp-date-from').click()">
+            <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:8px;">
+              📅 <span id="cp-from-label" style="color:var(--muted);">Select date</span>
+            </div>
+            <input type="date" id="cp-date-from" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-from-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('cp-from-label').style.color=this.value?'var(--text)':'var(--muted)';">
+          </div>
+          <label class="form-label">Departure date</label>
+          <div style="position:relative;margin-bottom:16px;" onclick="document.getElementById('cp-date-to').showPicker ? document.getElementById('cp-date-to').showPicker() : document.getElementById('cp-date-to').click()">
+            <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:8px;">
+              📅 <span id="cp-to-label" style="color:var(--muted);">Select date</span>
+            </div>
+            <input type="date" id="cp-date-to" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-to-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('cp-to-label').style.color=this.value?'var(--text)':'var(--muted)';">
+          </div>
         <div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn-secondary" onclick="cpNextStep(1)" style="flex:1;">← Back</button>
           <button class="btn-primary" onclick="cpNextStep(3)" style="flex:2;">Next →</button>
@@ -1009,17 +1019,32 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div style="margin-top:20px;padding:14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);">
           <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">➕ Need something to add yourself?</div>
           <label class="form-label">Date</label>
-          <input type="date" class="input-field" id="cp-custom-date" style="margin-bottom:8px;">
+          <div style="position:relative;margin-bottom:12px;" onclick="document.getElementById('cp-custom-date').showPicker ? document.getElementById('cp-custom-date').showPicker() : document.getElementById('cp-custom-date').click()">
+            <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:8px;">
+              📅 <span id="cp-custom-date-label" style="color:var(--muted);">Select date</span>
+            </div>
+            <input type="date" id="cp-custom-date" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-custom-date-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('cp-custom-date-label').style.color=this.value?'var(--text)':'var(--muted)';">
+          </div>
           <label class="form-label">Note</label>
           <input type="text" class="input-field" id="cp-custom-note" placeholder="e.g. Private dinner at Nobu">
           <div style="display:flex;gap:8px;">
             <div style="flex:1;">
               <label class="form-label">Start time <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
-              <input type="time" class="input-field" id="cp-custom-start">
+              <div style="position:relative;" onclick="document.getElementById('cp-custom-start').showPicker ? document.getElementById('cp-custom-start').showPicker() : document.getElementById('cp-custom-start').click()">
+                <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:6px;">
+                  ⏰ <span id="cp-start-label" style="color:var(--muted);">Time</span>
+                </div>
+                <input type="time" id="cp-custom-start" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-start-label').textContent=this.value||'Time';document.getElementById('cp-start-label').style.color=this.value?'var(--text)':'var(--muted)';">
+              </div>
             </div>
             <div style="flex:1;">
               <label class="form-label">End time <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
-              <input type="time" class="input-field" id="cp-custom-end">
+              <div style="position:relative;" onclick="document.getElementById('cp-custom-end').showPicker ? document.getElementById('cp-custom-end').showPicker() : document.getElementById('cp-custom-end').click()">
+                <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:6px;">
+                  ⏰ <span id="cp-end-label" style="color:var(--muted);">Time</span>
+                </div>
+                <input type="time" id="cp-custom-end" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-end-label').textContent=this.value||'Time';document.getElementById('cp-end-label').style.color=this.value?'var(--text)':'var(--muted)';">
+              </div>
             </div>
           </div>
           <button onclick="cpAddCustom()" class="btn-secondary" style="width:100%;margin-top:8px;">Add</button>
