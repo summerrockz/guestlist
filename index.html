@@ -905,10 +905,10 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
             <div style="font-size:16px;font-weight:700;">Select dates</div>
             <button onclick="closeProgDatePicker()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">×</button>
           </div>
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">Arrival</label>
-          <input type="date" id="prog-from-picker" class="input-field" style="margin-bottom:16px;">
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">Departure</label>
-          <input type="date" id="prog-to-picker" class="input-field" style="margin-bottom:20px;">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">Arrival date</label>
+          <input type="date" id="prog-from-picker" class="input-field" placeholder="Arrival date" style="margin-bottom:16px;width:100%;min-height:46px;">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">Departure date</label>
+          <input type="date" id="prog-to-picker" class="input-field" placeholder="Departure date" style="margin-bottom:20px;width:100%;min-height:46px;">
           <button onclick="applyProgDates()" class="btn-primary">Apply</button>
         </div>
       </div>
