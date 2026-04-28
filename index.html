@@ -527,7 +527,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
             <input type="date" id="cp-custom-date" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('cp-custom-date-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('cp-custom-date-label').style.color=this.value?'var(--text)':'var(--muted)';">
           </div>
           <label class="form-label">Note</label>
-          <input type="text" class="input-field" id="cp-custom-note" placeholder="e.g. Private dinner at Nobu">
+          <input type="text" class="input-field" id="cp-custom-note" placeholder="e.g. Private dinner at Nobu" oninput="cpCheckBlockedVenue(this)">
+          <div id="cp-blocked-warning" style="display:none;background:rgba(232,25,44,0.1);border:1px solid rgba(232,25,44,0.4);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;font-weight:600;color:#E8192C;">🚫 You are NOT allowed to add Pacha or Amnesia. You will be blocked.</div>
           <label class="form-label">Extra info <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
           <input type="text" class="input-field" id="cp-custom-extra" placeholder="e.g. Entry before 01:00 · Don't forget your ID">
           <div style="display:flex;gap:8px;">
@@ -588,7 +589,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="showSection('section-dashboard')" id="nav-dashboard"><span class="nav-icon">🏠</span>Dashboard</button>
-    <button class="nav-item" onclick="showSection('section-program')" id="nav-program"><span class="nav-icon">🤝</span>Program</button>
+    <button class="nav-item" onclick="showSection('section-program')" id="nav-program"><span class="nav-icon">🤝</span>Programme</button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl"><span class="nav-icon">📋</span>Entries</button>
     <button class="nav-item" onclick="showSection('section-calendar')" id="nav-calendar"><span class="nav-icon">📅</span>Calendar</button>
     <button class="nav-item" onclick="openMoreMenu()" id="nav-more"><span class="nav-icon">⋯</span>More</button>
@@ -1626,7 +1627,15 @@ async function cpDownloadPDF(){
   if(btn){btn.textContent='📄 Download PDF';btn.disabled=false;}
 }
 
-function cpAddCustom(){const date=document.getElementById('cp-custom-date').value;const note=document.getElementById('cp-custom-note').value.trim();if(!date||!note){alert('Please select a date and enter a note.');return;}const startT=document.getElementById('cp-custom-start').value;const endT=document.getElementById('cp-custom-end').value;const timeStr=startT&&endT?startT+' - '+endT:startT||endT||'';const extra=document.getElementById('cp-custom-extra').value.trim();const key=date+'|custom|'+Date.now();CP_SELECTED[key]={name:note,time:timeStr,type:'custom',dateStr:date,extra_notes:extra};document.getElementById('cp-custom-note').value='';document.getElementById('cp-custom-extra').value='';document.getElementById('cp-custom-start').value='';document.getElementById('cp-custom-end').value='';cpRenderCustomList();cpUpdateCount();}
+function cpCheckBlockedVenue(input){
+  const val=(input.value||'').toLowerCase();
+  const blocked=val.includes('pacha')||val.includes('amnesia');
+  const warn=document.getElementById('cp-blocked-warning');
+  const btn=document.querySelector('#cp-page-3 .btn-secondary[onclick="cpAddCustom()"]');
+  if(warn)warn.style.display=blocked?'block':'none';
+  if(btn)btn.disabled=blocked;
+}
+function cpAddCustom(){const date=document.getElementById('cp-custom-date').value;const note=document.getElementById('cp-custom-note').value.trim();if(!date||!note){alert('Please select a date and enter a note.');return;}if(note.toLowerCase().includes('pacha')||note.toLowerCase().includes('amnesia')){alert('You are NOT allowed to add Pacha or Amnesia. You will be blocked.');return;}const startT=document.getElementById('cp-custom-start').value;const endT=document.getElementById('cp-custom-end').value;const timeStr=startT&&endT?startT+' - '+endT:startT||endT||'';const extra=document.getElementById('cp-custom-extra').value.trim();const key=date+'|custom|'+Date.now();CP_SELECTED[key]={name:note,time:timeStr,type:'custom',dateStr:date,extra_notes:extra};document.getElementById('cp-custom-note').value='';document.getElementById('cp-custom-extra').value='';document.getElementById('cp-custom-start').value='';document.getElementById('cp-custom-end').value='';cpRenderCustomList();cpUpdateCount();}
 function cpRenderCustomList(){const customs=Object.entries(CP_SELECTED).filter(([k])=>k.includes('|custom|'));const wrap=document.getElementById('cp-custom-list');if(!wrap)return;wrap.innerHTML=customs.map(([key,item])=>{const d=new Date(item.dateStr+'T12:00:00');const dayFmt=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.06);border-radius:8px;margin-bottom:4px;font-size:12px;"><span><span style="color:var(--muted);">${dayFmt}</span> · ${item.name}</span><button onclick="cpRemoveCustom('${key}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;">×</button></div>`;}).join('');}
 function cpRemoveCustom(key){delete CP_SELECTED[key];cpRenderCustomList();cpUpdateCount();}
 function cpReset(){CP_SELECTED={};document.getElementById('cp-client-name').value='';document.getElementById('cp-date-from').value='';document.getElementById('cp-date-to').value='';const ef=document.getElementById('cp-custom-extra');if(ef)ef.value='';const customList=document.getElementById('cp-custom-list');if(customList)customList.innerHTML='';cpNextStep(1);}
