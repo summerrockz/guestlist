@@ -1350,17 +1350,78 @@ function cpBuildPreview(){
 }
 
 async function cpDownloadPDF(){
+  const btn=document.querySelector('#cp-page-4 button[onclick="cpDownloadPDF()"]');
+  if(btn){btn.textContent='⏳ Creating...';btn.disabled=true;}
   const clientName=document.getElementById('cp-client-name').value.trim();
   const lang=document.getElementById('cp-language').value;
   const t=CP_TRANSLATIONS[lang]||CP_TRANSLATIONS.en;
-  const from=document.getElementById('cp-date-from').value;const to=document.getElementById('cp-date-to').value;
-  const byDate={};Object.values(CP_SELECTED).forEach(item=>{if(!byDate[item.dateStr])byDate[item.dateStr]=[];byDate[item.dateStr].push(item);});
+  const from=document.getElementById('cp-date-from').value;
+  const to=document.getElementById('cp-date-to').value;
+  const byDate={};
+  Object.values(CP_SELECTED).forEach(item=>{if(!byDate[item.dateStr])byDate[item.dateStr]=[];byDate[item.dateStr].push(item);});
   const dates=Object.keys(byDate).sort();
-  const fromFmt=new Date(from+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const toFmt=new Date(to+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  let daysHtml=dates.map(dateStr=>{const d=new Date(dateStr+'T12:00:00');const dayLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});const items=byDate[dateStr].map(item=>{const badge=item.type==='gl'?`<span style="font-size:10px;background:rgba(232,25,44,0.2);color:#E8192C;padding:2px 8px;border-radius:999px;margin-left:8px;font-weight:600;">${t.guestlist} ✓</span>`:"";return`<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;"><span style="color:#E8192C;margin-right:8px;">▸</span><span style="font-weight:500;">${item.name}</span>${item.time?`<span style="color:rgba(255,255,255,0.4);font-size:11px;margin-left:8px;">⏰ ${item.time}</span>`:''}${badge}</div>`;}).join('');return`<div style="margin-bottom:24px;"><div style="font-size:14px;font-weight:700;color:#E8192C;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid rgba(232,25,44,0.3);">${dayLabel}</div>${items}</div>`;}).join('');
-  const pdfHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#111;color:#fff;font-family:Arial,sans-serif;padding:40px 32px;}.header{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #E8192C;}.logo{width:52px;height:52px;border-radius:50%;}.header-text h1{font-size:22px;font-weight:800;}.client-bar{background:#1a1a1a;border-left:3px solid #E8192C;padding:12px 16px;margin-bottom:28px;border-radius:0 8px 8px 0;}.client-bar .name{font-size:18px;font-weight:700;}.footer{margin-top:40px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;}</style></head><body><div class="header"><img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" class="logo"><div class="header-text"><h1>SUMMERROCKZ</h1><p>${t.programme} · Ibiza 2026</p></div></div><div class="client-bar"><div class="name">${clientName}</div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">${fromFmt} → ${toFmt}</div></div>${daysHtml}<div class="footer"><span>${t.enjoy}</span><span>${t.createdBy} ${SELLER.seller_name} · Summerrockz Ibiza</span></div></body></html>`;
-  const blob=new Blob([pdfHtml],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Programma_'+clientName.replace(/\s+/g,'_')+'_Ibiza2026.html';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const fmtFull=d=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const fromFmt=from?fmtFull(from):'';
+  const toFmt=to?fmtFull(to):'';
+
+  // Build body HTML for the plan card
+  let bodyHtml='';
+  dates.forEach(dateStr=>{
+    const d=new Date(dateStr+'T12:00:00');
+    const dayLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    bodyHtml+=`<div style="margin-bottom:16px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#b6a28b;margin-bottom:8px;padding-left:4px;">${dayLabel}</div>`;
+    byDate[dateStr].forEach(item=>{
+      const isGL=item.type==='gl';
+      const dotColor=isGL?'#E8192C':'#b6a28b';
+      const badge=isGL?`<span style="font-size:9px;background:#E8192C;color:#fff;padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:700;">${t.guestlist}</span>`:'';
+      bodyHtml+=`<div style="background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:5px;border:1px solid rgba(160,140,115,0.18);display:flex;align-items:center;gap:10px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:#171513;">${item.name}${badge}</div>
+          ${item.time?`<div style="font-size:11px;color:#8b7b69;margin-top:2px;">⏰ ${item.time}</div>`:''}
+        </div>
+      </div>`;
+    });
+    bodyHtml+='</div>';
+  });
+
+  // Fill hidden plan card
+  const card=document.getElementById('sr-plan-card');
+  document.getElementById('sr-plan-card-name').textContent=clientName;
+  document.getElementById('sr-plan-card-dates').textContent=fromFmt+(toFmt?' — '+toFmt:'');
+  document.getElementById('sr-plan-card-body').innerHTML=bodyHtml||'<div style="text-align:center;padding:20px;color:#8b7b69;font-size:13px;">No events selected.</div>';
+  document.getElementById('sr-plan-card-seller').textContent=SELLER.seller_name+' · Summerrockz Ibiza';
+  card.style.display='block';
+
+  try{
+    // Load html2canvas
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    // Load jsPDF
+    if(!window.jspdf){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    const canvas=await html2canvas(card,{backgroundColor:'#FAFAF8',scale:3,useCORS:true,logging:false});
+    card.style.display='none';
+    const imgData=canvas.toDataURL('image/png');
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width/3,canvas.height/3]});
+    pdf.addImage(imgData,'PNG',0,0,canvas.width/3,canvas.height/3);
+    const pdfBlob=pdf.output('blob');
+    const safeName=clientName.replace(/\s+/g,'-');
+    const file=new File([pdfBlob],`Programma-${safeName}-Ibiza2026.pdf`,{type:'application/pdf'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Programma '+clientName+' — Ibiza 2026'});
+    } else {
+      const link=document.createElement('a');link.download=file.name;link.href=URL.createObjectURL(pdfBlob);link.click();
+    }
+  } catch(e){
+    card.style.display='none';
+    alert('Could not generate PDF. Try again.');
+  }
+  if(btn){btn.textContent='📄 Download PDF';btn.disabled=false;}
 }
 
 function cpAddCustom(){const date=document.getElementById('cp-custom-date').value;const note=document.getElementById('cp-custom-note').value.trim();if(!date||!note){alert('Please select a date and enter a note.');return;}const startT=document.getElementById('cp-custom-start').value;const endT=document.getElementById('cp-custom-end').value;const timeStr=startT&&endT?startT+' - '+endT:startT||endT||'';const key=date+'|custom|'+Date.now();CP_SELECTED[key]={name:note,time:timeStr,type:'custom',dateStr:date};document.getElementById('cp-custom-note').value='';document.getElementById('cp-custom-start').value='';document.getElementById('cp-custom-end').value='';cpRenderCustomList();cpUpdateCount();}
@@ -1373,5 +1434,18 @@ let pullStartY=0;
 document.addEventListener("touchstart",e=>{if(window.scrollY===0)pullStartY=e.touches[0].clientY;},{passive:true});
 document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].clientY-pullStartY;if(dist<80)return;const ind=document.createElement("div");ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;";ind.innerHTML="🔄 Refreshing…";document.body.appendChild(ind);await loadData();const active=document.querySelector(".section.active");if(active){const id=active.id;if(id==="section-events")renderEvents();if(id==="section-mygl")renderMyGL();if(id==="section-admin")renderAdminAndRestore();if(id==="section-dashboard")renderDashboard();}setTimeout(()=>ind.remove(),800);},{passive:true});
 </script>
+
+<!-- Hidden plan card for PDF generation -->
+<div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#FAFAF8;font-family:Poppins,Arial,sans-serif;display:none;">
+  <div style="background:linear-gradient(160deg,#111111 0%,#2a2a2a 100%);padding:24px 24px 20px;text-align:center;">
+    <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" style="width:64px;height:64px;border-radius:50%;margin-bottom:12px;" crossorigin="anonymous">
+    <div id="sr-plan-card-name" style="font-size:22px;font-weight:700;color:#fff;letter-spacing:0.06em;margin-bottom:4px;"></div>
+    <div id="sr-plan-card-dates" style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.12em;text-transform:uppercase;"></div>
+  </div>
+  <div id="sr-plan-card-body" style="padding:20px 16px;"></div>
+  <div style="padding:14px 20px 20px;border-top:1px solid rgba(160,140,115,0.15);text-align:center;">
+    <div id="sr-plan-card-seller" style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#b6a28b;font-weight:600;"></div>
+  </div>
+</div>
 </body>
 </html>
