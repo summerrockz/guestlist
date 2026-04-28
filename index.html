@@ -1308,9 +1308,9 @@ async function openProductDetail(venue){
   const venueInfo=VENUE_INFO_DATA.find(v=>(v.venue||'').toLowerCase()===venue.toLowerCase());
   const desc=venueInfo&&venueInfo.description?venueInfo.description:'';
   const lastInfo=venueInfo&&venueInfo.last_info?venueInfo.last_info:'';
-  document.getElementById('pdt-content-info').innerHTML=desc
-    ?('<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.85);">'+desc.replace(/\n/g,'<br>')+'</div>')
-    :'<div class="empty">No description added yet.</div>';
+  window._currentVenueInfo=venueInfo||null;
+  window._currentVenueName=venue;
+  renderPDInfoTab('en');
   var _liBtn='<button onclick="copyLastInfo(\''+venue.replace(/'/g,"\\'")+'\')" class="btn-primary" style="margin-top:0;">\ud83d\udccb Copy last info</button>';
   document.getElementById('pdt-content-lastinfo').innerHTML=lastInfo
     ?('<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Last info</div><div style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.85);white-space:pre-wrap;">'+lastInfo+'</div></div>'+_liBtn)
@@ -1319,6 +1319,23 @@ async function openProductDetail(venue){
   showSection('section-product-detail');
 }
 
+function renderPDInfoTab(lang){
+  var v=window._currentVenueInfo||null;
+  var langs=['en','nl','fr','es','it'];
+  var flags={en:'🇬🇧',nl:'🇳🇱',fr:'🇫🇷',es:'🇪🇸',it:'🇮🇹'};
+  var flagBar='<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">';
+  for(var i=0;i<langs.length;i++){
+    var l=langs[i];var active=l===lang;
+    flagBar+='<button data-lang="'+l+'" onclick="renderPDInfoTab(this.dataset.lang)" style="padding:6px 12px;border-radius:999px;border:1px solid '+(active?'var(--red)':'var(--border)')+';background:'+(active?'var(--red)':'transparent')+';color:'+(active?'#fff':'var(--muted)')+';font-size:13px;cursor:pointer;">'+flags[l]+'</button>';
+  }
+  flagBar+='</div>';
+  var key=lang==='en'?'description':'description_'+lang;
+  var text=v&&v[key]?v[key]:(lang!=='en'&&v&&v.description?v.description:'');
+  var content=text
+    ?'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.85);">'+text.replace(/\n/g,'<br>')+'</div>'
+    :'<div class="empty">No description available in this language.</div>';
+  document.getElementById('pdt-content-info').innerHTML=flagBar+content;
+}
 function setPDTab(tab){['overview','info','lastinfo'].forEach(t=>{const btn=document.getElementById('pdt-'+t);const content=document.getElementById('pdt-content-'+t);if(btn){btn.style.background=t===tab?'var(--red)':'transparent';btn.style.color=t===tab?'#fff':'var(--muted)';}if(content)content.style.display=t===tab?'block':'none';});}
 
 function copyLastInfo(venue){const venueInfo=VENUE_INFO_DATA.find(v=>(v.venue||'').toLowerCase()===venue.toLowerCase());if(!venueInfo||!venueInfo.last_info)return;navigator.clipboard.writeText(venueInfo.last_info).then(()=>{const btn=document.querySelector('#pdt-content-lastinfo .btn-primary');if(btn){btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='📋 Copy last info',2000);}});}
