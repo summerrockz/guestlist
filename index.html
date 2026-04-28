@@ -3566,15 +3566,32 @@ function renderProgram() {
 
   // SEARCH or DATE RANGE MODE
   if (progSearch || progFrom || progTo) {
-    const allDates = Object.keys(source).sort();
+    // Combine programme dates + GL event dates
+    const glDatesSet = new Set(EVENTS
+      .filter(ev => (ev.status||"").toLowerCase() !== "inactive" && normalizeDate(ev.date||"") >= todayStr && normalizeDate(ev.date||"") <= _seasonEnd)
+      .map(ev => normalizeDate(ev.date||""))
+    );
+    const allDatesSet = new Set([...Object.keys(source), ...glDatesSet]);
+    const allDates = [...allDatesSet].sort();
     const results = allDates.map(dateStr => {
+      if (dateStr < todayStr || dateStr > _seasonEnd) return "";
       if (progFrom && dateStr < progFrom) return "";
       if (progTo && dateStr > progTo) return "";
-      const clubs = progSearch ? source[dateStr].filter(c => c.toLowerCase().includes(progSearch)) : source[dateStr];
+      const clubs = progSearch ? (source[dateStr]||[]).filter(c => c.toLowerCase().includes(progSearch)) : (source[dateStr]||[]);
+      // Also check GL events for this date
+      const glMatches = EVENTS.filter(ev =>
+        normalizeDate(ev.date||"") === dateStr &&
+        (ev.status||"").toLowerCase() !== "inactive" &&
+        (progSearch ? (
+          (ev.event_name||"").toLowerCase().includes(progSearch) ||
+          (CLUBS.find(c=>c.club_id===ev.club_id)?.club_name||"").toLowerCase().includes(progSearch)
+        ) : true)
+      );
+      if (!clubs.length && !glMatches.length) return "";
       if (!clubs.length) return "";
       const d = new Date(dateStr + "T12:00:00");
       const isToday = dateStr === todayStr;
-      const dayGl = EVENTS.filter(ev => normalizeDate(ev.date||"") === dateStr && (ev.status||"").toLowerCase() !== "inactive");
+      const dayGl = progSearch ? glMatches : EVENTS.filter(ev => normalizeDate(ev.date||"")=== dateStr && (ev.status||'').toLowerCase() !== 'inactive')
       const glHtml = dayGl.length ? `<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;display:flex;flex-direction:column;gap:4px;">
         ${dayGl.map(ev => {
           const cl = CLUBS.find(c=>c.club_id===ev.club_id)||{};
@@ -3662,7 +3679,13 @@ function renderProgram() {
   }
 
   // NORMAL MODE — weekly view
-  if (!progWeekStart) progWeekStart = getWeekStart(new Date());
+  // Clamp week to today min, Oct 5 max
+  const _seasonEnd = "2026-10-05";
+  const _todayDate = new Date(); _todayDate.setHours(0,0,0,0);
+  if (!progWeekStart) progWeekStart = getWeekStart(_todayDate);
+  // Don't show weeks fully in the past
+  const _weekEndDate = new Date(progWeekStart); _weekEndDate.setDate(_weekEndDate.getDate()+6);
+  if (_weekEndDate < _todayDate) progWeekStart = getWeekStart(_todayDate);
   const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const weekEnd = new Date(progWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
@@ -3672,6 +3695,7 @@ function renderProgram() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(progWeekStart); d.setDate(d.getDate()+i);
     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (dateStr < todayStr || dateStr > _seasonEnd) continue; // skip past days and after season
     const isToday = dateStr === todayStr;
     const clubs = source[dateStr] || [];
     const fullDayName = d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
