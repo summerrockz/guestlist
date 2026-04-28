@@ -3932,6 +3932,11 @@ function openMultiGLModal() {
   document.getElementById("modal-notes").value = "";
   document.getElementById("modal-msg").textContent = "";
 
+  // Girls only - check if ANY selected event is girls_only
+  const anyGirlsOnly = SELECTED_EVENTS.some(s => (s.event?.girls_only||"").toLowerCase() === "yes");
+  document.getElementById("modal-girls-only-group").style.display = anyGirlsOnly ? "block" : "none";
+  if (anyGirlsOnly) document.getElementById("modal-girls-only-cb").checked = false;
+
   // Override submit button for multi-add
   const btn = document.getElementById("modal-submit");
   btn.textContent = `Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length > 1 ? "s" : ""}`;
@@ -3951,6 +3956,14 @@ async function submitMultiGL() {
 
   const btn = document.getElementById("modal-submit");
   btn.disabled = true; btn.textContent = "Adding…";
+
+  // Girls only validation
+  const anyGirlsOnly2 = SELECTED_EVENTS.some(s => (s.event?.girls_only||"").toLowerCase() === "yes");
+  if (anyGirlsOnly2 && !document.getElementById("modal-girls-only-cb").checked) {
+    msg.textContent = "Please confirm all guests are female.";
+    btn.disabled = false; btn.textContent = `Add to ${SELECTED_EVENTS.length} guestlists`;
+    return;
+  }
 
   if (nameOnly) {
     const nameFields = Array.from(document.querySelectorAll(".modal-multi-name"));
