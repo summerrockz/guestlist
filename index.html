@@ -1206,7 +1206,57 @@ function copyVipPriceByDate(dateStr){const p=VIP_PRICES_DATA.find(p=>normalizeDa
 
 let PRODUCTS=[];
 async function loadProducts(){const wrap=document.getElementById("products-list");wrap.innerHTML='<div class="loading">Loading…</div>';try{PRODUCTS=await fetchSheet("PRODUCTS");renderProducts();}catch(e){wrap.innerHTML='<div class="empty">Could not load products.</div>';}}
-function renderProducts(){const wrap=document.getElementById("products-list");if(!PRODUCTS.length){wrap.innerHTML='<div class="empty">No products found.</div>';return;}const byVenue={};PRODUCTS.forEach(p=>{const v=p.venue||"Other";if(!byVenue[v])byVenue[v]={image_url:p.image_url||"",time:p.time||"",days:p.days||"",music:p.music||"",dresscode:p.dresscode||"",notes:p.notes||"",important:p.important||"",items:[]};byVenue[v].items.push(p);});Object.values(byVenue).forEach(d=>d.items.sort((a,b)=>(a.event_name||"").localeCompare(b.event_name||"")));wrap.innerHTML=Object.entries(byVenue).map(([venue,data],vi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">${data.image_url?`<div style="position:relative;cursor:pointer;" onclick="toggleProduct(${vi})"><img src="${data.image_url}" style="width:100%;height:140px;object-fit:cover;display:block;"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%);"></div><div style="position:absolute;bottom:12px;left:14px;right:14px;"><div style="font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">${venue}</div>${data.time?`<div style="font-size:11px;color:rgba(255,255,255,0.65);">${data.time}</div>`:""}</div></div>`:`<div style="padding:14px 16px;cursor:pointer;" onclick="toggleProduct(${vi})"><div style="font-size:14px;font-weight:700;">${venue}</div></div>`}<div id="prod-${vi}" style="display:none;padding:14px 16px;">${data.music?`<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Music: <span style="color:var(--text);">${data.music}</span></div>`:""}</div></div>`).join("");}
+function renderProducts(){
+  const wrap=document.getElementById("products-list");
+  if(!PRODUCTS.length){wrap.innerHTML='<div class="empty">No products found.</div>';return;}
+  const byVenue={};
+  PRODUCTS.forEach(p=>{
+    const v=p.venue||"Other";
+    if(!byVenue[v])byVenue[v]={image_url:p.image_url||"",time:p.time||"",days:p.days||"",music:p.music||"",dresscode:p.dresscode||"",notes:p.notes||"",important:p.important||"",items:[]};
+    byVenue[v].items.push(p);
+  });
+  Object.values(byVenue).forEach(d=>d.items.sort((a,b)=>(a.event_name||"").localeCompare(b.event_name||"")));
+  function ticketColor(t){t=(t||"").toLowerCase();if(t.includes("ultra"))return"#E8192C";if(t.includes("super"))return"#F59E0B";if(t.includes("vip"))return"#3B82F6";return"var(--muted)";}
+  wrap.innerHTML=Object.entries(byVenue).map(([venue,data],vi)=>{
+    const vips=data.items;
+    return`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
+      ${data.image_url
+        ?`<div style="position:relative;cursor:pointer;" onclick="toggleProduct(${vi})"><img src="${data.image_url}" style="width:100%;height:140px;object-fit:cover;display:block;"><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%);"></div><div style="position:absolute;bottom:12px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;"><div><div style="font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">${venue}</div>${data.time?`<div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;">${data.time}${data.days?" · "+data.days:""}</div>`:""}</div><div style="font-size:18px;">›</div></div></div>`
+        :`<div style="padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleProduct(${vi})"><div><div style="font-size:14px;font-weight:700;">${venue}</div>${data.time?`<div style="font-size:11px;color:var(--muted);">${data.time}${data.days?" · "+data.days:""}</div>`:""}</div><div style="font-size:18px;color:var(--muted);">›</div></div>`}
+      <div id="prod-${vi}" style="display:none;padding:14px 16px;">
+        ${data.music?`<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Music: <span style="color:var(--text);">${data.music}</span></div>`:""}
+        ${vips.map(p=>`
+          <div style="border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:10px;">
+            <div style="background:rgba(255,255,255,0.05);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                ${p.event_name?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">${p.event_name}${p.days?" · "+p.days:""}${p.time?" · "+p.time:""}</div>`:""}
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <span style="font-size:16px;">${p.emoji||""}</span>
+                  <span style="font-size:15px;font-weight:800;color:${ticketColor(p.ticket_type)};">${(p.ticket_type||"").toUpperCase()}</span>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                ${p.price_total?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_total}</div>`
+                :p.price_pp?`<div style="font-size:22px;font-weight:800;color:var(--green);">€${p.price_pp}</div>`:""}
+              </div>
+            </div>
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:0;font-size:12px;">
+              ${p.pax_app?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">People in app</span><span style="font-weight:700;">${p.pax_app}</span></div>`:""}
+              ${p.max_pax&&p.max_pax!=p.pax_app?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">Max people at table</span><span style="font-weight:700;">${p.max_pax}</span></div>`:""}
+              ${p.deposit?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">Deposit</span><span style="font-weight:700;">€${p.deposit}</span></div>`:""}
+              ${p.price_pp&&p.price_total?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">Price per person</span><span style="font-weight:700;">€${p.price_pp}</span></div>`:""}
+              ${p.included?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">Included</span><span style="font-weight:700;">${p.included}</span></div>`:""}
+              ${p.drinks?`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);">Drinks</span><span style="font-weight:700;text-align:right;max-width:55%;">${p.drinks}</span></div>`:""}
+              ${p.bottles?`<div style="padding:6px 0;border-bottom:1px solid var(--border);"><div style="color:var(--muted);margin-bottom:4px;">Bottle options</div><div style="font-weight:600;line-height:1.6;">${p.bottles}</div></div>`:""}
+              ${p.com_full||p.com_dep?`<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 12px;margin-top:8px;"><div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:0.1em;margin-bottom:6px;">YOUR COMMISSION</div><div style="display:flex;gap:20px;">${p.com_full?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If full paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_full}</div></div>`:""}${p.com_dep?`<div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">If deposit paid</div><div style="font-size:20px;font-weight:800;color:var(--amber);">${p.com_dep}</div></div>`:""}</div></div>`:""}
+            </div>
+          </div>`).join("")}
+        ${data.dresscode?`<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:11px;color:var(--muted);">Dresscode: <span style="color:var(--text);font-weight:600;">${data.dresscode}</span></div>`:""}
+        ${data.notes?`<div style="margin-top:6px;padding:8px 12px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.7);">${data.notes}</div>`:""}
+        ${data.important?`<div style="margin-top:6px;padding:10px 12px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.25);border-radius:8px;font-size:11px;font-weight:600;color:var(--red);">⚠️ ${data.important}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");}
 function toggleProduct(vi){const el=document.getElementById("prod-"+vi);if(!el)return;const isOpen=el.style.display!=="none";document.querySelectorAll("[id^='prod-']").forEach(e=>e.style.display="none");if(!isOpen)el.style.display="block";}
 
 let calYear,calMonth,calSelectedDate=null,calActiveView=null;
