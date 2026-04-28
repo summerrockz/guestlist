@@ -822,7 +822,9 @@ function urlBase64ToUint8Array(b){const p="=".repeat((4-b.length%4)%4);const bas
 
 async function loadData(){[SELLERS,CLUBS,EVENTS,ENTRIES]=await Promise.all([fetchSheet("SELLERS"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("GL_ENTRIES")]);}
 let PROGRAMME_SHEET={};
-async function loadProgram(){try{const rows=await fetchSheet("PROGRAMME");PROGRAMME_SHEET={};rows.forEach(r=>{const date=normalizeDate(r.date||"");if(!date)return;const venues=(r.venues||"").split(",").map(v=>v.trim()).filter(Boolean);PROGRAMME_SHEET[date]=venues;});}catch(e){}}
+let PROGRAMME_TIMES={};
+async function loadProgrammeTimes(){try{const rows=await fetchSheet("PROGRAMME_TIMES");rows.forEach(r=>{if(r.venue&&r.time)PROGRAMME_TIMES[(r.venue||'').trim().toUpperCase()]=(r.time||'').trim();});}catch(e){}}
+async function loadProgram(){try{await loadProgrammeTimes();const rows=await fetchSheet("PROGRAMME");PROGRAMME_SHEET={};rows.forEach(r=>{const date=normalizeDate(r.date||"");if(!date)return;const venues=(r.venues||"").split(",").map(v=>v.trim()).filter(Boolean);PROGRAMME_SHEET[date]=venues;});}catch(e){}}
 async function loadVipRequests(){VIP_REQUESTS=await fetchSheet("VIP_REQUESTS");}
 
 function renderDashboard(){
@@ -1330,13 +1332,48 @@ function cpBuildEventsList(){
     const d=new Date(dateStr+'T12:00:00');const fullDay=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     const progVenues=source[dateStr]||[];const glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||'')===dateStr&&(ev.status||'').toLowerCase()!=='inactive');
     if(!progVenues.length&&!glEvents.length)return'';
-    const progItems=progVenues.map(venue=>{const prod=PRODUCTS.find(p=>(p.venue||'').toUpperCase()===venue.toUpperCase());const time=prod?prod.time:'';const key=dateStr+'|prog|'+venue;const isSelected=CP_SELECTED[key];return`<div onclick="cpToggleItem('${key}','${venue}','${time}','prog','${dateStr}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(232,25,44,0.1)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(232,25,44,0.3)':'rgba(255,255,255,0.08)'};cursor:pointer;"><div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'var(--red)':'rgba(255,255,255,0.2)'};background:${isSelected?'var(--red)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${venue}</div>${time?`<div style="font-size:11px;color:var(--muted);">⏰ ${time}</div>`:''}</div><div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(232,25,44,0.15);color:var(--red);">SR</div></div>`;}).join('');
-    const glItems=glEvents.map(ev=>{const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};const key=dateStr+'|gl|'+ev.event_id;const isSelected=CP_SELECTED[key];const label=cl.club_name+(ev.event_name?' · '+ev.event_name:'');return`<div onclick="cpToggleItem('${key}','${label.replace(/'/g,"\\'")}','${ev.time||''}','gl','${dateStr}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.08)'};cursor:pointer;"><div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)'};background:${isSelected?'rgba(255,255,255,0.15)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${label}</div>${ev.time?`<div style="font-size:11px;color:var(--muted);">⏰ ${ev.time}</div>`:''} ${ev.free_condition?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">🎫 ${ev.free_condition}</div>`:''} ${ev.extra_notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${ev.extra_notes}</div>`:''}</div><div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">GL</div></div>`;}).join('');
+    const progItems=progVenues.map(venue=>{const SR_TIMES={
+  'THE SITE ROOF':'19:00 - 23:00',
+  'THE SITE ROOFTOPPARTY':'19:00 - 23:00',
+  'THE SITE':'19:00 - 23:00',
+  'NOBU':'19:00 - 00:00',
+  'NOBU ROOFTOPPARTY':'19:00 - 00:00',
+  'ANTS':'15:00 - 23:00',
+  'USHUAÏA - ANTS':'15:00 - 23:00',
+  'TOMORROWLAND & DIMITRI VEGAS & LIKE MIKE':'17:00 - 23:00',
+  'MARTIN GARRIX':'17:00 - 23:00',
+  'USHUAÏA - MARTIN GARRIX':'17:00 - 23:00',
+  'USHUAÏA - TOMORROWLAND':'17:00 - 23:00',
+  'COVA SANTA':'18:00 - 23:00',
+  'COVA (GALA)':'18:00 - 23:00',
+  'COVA (PANTHEON)':'18:00 - 23:00',
+  'COVA (PIV)':'18:00 - 23:00',
+  'JABEQUE':'15:30 - 19:30',
+  'JABEQUE POOLPARTY':'15:30 - 19:30',
+  'VIP CATAMARAN':'14:30 - 17:30',
+  'BOAT PARTY':'14:30 - 17:30',
+  'BAM-BU-KU':'14:00 - 19:00',
+  'BAMBUKU':'14:00 - 19:00',
+  'BAMBUKU POOLPARTY':'14:00 - 19:00',
+  'EDEN':'00:00 - 05:00',
+  'TANTRA VIP EXPERIENCE':'21:00 - 05:00',
+  'TANTRA - VIP EXPERIENCE':'21:00 - 05:00',
+  'TANTRA BAR':'21:00 - 05:00',
+  'TANTRA VIP':'21:00 - 05:00',
+  'TANTRA - OPEN BAR':'Slot between 21:00 - 05:00 (3h)',
+  'ZOO BAR':'21:30 - 00:30',
+  'MOMA - OPEN BAR':'Slot between 16:00 - 23:00 (3h)',
+};
+const _month=new Date(dateStr+'T12:00:00').getMonth()+1;
+let ptTime=SR_TIMES[venue.toUpperCase()]||PROGRAMME_TIMES[venue.toUpperCase()]||'';
+if(venue.toUpperCase()==='CAFE DEL MAR'||venue.toUpperCase()==='CAFÉ DEL MAR'){ptTime=(_month>=7&&_month<=8)?'19:30 - 00:00':'19:00 - 23:00';}
+const prod=!ptTime?PRODUCTS.find(p=>(p.venue||'').toUpperCase()===venue.toUpperCase()&&(p.time||'').trim()!==''):null;const time=ptTime||(prod?prod.time:'');const key=dateStr+'|prog|'+venue;const isSelected=CP_SELECTED[key];return`<div onclick="cpToggleItem('${key}','${venue}','${time}','prog','${dateStr}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(232,25,44,0.1)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(232,25,44,0.3)':'rgba(255,255,255,0.08)'};cursor:pointer;"><div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'var(--red)':'rgba(255,255,255,0.2)'};background:${isSelected?'var(--red)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${venue}</div>${time?`<div style="font-size:11px;color:var(--muted);">⏰ ${time}</div>`:''}</div><div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(232,25,44,0.15);color:var(--red);">SR</div></div>`;}).join('');
+    const glItems=glEvents.map(ev=>{const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};const key=dateStr+'|gl|'+ev.event_id;const isSelected=CP_SELECTED[key];const label=cl.club_name+(ev.event_name?' · '+ev.event_name:'');return`<div onclick="cpToggleItem('${key}','${label.replace(/'/g,"\\'")}','${ev.time||''}','gl','${dateStr}','${(ev.free_condition||'').replace(/'/g,"\\'")}','${(ev.extra_notes||'').replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.08)'};cursor:pointer;"><div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)'};background:${isSelected?'rgba(255,255,255,0.15)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${label}</div>${ev.time?`<div style="font-size:11px;color:var(--muted);">⏰ ${ev.time}</div>`:''} ${ev.free_condition?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">🎫 ${ev.free_condition}</div>`:''} ${ev.extra_notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 ${ev.extra_notes}</div>`:''}</div><div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">GL</div></div>`;}).join('');
     return`<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">${fullDay}</div>${progItems}${glItems}</div>`;
   }).filter(Boolean).join('');
   cpUpdateCount();
 }
-function cpToggleItem(key,name,time,type,dateStr){if(CP_SELECTED[key])delete CP_SELECTED[key];else CP_SELECTED[key]={name,time,type,dateStr};cpBuildEventsList();}
+function cpToggleItem(key,name,time,type,dateStr,extra1,extra2){if(CP_SELECTED[key])delete CP_SELECTED[key];else CP_SELECTED[key]={name,time,type,dateStr,free_condition:extra1||'',extra_notes:extra2||''};cpBuildEventsList();}
 function cpUpdateCount(){const count=Object.keys(CP_SELECTED).length;const el=document.getElementById('cp-selected-count');if(el)el.textContent=count?count+' selected':'';}
 
 function cpBuildPreview(){
@@ -1379,11 +1416,13 @@ async function cpDownloadPDF(){
       const isGL=item.type==='gl';
       const dotColor=isGL?'#E8192C':'rgba(255,255,255,0.2)';
       const badge=isGL?`<span style="font-size:9px;background:#E8192C;color:#fff;padding:2px 8px;border-radius:99px;margin-left:8px;font-weight:700;letter-spacing:0.05em;">GL</span>`:'<span style="font-size:9px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.35);padding:2px 8px;border-radius:99px;margin-left:8px;font-weight:600;">SR</span>';
+      const glNotes=[item.free_condition,item.extra_notes].filter(Boolean).join(' · ');
       bodyHtml+=`<div style="background:#1a1a1a;border-radius:12px;padding:11px 14px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;">
         <div style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${item.name}${badge}</div>
           ${item.time?`<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;">⏰ ${item.time}</div>`:''}
+          ${glNotes?`<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">${glNotes}</div>`:''}
         </div>
       </div>`;
     });
