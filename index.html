@@ -4520,8 +4520,10 @@ function cpNextStep(step) {
     stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
   });
 
-  // Scroll to top - force immediate
-  setTimeout(() => window.scrollTo(0, 0), 50);
+  // Force scroll to absolute top
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 100);
 }
 
 function cpBuildEventsList() {
