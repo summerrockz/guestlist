@@ -60,7 +60,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .msg { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
 
 /* ── MAIN LAYOUT ── */
-.app-wrap { max-width: 480px; margin: 0 auto; padding: 0 0 180px; }
+.app-wrap { max-width: 480px; margin: 0 auto; padding: 0 0 240px; }
 
 /* ── HEADER ── */
 .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 100; }
@@ -959,7 +959,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   </div>
 
   <!-- CREATE PROGRAMME -->
-  <div class="section" id="section-createprog" style="height:calc(100vh - 130px);overflow-y:auto;">
+  <div class="section" id="section-createprog">
     <div style="padding-top:4px;">
       <!-- Step indicator -->
       <div id="cp-steps" style="display:flex;gap:0;margin-bottom:24px;border-radius:999px;overflow:hidden;border:1px solid var(--border);">
@@ -4656,6 +4656,12 @@ function cpBuildPreview() {
   });
 
   document.getElementById('cp-preview').innerHTML = html;
+  // Scroll back to top after content is injected
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 10);
 }
 
 async function cpDownloadPDF() {
