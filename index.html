@@ -1321,8 +1321,8 @@ async function openProductDetail(venue){
 
 function renderPDInfoTab(lang){
   var v=window._currentVenueInfo||null;
-  var langs=['en','nl','fr','es','it'];
-  var flags={en:'🇬🇧',nl:'🇳🇱',fr:'🇫🇷',es:'🇪🇸',it:'🇮🇹'};
+  var langs=['en','nl','fr','es','it','de'];
+  var flags={en:'🇬🇧',nl:'🇳🇱',fr:'🇫🇷',es:'🇪🇸',it:'🇮🇹',de:'🇩🇪'};
   var flagBar='<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;">';
   for(var i=0;i<langs.length;i++){
     var l=langs[i];var active=l===lang;
