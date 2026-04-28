@@ -1370,16 +1370,16 @@ async function cpDownloadPDF(){
     const d=new Date(dateStr+'T12:00:00');
     const dayLabel=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
     bodyHtml+=`<div style="margin-bottom:16px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#b6a28b;margin-bottom:8px;padding-left:4px;">${dayLabel}</div>`;
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:8px;padding-left:2px;">${dayLabel}</div>`;
     byDate[dateStr].forEach(item=>{
       const isGL=item.type==='gl';
-      const dotColor=isGL?'#E8192C':'#b6a28b';
-      const badge=isGL?`<span style="font-size:9px;background:#E8192C;color:#fff;padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:700;">${t.guestlist}</span>`:'';
-      bodyHtml+=`<div style="background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:5px;border:1px solid rgba(160,140,115,0.18);display:flex;align-items:center;gap:10px;">
-        <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
+      const dotColor=isGL?'#E8192C':'rgba(255,255,255,0.2)';
+      const badge=isGL?`<span style="font-size:9px;background:#E8192C;color:#fff;padding:2px 8px;border-radius:99px;margin-left:8px;font-weight:700;letter-spacing:0.05em;">GL</span>`:'<span style="font-size:9px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.35);padding:2px 8px;border-radius:99px;margin-left:8px;font-weight:600;">SR</span>';
+      bodyHtml+=`<div style="background:#1a1a1a;border-radius:12px;padding:11px 14px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div>
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:600;color:#171513;">${item.name}${badge}</div>
-          ${item.time?`<div style="font-size:11px;color:#8b7b69;margin-top:2px;">⏰ ${item.time}</div>`:''}
+          <div style="font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${item.name}${badge}</div>
+          ${item.time?`<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;">⏰ ${item.time}</div>`:''}
         </div>
       </div>`;
     });
@@ -1436,16 +1436,33 @@ document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].cl
 </script>
 
 <!-- Hidden plan card for PDF generation -->
-<div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#FAFAF8;font-family:Poppins,Arial,sans-serif;display:none;">
-  <div style="background:linear-gradient(160deg,#111111 0%,#2a2a2a 100%);padding:24px 24px 20px;text-align:center;">
-    <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" style="width:64px;height:64px;border-radius:50%;margin-bottom:12px;" crossorigin="anonymous">
-    <div id="sr-plan-card-name" style="font-size:22px;font-weight:700;color:#fff;letter-spacing:0.06em;margin-bottom:4px;"></div>
-    <div id="sr-plan-card-dates" style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.12em;text-transform:uppercase;"></div>
+<div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#111111;font-family:Poppins,Arial,sans-serif;display:none;">
+
+  <!-- HEADER — like login screen -->
+  <div style="background:#0e0e0e;padding:40px 24px 32px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" crossorigin="anonymous"
+      style="width:72px;height:72px;border-radius:50%;margin-bottom:16px;">
+    <div style="font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:8px;">Summerrockz Ibiza</div>
+    <div style="font-size:26px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#fff;margin-bottom:2px;">
+      Guest<span style="color:#E8192C;">list</span>
+    </div>
+    <div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:20px;">Program</div>
+    <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 20px;">
+      <div id="sr-plan-card-name" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;"></div>
+      <div id="sr-plan-card-dates" style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.05em;"></div>
+    </div>
   </div>
-  <div id="sr-plan-card-body" style="padding:20px 16px;"></div>
-  <div style="padding:14px 20px 20px;border-top:1px solid rgba(160,140,115,0.15);text-align:center;">
-    <div id="sr-plan-card-seller" style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#b6a28b;font-weight:600;"></div>
+
+  <!-- BODY -->
+  <div id="sr-plan-card-body" style="padding:20px 16px 8px;background:#111111;"></div>
+
+  <!-- FOOTER -->
+  <div style="padding:20px 24px 28px;text-align:center;background:#111111;">
+    <div style="width:32px;height:2px;background:#E8192C;border-radius:2px;margin:0 auto 14px;"></div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;">Specially made for you by</div>
+    <div id="sr-plan-card-seller" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:0.05em;"></div>
   </div>
+
 </div>
 </body>
 </html>
