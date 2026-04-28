@@ -1411,9 +1411,9 @@ async function cpDownloadPDF(){
     pdf.addImage(imgData,'PNG',0,0,canvas.width/3,canvas.height/3);
     const pdfBlob=pdf.output('blob');
     const safeName=clientName.replace(/\s+/g,'-');
-    const file=new File([pdfBlob],`Programma-${safeName}-Ibiza2026.pdf`,{type:'application/pdf'});
+    const file=new File([pdfBlob],`Program ${clientName} - Ibiza 2026.pdf`,{type:'application/pdf'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:'Programma '+clientName+' — Ibiza 2026'});
+      await navigator.share({files:[file],title:'Program '+clientName+' - Ibiza 2026'});
     } else {
       const link=document.createElement('a');link.download=file.name;link.href=URL.createObjectURL(pdfBlob);link.click();
     }
