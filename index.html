@@ -1292,7 +1292,7 @@ async function openProductDetail(venue){
   var overviewMeta='';
   if(data.time||data.days||data.music||data.dresscode){
     overviewMeta='<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;">'
-      +(data.time?'<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;"><span style="color:var(--muted);flex-shrink:0;">⏰ Time</span><span style="font-weight:600;text-align:right;">'+data.time+(data.days?' · '+data.days:'')+'</span></div>':'')
+      +(data.time?'<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;"><span style="color:var(--muted);">⏰ Time</span><div style="font-weight:600;margin-top:2px;">'+data.time+(data.days?' · '+data.days:'')+'</div></div>':'')
       +(data.music?'<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;"><span style="color:var(--muted);">🎵 Music</span><div style="font-weight:600;margin-top:2px;line-height:1.5;">'+data.music+'</div></div>':'')
       +(data.dresscode?'<div style="padding:6px 0;font-size:11px;"><span style="color:var(--muted);">👔 Dresscode</span><div style="font-weight:600;margin-top:2px;line-height:1.5;">'+data.dresscode+'</div></div>':'')
       +'</div>';
