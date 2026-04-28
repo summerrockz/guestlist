@@ -3545,6 +3545,8 @@ function applyProgDates() {
   const to = document.getElementById("prog-to-picker").value;
   document.getElementById("prog-date-from").value = from;
   document.getElementById("prog-date-to").value = to;
+  // Jump week to the from date so it's visible
+  if (from) progWeekStart = getWeekStart(new Date(from + "T12:00:00"));
   closeProgDatePicker();
   onProgDateChange();
 }
