@@ -3600,7 +3600,7 @@ function renderProgram() {
         }).join("")}
       </div>` : "";
       const fullDayName2 = d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-      return `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:14px 16px;">
+      return `<div style="background:var(--card);border:2px solid ${isToday?"var(--red)":"rgba(255,255,255,0.15)"};border-radius:var(--radius);padding:14px 16px;">
         <div style="font-size:15px;font-weight:700;color:${isToday?"var(--red)":"var(--text)"};margin-bottom:10px;">
           ${isToday?"🔴 ":""}${fullDayName2}
         </div>
@@ -3669,7 +3669,7 @@ function renderProgram() {
     const isToday = dateStr === todayStr;
     const clubs = source[dateStr] || [];
     const fullDayName = d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-    html += `<div style="background:var(--card);border:1px solid ${isToday?"var(--red)":"var(--border)"};border-radius:var(--radius);padding:14px 16px;">
+    html += `<div style="background:var(--card);border:2px solid ${isToday?"var(--red)":"rgba(255,255,255,0.15)"};border-radius:var(--radius);padding:14px 16px;">
       
       <!-- Date header -->
       <div style="font-size:15px;font-weight:700;color:${isToday?"var(--red)":"var(--text)"};margin-bottom:10px;${isToday?"":""}">
