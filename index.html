@@ -1093,6 +1093,14 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
     </div>
 
+    <!-- GIRLS ONLY -->
+    <div id="modal-girls-only-group" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:12px;cursor:pointer;" onclick="document.getElementById('modal-girls-only-cb').click()">
+        <input type="checkbox" id="modal-girls-only-cb" style="width:18px;height:18px;accent-color:#EC4899;cursor:pointer;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:600;color:#EC4899;">💃 I confirm all guests are female</div>
+      </div>
+    </div>
+
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
@@ -2043,6 +2051,13 @@ function openModal(eventId, clubId) {
   const lioNeedsPackage = clubId === "lio" && eventDow === 3;
   const hasDrink = clubId === "club_chinois" || lioNeedsPackage;
   document.getElementById("modal-drink-group").style.display = hasDrink ? "block" : "none";
+
+  // Girls only confirmation
+  const isGirlsOnly = (CURRENT_EVENT?.girls_only||"").toLowerCase() === "yes";
+  document.getElementById("modal-girls-only-group").style.display = isGirlsOnly ? "block" : "none";
+  if (isGirlsOnly) {
+    document.getElementById("modal-girls-only-cb").checked = false;
+  }
   if (hasDrink) {
     // Reset drink package state
     window._drinkPackageEnabled = false;
@@ -2117,6 +2132,13 @@ const originalModalSubmit = async () => {
   if (drinkEnabled && !drinkPhone) { msg.textContent = "Phone number is required for drink package."; return; }
   const drinkNote = drinkEnabled ? `🍹 Drink package: ${drinkPackage} | 📞 ${drinkPhone}` : "";
   const finalNotes = [drinkNote, notes].filter(Boolean).join(" | ");
+
+  // Girls only validation
+  const isGirlsOnly2 = (CURRENT_EVENT?.girls_only||"").toLowerCase() === "yes";
+  if (isGirlsOnly2 && !document.getElementById("modal-girls-only-cb").checked) {
+    msg.textContent = "Please confirm all guests are female.";
+    return;
+  }
 
   if (nameOnly) {
     const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));
