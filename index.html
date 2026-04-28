@@ -369,8 +369,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   <div class="login-title">Guest<span class="login-red">list</span></div>
   <div class="login-sub">Seller Portal</div>
   <div class="login-box">
-    <label class="form-label">Email</label>
-    <input type="email" class="input-field" id="login-email" placeholder="your@email.com">
+    <label class="form-label">Username</label>
+    <input type="text" class="input-field" id="login-email" placeholder="username">
     <label class="form-label">Access code</label>
     <input type="password" class="input-field" id="login-code" placeholder="••••••••">
     <button class="btn-primary" id="login-btn">Access Portal</button>
@@ -1404,7 +1404,7 @@ document.getElementById("login-btn").onclick = async () => {
   try {
     const sellers = await fetchSheet("SELLERS");
     const match = sellers.find(s =>
-      (s.seller_email||"").trim().toLowerCase() === email &&
+      ((s.seller_email||"").trim().toLowerCase() === email || (s.seller_name||"").trim().toLowerCase() === email) &&
       (s.seller_code||"").trim() === code &&
       (s.status||"").toLowerCase() === "active"
     );
