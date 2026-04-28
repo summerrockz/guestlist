@@ -4520,10 +4520,12 @@ function cpNextStep(step) {
     stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
   });
 
-  // Force scroll to absolute top
+  // Force scroll to top multiple times to beat any auto-scroll
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
-  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 100);
+  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 50);
+  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 200);
+  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 500);
 }
 
 function cpBuildEventsList() {
