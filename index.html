@@ -960,7 +960,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
   <!-- CREATE PROGRAMME -->
   <div class="section" id="section-createprog">
-    <div style="padding-top:4px;">
+    <div>
       <!-- Step indicator -->
       <div id="cp-steps" style="display:flex;gap:0;margin-bottom:24px;border-radius:999px;overflow:hidden;border:1px solid var(--border);">
         <div id="cp-step-1" style="flex:1;text-align:center;padding:8px;font-size:11px;font-weight:700;background:var(--red);color:#fff;">1. Details</div>
@@ -1059,7 +1059,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
       <!-- Step 4: Preview + Download -->
       <div id="cp-page-4" style="display:none;">
-        <button class="btn-primary" onclick="cpDownloadPDF()" id="cp-download-btn" style="width:100%;margin-bottom:12px;">📄 Download PDF</button>
         <div style="display:flex;gap:8px;margin-bottom:16px;">
           <button class="btn-secondary" onclick="cpNextStep(3)" style="flex:1;">← Edit</button>
           <button class="btn-secondary" onclick="cpReset()" style="flex:1;">Start over</button>
@@ -4520,12 +4519,15 @@ function cpNextStep(step) {
     stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
   });
 
-  // Force scroll to top multiple times to beat any auto-scroll
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 50);
-  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 200);
-  setTimeout(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }, 500);
+  // Scroll to the section
+  const _sec = document.getElementById('section-createprog');
+  if (_sec) {
+    setTimeout(() => _sec.scrollIntoView({block:'start', behavior:'instant'}), 50);
+    setTimeout(() => _sec.scrollIntoView({block:'start', behavior:'instant'}), 200);
+  }
+  // Show/hide fixed download button
+  const _cpBtn = document.getElementById('cp-download-btn');
+  if (_cpBtn) _cpBtn.style.display = step === 4 ? 'block' : 'none';
 }
 
 function cpBuildEventsList() {
@@ -4656,11 +4658,11 @@ function cpBuildPreview() {
   });
 
   document.getElementById('cp-preview').innerHTML = html;
-  // Scroll back to top after content is injected
+  // Force scroll to download button
   setTimeout(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    const btn = document.getElementById('cp-download-btn');
+    if (btn) btn.scrollIntoView({block:'start', behavior:'instant'});
+    window.scrollBy(0, -80); // account for sticky header
   }, 10);
 }
 
@@ -4739,6 +4741,9 @@ async function cpDownloadPDF() {
     <span>${t.enjoy}</span>
     <span>${t.createdBy} ${SELLER.seller_name} · Summerrockz Ibiza</span>
   </div>
+  <!-- FIXED CREATE PDF BUTTON -->
+  <button id="cp-download-btn" onclick="cpDownloadPDF()" style="display:none;position:fixed;top:72px;left:16px;right:16px;width:calc(100% - 32px);max-width:448px;padding:14px;border-radius:999px;background:var(--red);color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer;z-index:9999;font-family:Poppins,sans-serif;box-shadow:0 4px 20px rgba(232,25,44,0.4);">📄 Download PDF</button>
+
 </body>
 </html>`;
 
