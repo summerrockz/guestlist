@@ -3540,7 +3540,7 @@ function buildGLHtml(dayGl, dateStr) {
         ${ev.extra_notes?`<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 ${ev.extra_notes}</div>`:""}
         ${!disabled
           ? `<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-${ev.event_id}" onclick="toggleGLCard('${ev.event_id}','${ev.club_id}',this)">
-              <input type="checkbox" class="multi-gl-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}">
+              <input type="checkbox" class="gl-card-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}">
               <span id="gl-label-text-${ev.event_id}">Add to guestlist</span>
             </label>`
           : `<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">${closed?"⛔ Deadline passed":isFull?"👥 Guestlist full":"Not available"}</div>`
@@ -3591,7 +3591,7 @@ function renderProgram() {
             ${ev.extra_notes?`<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 ${ev.extra_notes}</div>`:""}
             ${!disabled
               ? `<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s;" id="gl-label-${ev.event_id}" onclick="toggleGLCard('${ev.event_id}','${ev.club_id}',this)">
-                  <input type="checkbox" class="multi-gl-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}">
+                  <input type="checkbox" class="gl-card-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}">
                   <span id="gl-label-text-${ev.event_id}">Add to guestlist</span>
                 </label>`
               : `<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">${closed?"⛔ Deadline passed":isFull?"👥 Guestlist full":"Not available"}</div>`
@@ -4011,7 +4011,7 @@ function toggleMultiGL(checkbox, eventId, clubId) {
 
 function clearMultiGL() {
   SELECTED_EVENTS = [];
-  document.querySelectorAll(".multi-gl-cb").forEach(cb => {
+  document.querySelectorAll(".multi-gl-cb, .gl-card-cb").forEach(cb => {
     cb.checked = false;
     const eventId = cb.dataset.eventId;
     if (eventId) {
