@@ -958,6 +958,72 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 
   </div>
 
+  <!-- CREATE PROGRAMME -->
+  <div class="section" id="section-createprog">
+    <div style="padding-top:4px;">
+      <!-- Step indicator -->
+      <div id="cp-steps" style="display:flex;gap:0;margin-bottom:24px;border-radius:999px;overflow:hidden;border:1px solid var(--border);">
+        <div id="cp-step-1" style="flex:1;text-align:center;padding:8px;font-size:11px;font-weight:700;background:var(--red);color:#fff;">1. Details</div>
+        <div id="cp-step-2" style="flex:1;text-align:center;padding:8px;font-size:11px;font-weight:700;background:var(--input-bg);color:var(--muted);">2. Dates</div>
+        <div id="cp-step-3" style="flex:1;text-align:center;padding:8px;font-size:11px;font-weight:700;background:var(--input-bg);color:var(--muted);">3. Events</div>
+        <div id="cp-step-4" style="flex:1;text-align:center;padding:8px;font-size:11px;font-weight:700;background:var(--input-bg);color:var(--muted);">4. Create</div>
+      </div>
+
+      <!-- Step 1: Client details -->
+      <div id="cp-page-1">
+        <div class="section-title">Client details</div>
+        <label class="form-label">Client name</label>
+        <input type="text" class="input-field" id="cp-client-name" placeholder="e.g. John Smith">
+        <label class="form-label">Language</label>
+        <select class="input-field" id="cp-language">
+          <option value="en">🇬🇧 English</option>
+          <option value="fr">🇫🇷 French</option>
+          <option value="es">🇪🇸 Spanish</option>
+          <option value="it">🇮🇹 Italian</option>
+          <option value="nl">🇳🇱 Dutch</option>
+        </select>
+        <button class="btn-primary" onclick="cpNextStep(2)">Next →</button>
+      </div>
+
+      <!-- Step 2: Dates -->
+      <div id="cp-page-2" style="display:none;">
+        <div class="section-title">Trip dates</div>
+        <label class="form-label">Arrival date</label>
+        <input type="date" class="input-field" id="cp-date-from">
+        <label class="form-label">Departure date</label>
+        <input type="date" class="input-field" id="cp-date-to">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-secondary" onclick="cpNextStep(1)" style="flex:1;">← Back</button>
+          <button class="btn-primary" onclick="cpNextStep(3)" style="flex:2;">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Select events -->
+      <div id="cp-page-3" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div class="section-title" style="margin-bottom:0;">Select events</div>
+          <div id="cp-selected-count" style="font-size:12px;color:var(--muted);"></div>
+        </div>
+        <div id="cp-events-list"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button class="btn-secondary" onclick="cpNextStep(2)" style="flex:1;">← Back</button>
+          <button class="btn-primary" onclick="cpNextStep(4)" style="flex:2;">Create PDF →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Preview + Download -->
+      <div id="cp-page-4" style="display:none;">
+        <div class="section-title">Your programme is ready</div>
+        <div id="cp-preview" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;font-size:12px;line-height:1.8;color:rgba(255,255,255,0.8);"></div>
+        <button class="btn-primary" onclick="cpDownloadPDF()" id="cp-download-btn">📄 Download PDF</button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-secondary" onclick="cpNextStep(3)" style="flex:1;">← Edit</button>
+          <button class="btn-secondary" onclick="cpReset()" style="flex:1;">Start over</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FLOATING MULTI-GL BUTTON -->
   <div id="multi-gl-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;max-width:480px;margin:0 auto;padding:0 16px;z-index:250;">
     <div style="background:#1c1c1c;border-radius:16px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);">
@@ -1048,6 +1114,15 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     </button>
 
 
+
+    <button onclick="moreNav('section-createprog')"
+      style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
+      <span style="font-size:22px;">📋</span>
+      <div>
+        <div>Create Programme</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Generate a personalised client programme PDF</div>
+      </div>
+    </button>
 
     <button onclick="doLogout()"
       style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;color:rgba(232,25,44,0.85);cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;">
@@ -1409,7 +1484,8 @@ function showSection(id) {
     "section-vip-process":"nav-more",
     "section-commissions":"nav-more",
     "section-products":"nav-more",
-    "section-vip-prices":"nav-more"
+    "section-vip-prices":"nav-more",
+    "section-createprog":"nav-more"
   };
   const navEl = document.getElementById(navMap[id]);
   if (navEl) navEl.classList.add("active");
@@ -4360,6 +4436,253 @@ function checkDeadlines() {
   else { banner.style.display="none"; }
 }
 setInterval(checkDeadlines, 60000);
+
+// ── CREATE PROGRAMME ──
+const CP_TRANSLATIONS = {
+  en: { programme: "PROGRAMME", guestlist: "Guestlist", confirmed: "Confirmed", createdBy: "Created by", enjoy: "Enjoy your stay in Ibiza!" },
+  fr: { programme: "PROGRAMME", guestlist: "Liste d'invités", confirmed: "Confirmé", createdBy: "Créé par", enjoy: "Profitez de votre séjour à Ibiza!" },
+  es: { programme: "PROGRAMA", guestlist: "Lista de invitados", confirmed: "Confirmado", createdBy: "Creado por", enjoy: "¡Disfruta tu estancia en Ibiza!" },
+  it: { programme: "PROGRAMMA", guestlist: "Lista ospiti", confirmed: "Confermato", createdBy: "Creato da", enjoy: "Godetevi il vostro soggiorno a Ibiza!" },
+  nl: { programme: "PROGRAMMA", guestlist: "Gastenlijst", confirmed: "Bevestigd", createdBy: "Aangemaakt door", enjoy: "Geniet van je verblijf in Ibiza!" }
+};
+
+let CP_SELECTED = {}; // { dateStr: [{ type:'prog'|'gl', name, time, eventId? }] }
+
+function cpNextStep(step) {
+  // Validate
+  if (step === 2) {
+    if (!document.getElementById('cp-client-name').value.trim()) {
+      alert('Please enter a client name.');
+      return;
+    }
+  }
+  if (step === 3) {
+    const from = document.getElementById('cp-date-from').value;
+    const to = document.getElementById('cp-date-to').value;
+    if (!from || !to) { alert('Please select arrival and departure dates.'); return; }
+    if (from > to) { alert('Departure must be after arrival.'); return; }
+    cpBuildEventsList();
+  }
+  if (step === 4) {
+    cpBuildPreview();
+  }
+  // Show/hide pages
+  [1,2,3,4].forEach(i => {
+    document.getElementById('cp-page-'+i).style.display = i === step ? 'block' : 'none';
+    const stepEl = document.getElementById('cp-step-'+i);
+    stepEl.style.background = i === step ? 'var(--red)' : i < step ? 'rgba(34,197,94,0.3)' : 'var(--input-bg)';
+    stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
+  });
+}
+
+function cpBuildEventsList() {
+  const from = document.getElementById('cp-date-from').value;
+  const to = document.getElementById('cp-date-to').value;
+  const wrap = document.getElementById('cp-events-list');
+  const source = (typeof PROGRAMME_SHEET !== "undefined" && Object.keys(PROGRAMME_SHEET).length) ? PROGRAMME_SHEET : PROGRAMME;
+
+  // Build date range
+  const dates = [];
+  let cur = new Date(from + 'T12:00:00');
+  const end = new Date(to + 'T12:00:00');
+  while (cur <= end) {
+    dates.push(cur.toISOString().slice(0,10));
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  if (!dates.length) { wrap.innerHTML = '<div class="empty">No dates found.</div>'; return; }
+
+  wrap.innerHTML = dates.map(dateStr => {
+    const d = new Date(dateStr + 'T12:00:00');
+    const fullDay = d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+    const progVenues = source[dateStr] || [];
+    const glEvents = EVENTS.filter(ev => normalizeDate(ev.date||'') === dateStr && (ev.status||'').toLowerCase() !== 'inactive');
+
+    if (!progVenues.length && !glEvents.length) return '';
+
+    const progItems = progVenues.map(venue => {
+      const prod = PRODUCTS.find(p => (p.venue||'').toUpperCase() === venue.toUpperCase());
+      const time = prod ? prod.time : '';
+      const key = dateStr + '|prog|' + venue;
+      const isSelected = CP_SELECTED[key];
+      return `<div onclick="cpToggleItem('${key}','${venue}','${time}','prog','${dateStr}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(34,197,94,0.12)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(34,197,94,0.3)':'rgba(255,255,255,0.08)'};cursor:pointer;">
+        <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'var(--green)':'rgba(255,255,255,0.2)'};background:${isSelected?'var(--green)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${venue}</div>
+          ${time?`<div style="font-size:11px;color:var(--muted);">⏰ ${time}</div>`:''}
+        </div>
+        <div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.08);color:var(--muted);">SR</div>
+      </div>`;
+    }).join('');
+
+    const glItems = glEvents.map(ev => {
+      const cl = CLUBS.find(c => c.club_id === ev.club_id) || {};
+      const key = dateStr + '|gl|' + ev.event_id;
+      const isSelected = CP_SELECTED[key];
+      const label = cl.club_name + (ev.event_name ? ' · ' + ev.event_name : '');
+      return `<div onclick="cpToggleItem('${key}','${label.replace(/'/g,"\'")}','${ev.time||''}','gl','${dateStr}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;background:${isSelected?'rgba(232,25,44,0.12)':'rgba(255,255,255,0.04)'};border:1px solid ${isSelected?'rgba(232,25,44,0.3)':'rgba(255,255,255,0.08)'};cursor:pointer;">
+        <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${isSelected?'var(--red)':'rgba(255,255,255,0.2)'};background:${isSelected?'var(--red)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;">${isSelected?'✓':''}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${label}</div>
+          ${ev.time?`<div style="font-size:11px;color:var(--muted);">⏰ ${ev.time}</div>`:''}
+        </div>
+        <div style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(232,25,44,0.12);color:var(--red);">GL</div>
+      </div>`;
+    }).join('');
+
+    return `<div style="margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">${fullDay}</div>
+      ${progItems}${glItems}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  cpUpdateCount();
+}
+
+function cpToggleItem(key, name, time, type, dateStr) {
+  if (CP_SELECTED[key]) {
+    delete CP_SELECTED[key];
+  } else {
+    CP_SELECTED[key] = { name, time, type, dateStr };
+  }
+  cpBuildEventsList();
+}
+
+function cpUpdateCount() {
+  const count = Object.keys(CP_SELECTED).length;
+  const el = document.getElementById('cp-selected-count');
+  if (el) el.textContent = count ? count + ' selected' : '';
+}
+
+function cpBuildPreview() {
+  const clientName = document.getElementById('cp-client-name').value.trim();
+  const lang = document.getElementById('cp-language').value;
+  const t = CP_TRANSLATIONS[lang] || CP_TRANSLATIONS.en;
+  const from = document.getElementById('cp-date-from').value;
+  const to = document.getElementById('cp-date-to').value;
+
+  // Group by date
+  const byDate = {};
+  Object.values(CP_SELECTED).forEach(item => {
+    if (!byDate[item.dateStr]) byDate[item.dateStr] = [];
+    byDate[item.dateStr].push(item);
+  });
+
+  const dates = Object.keys(byDate).sort();
+  const fromFmt = new Date(from+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long'});
+  const toFmt = new Date(to+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long'});
+
+  let html = `<div style="font-weight:700;font-size:14px;margin-bottom:4px;">${t.programme} — ${clientName}</div>`;
+  html += `<div style="color:var(--muted);font-size:12px;margin-bottom:16px;">${fromFmt} → ${toFmt}</div>`;
+
+  dates.forEach(dateStr => {
+    const d = new Date(dateStr+'T12:00:00');
+    const dayLabel = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    html += `<div style="font-weight:700;color:var(--red);margin-top:12px;margin-bottom:6px;">${dayLabel}</div>`;
+    byDate[dateStr].forEach(item => {
+      const badge = item.type === 'gl' ? `<span style="font-size:10px;background:rgba(232,25,44,0.15);color:var(--red);padding:1px 6px;border-radius:999px;margin-left:6px;">${t.guestlist}</span>` : '';
+      html += `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">• ${item.name}${item.time?` <span style="color:var(--muted);font-size:11px;">⏰ ${item.time}</span>`:''}${badge}</div>`;
+    });
+  });
+
+  document.getElementById('cp-preview').innerHTML = html;
+}
+
+async function cpDownloadPDF() {
+  const btn = document.getElementById('cp-download-btn');
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+
+  const clientName = document.getElementById('cp-client-name').value.trim();
+  const lang = document.getElementById('cp-language').value;
+  const t = CP_TRANSLATIONS[lang] || CP_TRANSLATIONS.en;
+  const from = document.getElementById('cp-date-from').value;
+  const to = document.getElementById('cp-date-to').value;
+
+  const byDate = {};
+  Object.values(CP_SELECTED).forEach(item => {
+    if (!byDate[item.dateStr]) byDate[item.dateStr] = [];
+    byDate[item.dateStr].push(item);
+  });
+
+  const dates = Object.keys(byDate).sort();
+  const fromFmt = new Date(from+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const toFmt = new Date(to+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  let daysHtml = dates.map(dateStr => {
+    const d = new Date(dateStr+'T12:00:00');
+    const dayLabel = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    const items = byDate[dateStr].map(item => {
+      const badge = item.type === 'gl' 
+        ? `<span style="font-size:10px;background:rgba(232,25,44,0.2);color:#E8192C;padding:2px 8px;border-radius:999px;margin-left:8px;font-weight:600;">${t.guestlist} ✓</span>` 
+        : '';
+      return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;">
+        <span style="color:#E8192C;margin-right:8px;">▸</span>
+        <span style="font-weight:500;">${item.name}</span>
+        ${item.time?`<span style="color:rgba(255,255,255,0.4);font-size:11px;margin-left:8px;">⏰ ${item.time}</span>`:''}
+        ${badge}
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:24px;">
+      <div style="font-size:14px;font-weight:700;color:#E8192C;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid rgba(232,25,44,0.3);">${dayLabel}</div>
+      ${items}
+    </div>`;
+  }).join('');
+
+  const pdfHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#111; color:#fff; font-family:Arial,sans-serif; padding:40px 32px; }
+  .header { display:flex; align-items:center; gap:16px; margin-bottom:32px; padding-bottom:20px; border-bottom:2px solid #E8192C; }
+  .logo { width:52px; height:52px; border-radius:50%; }
+  .header-text h1 { font-size:22px; font-weight:800; letter-spacing:0.05em; }
+  .header-text p { font-size:13px; color:rgba(255,255,255,0.5); margin-top:2px; }
+  .client-bar { background:#1a1a1a; border-left:3px solid #E8192C; padding:12px 16px; margin-bottom:28px; border-radius:0 8px 8px 0; }
+  .client-bar .name { font-size:18px; font-weight:700; }
+  .client-bar .dates { font-size:12px; color:rgba(255,255,255,0.5); margin-top:3px; }
+  .footer { margin-top:40px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:rgba(255,255,255,0.3); display:flex; justify-content:space-between; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" class="logo">
+    <div class="header-text">
+      <h1>SUMMERROCKZ</h1>
+      <p>${t.programme} · Ibiza 2026</p>
+    </div>
+  </div>
+  <div class="client-bar">
+    <div class="name">${clientName}</div>
+    <div class="dates">${fromFmt} → ${toFmt}</div>
+  </div>
+  ${daysHtml}
+  <div class="footer">
+    <span>${t.enjoy}</span>
+    <span>${t.createdBy} ${SELLER.seller_name} · Summerrockz Ibiza</span>
+  </div>
+</body>
+</html>`;
+
+  // Open print dialog
+  const win = window.open('', '_blank');
+  win.document.write(pdfHtml);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 500);
+
+  btn.textContent = '📄 Download PDF';
+  btn.disabled = false;
+}
+
+function cpReset() {
+  CP_SELECTED = {};
+  document.getElementById('cp-client-name').value = '';
+  document.getElementById('cp-date-from').value = '';
+  document.getElementById('cp-date-to').value = '';
+  cpNextStep(1);
+}
 
 // PULL TO REFRESH
 let pullStartY = 0;
