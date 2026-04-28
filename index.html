@@ -1323,7 +1323,7 @@ function renderPDInfoTab(lang){
   var v=window._currentVenueInfo||null;
   var langs=['en','nl','fr','es','it'];
   var flags={en:'🇬🇧',nl:'🇳🇱',fr:'🇫🇷',es:'🇪🇸',it:'🇮🇹'};
-  var flagBar='<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">';
+  var flagBar='<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;">';
   for(var i=0;i<langs.length;i++){
     var l=langs[i];var active=l===lang;
     flagBar+='<button data-lang="'+l+'" onclick="renderPDInfoTab(this.dataset.lang)" style="padding:6px 12px;border-radius:999px;border:1px solid '+(active?'var(--red)':'var(--border)')+';background:'+(active?'var(--red)':'transparent')+';color:'+(active?'#fff':'var(--muted)')+';font-size:13px;cursor:pointer;">'+flags[l]+'</button>';
@@ -1333,7 +1333,7 @@ function renderPDInfoTab(lang){
   var text=v&&v[key]?v[key]:(lang!=='en'&&v&&v.description?v.description:'');
   var content=text
     ?'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.85);">'+text.replace(/\n/g,'<br>')+'</div>'
-    :'<div class="empty">No description available in this language.</div>';
+    :'<div class="empty">No translation yet.</div>';
   document.getElementById('pdt-content-info').innerHTML=flagBar+content;
 }
 function setPDTab(tab){['overview','info','lastinfo'].forEach(t=>{const btn=document.getElementById('pdt-'+t);const content=document.getElementById('pdt-content-'+t);if(btn){btn.style.background=t===tab?'var(--red)':'transparent';btn.style.color=t===tab?'#fff':'var(--muted)';}if(content)content.style.display=t===tab?'block':'none';});}
