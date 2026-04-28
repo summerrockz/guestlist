@@ -4494,6 +4494,10 @@ function cpNextStep(step) {
     stepEl.style.background = i === step ? 'var(--red)' : i < step ? 'rgba(34,197,94,0.3)' : 'var(--input-bg)';
     stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
   });
+  // Scroll to top of section
+  const sec = document.getElementById('section-createprog');
+  if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function cpBuildEventsList() {
