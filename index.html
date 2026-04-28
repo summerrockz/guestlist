@@ -485,14 +485,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div class="section-title">Client details</div>
         <label class="form-label">Client name</label>
         <input type="text" class="input-field" id="cp-client-name" placeholder="e.g. John Smith">
-        <label class="form-label">Language</label>
-        <select class="input-field" id="cp-language">
-          <option value="en">🇬🇧 English</option>
-          <option value="fr">🇫🇷 French</option>
-          <option value="es">🇪🇸 Spanish</option>
-          <option value="it">🇮🇹 Italian</option>
-          <option value="nl">🇳🇱 Dutch</option>
-        </select>
+
         <button class="btn-primary" onclick="cpNextStep(2)">Next →</button>
       </div>
 
@@ -1506,6 +1499,12 @@ const SR_TIMES={
   'TANTRA - OPEN BAR':'Slot between 21:00 - 05:00 (3h)',
   'ZOO BAR':'21:30 - 00:30',
   'MOMA - OPEN BAR':'Slot between 16:00 - 23:00 (3h)',
+  'COVA SANTA VIP':'18:00 - 23:00',
+  'COVA SANTA VIP 💄 / NORMAL':'18:00 - 23:00',
+  'COVA SANTA VIP 💄🚹 / NORMAL':'18:00 - 23:00',
+  'COVA SANTA ONLY VIP 💄':'18:00 - 23:00',
+  'EDEN BALCONY VIP':'00:00 - 05:00',
+  'EDEN':'00:00 - 05:00',
 };
 function cpBuildEventsList(){
   const from=document.getElementById('cp-date-from').value;const to=document.getElementById('cp-date-to').value;
@@ -1532,7 +1531,7 @@ function cpUpdateCount(){const count=Object.keys(CP_SELECTED).length;const el=do
 
 function cpBuildPreview(){
   const clientName=document.getElementById('cp-client-name').value.trim();
-  const lang=document.getElementById('cp-language').value;
+  const lang='en';
   const t=CP_TRANSLATIONS[lang]||CP_TRANSLATIONS.en;
   const from=document.getElementById('cp-date-from').value;const to=document.getElementById('cp-date-to').value;
   const byDate={};Object.values(CP_SELECTED).forEach(item=>{if(!byDate[item.dateStr])byDate[item.dateStr]=[];byDate[item.dateStr].push(item);});
@@ -1548,7 +1547,7 @@ async function cpDownloadPDF(){
   const btn=document.querySelector('#cp-page-4 button[onclick="cpDownloadPDF()"]');
   if(btn){btn.textContent='⏳ Creating...';btn.disabled=true;}
   const clientName=document.getElementById('cp-client-name').value.trim();
-  const lang=document.getElementById('cp-language').value;
+  const lang='en';
   const t=CP_TRANSLATIONS[lang]||CP_TRANSLATIONS.en;
   const from=document.getElementById('cp-date-from').value;
   const to=document.getElementById('cp-date-to').value;
