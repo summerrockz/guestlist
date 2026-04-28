@@ -1060,14 +1060,18 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <!-- Step 4: Preview + Download -->
       <div id="cp-page-4" style="display:none;">
         <div class="section-title">Your programme is ready</div>
-        <button class="btn-primary" onclick="cpDownloadPDF()" id="cp-download-btn" style="margin-bottom:12px;">📄 Download PDF</button>
-        <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <div id="cp-preview" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:12px;line-height:1.8;color:rgba(255,255,255,0.8);margin-bottom:8px;"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
           <button class="btn-secondary" onclick="cpNextStep(3)" style="flex:1;">← Edit</button>
           <button class="btn-secondary" onclick="cpReset()" style="flex:1;">Start over</button>
         </div>
-        <div id="cp-preview" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:12px;line-height:1.8;color:rgba(255,255,255,0.8);"></div>
       </div>
     </div>
+  </div>
+
+  <!-- FLOATING CREATE PDF BUTTON -->
+  <div id="cp-pdf-bar" style="display:none;position:fixed;top:60px;left:0;right:0;max-width:480px;margin:0 auto;padding:0 16px;z-index:250;">
+    <button class="btn-primary" onclick="cpDownloadPDF()" id="cp-download-btn" style="width:100%;box-shadow:0 4px 20px rgba(232,25,44,0.4);">📄 Download PDF</button>
   </div>
 
   <!-- FLOATING MULTI-GL BUTTON -->
@@ -4519,9 +4523,10 @@ function cpNextStep(step) {
     stepEl.style.background = i === step ? 'var(--red)' : i < step ? 'rgba(34,197,94,0.3)' : 'var(--input-bg)';
     stepEl.style.color = i <= step ? '#fff' : 'var(--muted)';
   });
-  // Scroll to top of section
-  const sec = document.getElementById('section-createprog');
-  if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  // Show floating PDF button on step 4
+  const pdfBar = document.getElementById('cp-pdf-bar');
+  if (pdfBar) pdfBar.style.display = step === 4 ? 'block' : 'none';
+  // Scroll to top
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
