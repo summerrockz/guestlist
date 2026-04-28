@@ -1239,6 +1239,11 @@ const PROGRAMME={
 
 const CLUB_COLORS={"Boat Party":"#3B82F6","Nobu":"#F97316","Ushuaia":"#E8192C","The Site":"#14B8A6","Jabeque":"#84CC16","Bam-Bu-Ku":"#22C55E","Cafe del Mar":"#F59E0B","Tantra Bar":"#8B5CF6","Zoo Bar":"#EC4899"};
 function getClubColor(c){return CLUB_COLORS[c]||"#6B7280";}
+function getFormatColor(format){
+  const f=(format||'name').trim().toLowerCase();
+  if(f.includes('email'))return'#f97316';
+  return'#3b82f6';
+}
 
 let progWeekStart=null;
 function getWeekStart(date){const d=new Date(date);const day=d.getDay();const diff=day===0?-6:1-day;d.setDate(d.getDate()+diff);d.setHours(0,0,0,0);return d;}
@@ -1267,12 +1272,12 @@ function renderProgram(){
     const clubs=source[dateStr]||[];
     const fullDayName=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
     const glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||"")===dateStr&&(ev.status||"").toLowerCase()!=="inactive");
-    html+=`<div style="background:var(--card);border:2px solid ${isToday?"var(--red)":"rgba(255,255,255,0.15)"};border-radius:var(--radius);padding:14px 16px;"><div style="font-size:15px;font-weight:700;color:${isToday?"var(--red)":"var(--text)"};margin-bottom:10px;">${isToday?"🔴 ":""}${fullDayName}</div>${progView!=='gl'&&clubs.length>0?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">${clubs.map(c=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:${getClubColor(c)}22;color:${getClubColor(c)};border:1px solid ${getClubColor(c)}44;">${c}</span>`).join("")}</div>`:""}${progView!=='prog'&&glEvents.length>0?`<div style="border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Guestlists</div>${glEvents.map(ev=>{const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};const ds=deadlineStatus(cl.deadline,dateStr);const closed=ds==="closed";const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''&&ev.spots_left!==null?parseInt(ev.spots_left):null;const isFull=spotsLeft!==null&&spotsLeft<=0;const disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';const freeText=ev.free_condition?ev.free_condition:(ev.price_after?`€${ev.price_after} after`:"Free");return`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 11px;margin-bottom:4px;${disabled?'opacity:0.55':''}">
-<div style="font-size:12px;font-weight:700;color:var(--red);line-height:1.3;margin-bottom:5px;">${cl.club_name||ev.club_id}${ev.event_name?` · ${ev.event_name}`:""}</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-bottom:6px;">${ev.time?`<span style="color:var(--muted);">⏰ ${ev.time}</span>`:""}<span style="color:var(--amber);">🎫 ${freeText}</span>${spotsLeft!==null?`<span style="color:${spotsLeft<=5?'var(--red)':spotsLeft<=15?'var(--amber)':'var(--green)'};font-weight:600;">👥 ${spotsLeft} left</span>`:""}</div>
-${ev.extra_notes?`<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 ${ev.extra_notes}</div>`:""}
-${!disabled?`<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-${ev.event_id}" onclick="toggleGLCard('${ev.event_id}','${ev.club_id}',this)"><input type="checkbox" class="gl-card-cb" data-event-id="${ev.event_id}" data-club-id="${ev.club_id}" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-${ev.event_id}"><span id="gl-label-text-${ev.event_id}">Add to guestlist</span></label>`:`<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">${closed?"⛔ Deadline passed":isFull?"👥 Guestlist full":"Not available"}</div>`}
-</div>`;}).join("")}</div>`:""}</div>`;
+    const glSection=progView!=='prog'&&glEvents.length>0?'<div style="border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Guestlists</div>'+buildGLHtml(glEvents,dateStr)+'</div>':'';
+    html+='<div style="background:var(--card);border:2px solid '+(isToday?'var(--red)':'rgba(255,255,255,0.15)')+';border-radius:var(--radius);padding:14px 16px;">'
+      +'<div style="font-size:15px;font-weight:700;color:'+(isToday?'var(--red)':'var(--text)')+';margin-bottom:10px;">'+(isToday?'🔴 ':'')+fullDayName+'</div>'
+      +(progView!=='gl'&&clubs.length>0?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">'+clubs.map(c=>'<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:'+getClubColor(c)+'22;color:'+getClubColor(c)+';border:1px solid '+getClubColor(c)+'44;">'+c+'</span>').join('')+'</div>':'')
+      +glSection
+      +'</div>';
   }
   document.getElementById("prog-week").innerHTML=html;
   updateMonthButtons();
@@ -1305,6 +1310,35 @@ async function addNotification(type,recipientId,data){try{await post({action:"ad
 
 let SELECTED_EVENTS=[];
 document.addEventListener("change",function(e){if(e.target.classList.contains("multi-gl-cb"))toggleMultiGL(e.target,e.target.dataset.eventId,e.target.dataset.clubId);});
+
+
+function buildGLHtml(dayGl,dateStr){
+  if(!dayGl.length)return'';
+  var items=dayGl.map(function(ev){
+    var cl=CLUBS.find(function(c){return c.club_id===ev.club_id;})||{};
+    var spots=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
+    var isFull=spots!==null&&spots<=0;
+    var ds=deadlineStatus(cl.deadline,dateStr);
+    var closed=ds==='closed';
+    var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';
+    var ticketInfo=ev.free_condition||( ev.price_after?'€'+ev.price_after+' after ':'' );
+    var spotsColor=spots===null?'var(--muted)':spots<=5?'var(--red)':spots<=15?'var(--amber)':'var(--green)';
+    var fc=getFormatColor(cl.format);
+    var timeHtml=ev.time?'<div style="font-size:11px;color:var(--muted);">⏰ '+ev.time+'</div>':'';
+    var ticketHtml=ticketInfo?'<span style="color:var(--amber);">🎫 '+ticketInfo+'</span>':'';
+    var spotsHtml=spots!==null?'<span style="color:'+spotsColor+';font-weight:600;">👥 Spots left: '+spots+'</span>':'';
+    var notesHtml=ev.extra_notes?'<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 '+ev.extra_notes+'</div>':'';
+    var name=(cl.club_name||ev.club_id)+(ev.event_name?' · '+ev.event_name:'');
+    var actionHtml=disabled
+      ?'<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">'+(closed?'⛔ Deadline passed':isFull?'👥 Guestlist full':'Not available')+'</div>'
+      :'<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:'+fc+';cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-'+ev.event_id+'" onclick="toggleGLCard(this.dataset.eid,this.dataset.cid,this)" data-eid="'+ev.event_id+'" data-cid="'+ev.club_id+'"><input type="checkbox" class="gl-card-cb" data-event-id="'+ev.event_id+'" data-club-id="'+ev.club_id+'" style="width:18px;height:18px;accent-color:'+fc+';pointer-events:none;" id="gl-cb-'+ev.event_id+'"><span id="gl-label-text-'+ev.event_id+'">Add to guestlist</span></label>';
+    return'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:9px 11px;'+(disabled?'opacity:0.55;':'')+'">'
+      +'<div style="font-size:12px;font-weight:700;color:'+fc+';line-height:1.3;margin-bottom:5px;">'+name+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-bottom:6px;">'+timeHtml+ticketHtml+spotsHtml+'</div>'
+      +notesHtml+actionHtml+'</div>';
+  });
+  return'<div style="display:flex;flex-direction:column;gap:6px;">'+items.join('')+'</div>';
+}
 
 function toggleGLCard(eventId,clubId,labelEl){
   const cb=document.getElementById('gl-cb-'+eventId);
