@@ -1836,10 +1836,10 @@ function mergeEntries(sheetEntries){
     delete _localChanges[sheetEntry.entry_id];
     return sheetEntry;
   });
-  // Add locally added entries not yet in sheet - keep until sheet confirms
+  // Add locally added entries not yet in sheet - avoid duplicates
+  const mergedIds = new Set(merged.map(e => e.entry_id));
   ENTRIES.forEach(localEntry => {
-    const inSheet = sheetEntries.some(e => e.entry_id === localEntry.entry_id);
-    if(!inSheet && (localEntry.status||'').toLowerCase() !== 'cancelled'){
+    if(!mergedIds.has(localEntry.entry_id) && (localEntry.status||'').toLowerCase() !== 'cancelled'){
       merged.push(localEntry);
     }
   });
