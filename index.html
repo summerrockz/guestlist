@@ -1017,6 +1017,13 @@ async function deleteEntry(entryId,btn){
   btn.textContent="Cancelling…";btn.disabled=true;
   const entry=ENTRIES.find(e=>e.entry_id===entryId);
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
+  // Show loading modal immediately
+  const modal=document.getElementById('success-modal');
+  modal.querySelectorAll('div')[1].textContent='⏳';
+  modal.querySelectorAll('div')[2].textContent='Cancelling...';
+  document.getElementById('success-names').innerHTML='<div>'+(entry?entry.guest_name:'Entry')+'</div>';
+  modal.querySelector('button').style.display='none';
+  modal.style.display='flex';
   localStorage.setItem('cancelled_'+entryId,'1');
   trackLocalChange(entryId,{status:"cancelled"});
   try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
@@ -1470,8 +1477,10 @@ function showCancelSuccessModal(name){
   document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
   modal.querySelector('div > div:nth-child(1)').textContent='🚫';
   modal.querySelector('div > div:nth-child(2)').textContent='Entry cancelled';
-  modal.querySelector('button').textContent='📋 View my entries';
-  modal.querySelector('button').onclick=goToMyEntries;
+  const _cb=modal.querySelector('button');
+  _cb.textContent='📋 View my entries';
+  _cb.onclick=goToMyEntries;
+  _cb.style.display='block';
   modal.style.display='flex';
 }
 function showEditSuccessModal(name){
