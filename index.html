@@ -818,7 +818,7 @@ function showSection(id) {
   const navEl=document.getElementById(navMap[id]);
   if(navEl)navEl.classList.add("active");
   if(id==="section-events")loadData().then(renderEvents);
-  if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
+  if(id==="section-mygl"){if(!ENTRIES.length){loadData().then(renderMyGL);}else{renderMyGL();}setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
   if(id==="section-admin"){renderAdminAndRestore();startAdminRefresh();}
   if(id==="section-dashboard")loadData().then(renderDashboard);
   if(id==="section-vip")loadVipRequests().then(renderVipSeller);
@@ -1878,7 +1878,7 @@ function startGlobalAutoRefresh(){
         }
       }
     }catch(e){}
-  },30000);
+  },60000);
 }
 
 // PULL TO REFRESH
