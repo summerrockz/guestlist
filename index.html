@@ -1737,10 +1737,7 @@ function showNotePopup(event, note) {
   if (existing) existing.remove();
   const popup = document.createElement('div');
   popup.id = 'note-popup';
-  popup.style.cssText = 'position:fixed;z-index:9999;background:#1a1a1a;border:1px solid rgba(245,158,11,0.4);border-radius:14px;padding:14px 16px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-size:13px;color:rgba(255,255,255,0.9);line-height:1.6;';
-  const rect = event.target.getBoundingClientRect();
-  popup.style.top = (rect.bottom + 8) + 'px';
-  popup.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
+  popup.style.cssText = 'position:fixed;z-index:9999;background:#1a1a1a;border:1px solid rgba(245,158,11,0.4);border-radius:14px;padding:14px 16px;width:80%;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-size:13px;color:rgba(255,255,255,0.9);line-height:1.6;top:50%;left:50%;transform:translate(-50%,-50%);';
   popup.innerHTML = '<div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">📝 Note</div>' + note.replace(/\n/g,'<br>') + '<button onclick="document.getElementById(\'note-popup\').remove()" style="display:block;margin-top:10px;width:100%;padding:6px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;">Sluiten</button>';
   document.body.appendChild(popup);
   setTimeout(() => document.addEventListener('click', function closePopup() { const p = document.getElementById('note-popup'); if(p) p.remove(); document.removeEventListener('click', closePopup); }, {once:true}), 100);
