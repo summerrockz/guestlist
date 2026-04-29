@@ -1210,7 +1210,17 @@ const originalModalSubmit=async()=>{
 };
 
 async function notifyClubAdmins(clubId,clubName,guestName,pax,eventName,eventDate){
-  try{const cl=CLUBS.find(c=>c.club_id===clubId)||{};const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);const paxStr=parseInt(pax)>1?" +"+(parseInt(pax)-1):"";for(const adminId of adminIds){await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"🔔 New entry: "+clubName,body:`${guestName}${paxStr} · ${[eventDate,eventName].filter(Boolean).join(" · ")} — added by ${SELLER.seller_name}`,sellerId:adminId})});}}catch(e){}
+  try{
+    const cl=CLUBS.find(c=>c.club_id===clubId)||{};
+    const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    const names=typeof guestName==='string'&&guestName.includes(',')?guestName.split(',').map(n=>n.trim()):[guestName];
+    const context=[eventDate,eventName].filter(Boolean).join(" · ");
+    for(const adminId of adminIds){
+      for(const name of names){
+        await fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"🔔 New entry: "+clubName,body:name+" · "+context+" — added by "+SELLER.seller_name,sellerId:adminId})});
+      }
+    }
+  }catch(e){}
 }
 
 function openVipModal(){document.getElementById("vip-venue").value="";document.getElementById("vip-event-group").style.display="none";document.getElementById("vip-fields-wrap").style.display="none";document.getElementById("vip-msg").textContent="";document.getElementById("vip-modal").classList.add("open");}
