@@ -1149,7 +1149,7 @@ async function markEntrySent(entryId,isSent){
   // Save to localStorage so checkbox persists after refresh
   if(sentKey){if(isSent)localStorage.setItem(sentKey,"1");else localStorage.removeItem(sentKey);}
   try{await post({action:"mark_sent",entry_id:entryId,sent_to_club:isSent?"yes":""});ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,sent_to_club:isSent?"yes":""}:e);
-  if(isSent){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(entry){const paxStr=parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"";fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"✅ Confirmed: "+entry.club_name,body:entry.guest_name+paxStr+" · "+(entry.event_name||"")+" — confirmed by "+SELLER.seller_name,sellerId:entry.seller_id})}).catch(()=>{});addNotification("confirmed",entry.seller_id,{club:entry.club_name,guest:entry.guest_name+paxStr,event:entry.event_name||"",date:entry.date,by:SELLER.seller_name});}}
+  if(isSent){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(entry){const paxStr=parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"";fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"✅ Confirmed: "+entry.club_name,body:entry.guest_name+paxStr+" · "+(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""))+" — confirmed by "+SELLER.seller_name,sellerId:entry.seller_id})}).catch(()=>{});addNotification("confirmed",entry.seller_id,{club:entry.club_name,guest:entry.guest_name+paxStr,event:(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||"")),date:entry.date,by:SELLER.seller_name});}}
   }catch(e){}}
 
 function openModal(eventId,clubId){
