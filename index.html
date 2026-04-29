@@ -63,7 +63,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .msg { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
 
 /* ── MAIN LAYOUT ── */
-.app-wrap { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 0 20px; }
+.app-wrap { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 0 20px; position: relative; }
 
 /* ── HEADER ── */
 .app-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--dark); z-index: 100; }
@@ -214,7 +214,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 </div>
 
 <!-- MAIN APP -->
-<div id="main-app" style="display:none;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;">
+<div id="main-app" style="display:none;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;">
   <div class="app-wrap">
     <div class="app-header">
       <div class="header-brand">Summerrockz GL</div>
@@ -628,10 +628,10 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 <!-- SUCCESS MODAL -->
 <div id="success-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
   <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:32px 24px;width:90%;max-width:380px;text-align:center;">
-    <div style="font-size:64px;margin-bottom:16px;">✅</div>
-    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Successfully added!</div>
+    <div id="success-icon" style="font-size:64px;margin-bottom:16px;">✅</div>
+    <div id="success-title" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Successfully added!</div>
     <div id="success-names" style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:28px;line-height:1.8;"></div>
-    <button onclick="goToMyEntries()" style="width:100%;padding:16px;border-radius:999px;background:#E8192C;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">📋 View my entries</button>
+    <button id="success-btn" onclick="goToMyEntries()" style="width:100%;padding:16px;border-radius:999px;background:#E8192C;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">📋 View my entries</button>
   </div>
 </div>
 
@@ -1019,10 +1019,10 @@ async function deleteEntry(entryId,btn){
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
   // Show loading modal immediately
   const modal=document.getElementById('success-modal');
-  modal.querySelectorAll('div')[1].textContent='⏳';
-  modal.querySelectorAll('div')[2].textContent='Cancelling...';
+  document.getElementById('success-icon').textContent='⏳';
+  document.getElementById('success-title').textContent='Cancelling...';
   document.getElementById('success-names').innerHTML='<div>'+(entry?entry.guest_name:'Entry')+'</div>';
-  modal.querySelector('button').style.display='none';
+  document.getElementById('success-btn').style.display='none';
   modal.style.display='flex';
   localStorage.setItem('cancelled_'+entryId,'1');
   trackLocalChange(entryId,{status:"cancelled"});
@@ -1473,15 +1473,15 @@ function progJumpMonth(monthIndex){const first=new Date(2026,monthIndex,1);const
 document.getElementById("logout-btn").onclick=doLogout;
 function doLogout(){localStorage.removeItem("srz_seller");localStorage.removeItem("srz_notif_enabled");window.location.reload();}
 function showCancelSuccessModal(name){
-  const modal=document.getElementById('success-modal');
-  document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
-  modal.querySelector('div > div:nth-child(1)').textContent='🚫';
-  modal.querySelector('div > div:nth-child(2)').textContent='Entry cancelled';
-  const _cb=modal.querySelector('button');
-  _cb.textContent='📋 View my entries';
-  _cb.onclick=goToMyEntries;
-  _cb.style.display='block';
-  modal.style.display='flex';
+  document.getElementById('success-icon').textContent='🚫';
+  document.getElementById('success-title').textContent='Entry cancelled';
+  document.getElementById('success-names').innerHTML='<div>'+name+'</div>';
+  var btn=document.getElementById('success-btn');
+  btn.textContent='📋 View my entries';
+  btn.onclick=goToMyEntries;
+  btn.style.display='block';
+  btn.disabled=false;
+  document.getElementById('success-modal').style.display='flex';
 }
 function showEditSuccessModal(name){
   const modal=document.getElementById('success-modal');
@@ -1497,17 +1497,15 @@ function showSuccessModal(names,venues){
   if(venues&&venues.length){
     venueHtml='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">'+venues.map(v=>'<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:2px;">📍 '+v+'</div>').join('')+'</div>';
   }
-  var modal=document.getElementById('success-modal');
+  document.getElementById('success-icon').textContent='✅';
+  document.getElementById('success-title').textContent='Successfully added!';
   document.getElementById('success-names').innerHTML=names.map(n=>'<div>'+n+'</div>').join('')+venueHtml;
-  modal.querySelector('div > div:nth-child(1)').textContent='✅';
-  modal.querySelector('div > div:nth-child(2)').textContent='Successfully added!';
-  var btn=modal.querySelector('button');
+  var btn=document.getElementById('success-btn');
   btn.textContent='📋 View my entries';
   btn.onclick=goToMyEntries;
   btn.style.display='block';
-  btn.style.opacity='1';
   btn.disabled=false;
-  modal.style.display='flex';
+  document.getElementById('success-modal').style.display='flex';
 }
 async function goToMyEntries(){
   document.getElementById('success-modal').style.display='none';
