@@ -1372,8 +1372,8 @@ const CLUB_COLORS={"Boat Party":"#3B82F6","Nobu":"#F97316","Ushuaia":"#E8192C","
 function getClubColor(c){return CLUB_COLORS[c]||"#6B7280";}
 function getFormatColor(format){
   const f=(format||'name').trim().toLowerCase();
-  if(f.includes('email'))return'#E8192C';
-  return'rgba(255,255,255,0.85)';
+  if(f.includes('email'))return'#f97316';
+  return'#3b82f6';
 }
 
 let progWeekStart=null;
@@ -1453,16 +1453,18 @@ function buildGLHtml(dayGl,dateStr){
     var closed=ds==='closed';
     var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';
     var ticketInfo=ev.free_condition||(ev.price_after?'€'+ev.price_after+' after':'');
-    var timeHtml=ev.time?'<div style="font-size:11px;color:rgba(255,255,255,0.4);">⏰ '+ev.time+'</div>':'';
-    var ticketHtml=ticketInfo?'<span style="color:rgba(255,255,255,0.5);">🎫 '+ticketInfo+'</span>':'';
-    var spotsHtml=spots!==null?'<span style="color:var(--red);font-weight:600;">👥 '+spots+' spots left</span>':'';
-    var notesHtml=ev.extra_notes?'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">📝 '+ev.extra_notes+'</div>':'';
+    var spotsColor=spots!==null&&spots<=5?'var(--red)':spots!==null&&spots<=15?'var(--amber)':'var(--green)';
+    var fc=getFormatColor(cl.format);
+    var timeHtml=ev.time?'<div style="font-size:11px;color:var(--muted);">⏰ '+ev.time+'</div>':'';
+    var ticketHtml=ticketInfo?'<span style="color:var(--amber);">🎫 '+ticketInfo+'</span>':'';
+    var spotsHtml=spots!==null?'<span style="color:'+spotsColor+';font-weight:600;">👥 Spots left: '+spots+'</span>':'';
+    var notesHtml=ev.extra_notes?'<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 '+ev.extra_notes+'</div>':'';
     var name=(cl.club_name||ev.club_id)+(ev.event_name?' · '+ev.event_name:'');
     var actionHtml=disabled
-      ?'<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,0.3);">'+(closed?'⛔ Deadline passed':isFull?'👥 Guestlist full':'Not available')+'</div>'
-      :'<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-'+ev.event_id+'" onclick="toggleGLCard(this.dataset.eid,this.dataset.cid,this)" data-eid="'+ev.event_id+'" data-cid="'+ev.club_id+'"><input type="checkbox" class="gl-card-cb" data-event-id="'+ev.event_id+'" data-club-id="'+ev.club_id+'" style="width:18px;height:18px;accent-color:var(--red);pointer-events:none;" id="gl-cb-'+ev.event_id+'"><span id="gl-label-text-'+ev.event_id+'">Add to guestlist</span></label>';
-    return'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 11px;'+(disabled?'opacity:0.45;':'')+'">'
-      +'<div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:5px;">'+name+'</div>'
+      ?'<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">'+(closed?'⛔ Deadline passed':isFull?'👥 Guestlist full':'Not available')+'</div>'
+      :'<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:'+fc+';cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-'+ev.event_id+'" onclick="toggleGLCard(this.dataset.eid,this.dataset.cid,this)" data-eid="'+ev.event_id+'" data-cid="'+ev.club_id+'"><input type="checkbox" class="gl-card-cb" data-event-id="'+ev.event_id+'" data-club-id="'+ev.club_id+'" style="width:18px;height:18px;accent-color:'+fc+';pointer-events:none;" id="gl-cb-'+ev.event_id+'"><span id="gl-label-text-'+ev.event_id+'">Add to guestlist</span></label>';
+    return'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:9px 11px;'+(disabled?'opacity:0.55;':'')+'">'
+      +'<div style="font-size:12px;font-weight:700;color:'+fc+';line-height:1.3;margin-bottom:5px;">'+name+'</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-bottom:6px;">'+timeHtml+ticketHtml+spotsHtml+'</div>'
       +notesHtml+actionHtml+'</div>';
   });
@@ -1475,7 +1477,7 @@ function toggleGLCard(eventId,clubId,labelEl){
   const isChecked=!cb.checked;
   cb.checked=isChecked;
   const labels=document.querySelectorAll('[id="gl-label-'+eventId+'"]');
-  labels.forEach(lbl=>{lbl.style.background=isChecked?'rgba(232,25,44,0.15)':'rgba(255,255,255,0.06)';lbl.style.border=isChecked?'1px solid rgba(232,25,44,0.4)':'1px solid rgba(255,255,255,0.12)';lbl.style.color=isChecked?'var(--red)':'rgba(255,255,255,0.8)';});
+  labels.forEach(lbl=>{lbl.style.background=isChecked?'rgba(34,197,94,0.15)':'rgba(59,130,246,0.08)';lbl.style.border=isChecked?'1px solid rgba(34,197,94,0.3)':'1px solid rgba(59,130,246,0.2)';lbl.style.color=isChecked?'var(--green)':'var(--blue)';});
   const textEls=document.querySelectorAll('[id="gl-label-text-'+eventId+'"]');
   textEls.forEach(t=>t.textContent=isChecked?'✓ Selected':'Add to guestlist');
   const event=EVENTS.find(e=>e.event_id===eventId);
