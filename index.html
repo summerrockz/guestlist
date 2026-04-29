@@ -860,6 +860,7 @@ async function initApp() {
   document.getElementById("mygl-date").onchange=renderMyGL;
   await loadData(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
   setInterval(loadNotifications,60000);
+  startGlobalAutoRefresh();
 }
 
 async function setupPushNotifications() {
@@ -1798,6 +1799,39 @@ function cpAddCustom(){const date=document.getElementById('cp-custom-date').valu
 function cpRenderCustomList(){const customs=Object.entries(CP_SELECTED).filter(([k])=>k.includes('|custom|'));const wrap=document.getElementById('cp-custom-list');if(!wrap)return;wrap.innerHTML=customs.map(([key,item])=>{const d=new Date(item.dateStr+'T12:00:00');const dayFmt=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.06);border-radius:8px;margin-bottom:4px;font-size:12px;"><span><span style="color:var(--muted);">${dayFmt}</span> · ${item.name}</span><button onclick="cpRemoveCustom('${key}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;">×</button></div>`;}).join('');}
 function cpRemoveCustom(key){delete CP_SELECTED[key];cpRenderCustomList();cpUpdateCount();}
 function cpReset(){CP_SELECTED={};document.getElementById('cp-client-name').value='';document.getElementById('cp-date-from').value='';document.getElementById('cp-date-to').value='';const ef=document.getElementById('cp-custom-extra');if(ef)ef.value='';const customList=document.getElementById('cp-custom-list');if(customList)customList.innerHTML='';cpNextStep(1);}
+
+// GLOBAL AUTO-REFRESH
+let _globalRefreshTimer=null;
+function startGlobalAutoRefresh(){
+  if(_globalRefreshTimer)clearInterval(_globalRefreshTimer);
+  _globalRefreshTimer=setInterval(async()=>{
+    try{
+      const [newEntries,newVip]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("VIP_REQUESTS")]);
+      const entriesChanged=JSON.stringify(newEntries)!==JSON.stringify(ENTRIES);
+      const vipChanged=JSON.stringify(newVip)!==JSON.stringify(VIP_REQUESTS);
+      if(entriesChanged){
+        ENTRIES=newEntries;
+        const active=document.querySelector(".section.active");
+        if(active){
+          const id=active.id;
+          if(id==="section-mygl")renderMyGL();
+          if(id==="section-admin")renderAdminAndRestore();
+          if(id==="section-dashboard")renderDashboard();
+          if(id==="section-calendar")renderCalendar();
+        }
+      }
+      if(vipChanged){
+        VIP_REQUESTS=newVip;
+        const active=document.querySelector(".section.active");
+        if(active){
+          const id=active.id;
+          if(id==="section-vip")renderVipSeller();
+          if(id==="section-vip-admin")renderVipAdmin();
+        }
+      }
+    }catch(e){}
+  },30000);
+}
 
 // PULL TO REFRESH
 let pullStartY=0;
