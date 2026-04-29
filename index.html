@@ -969,12 +969,10 @@ function renderMyGL(){
   const clearBtn=document.getElementById("mygl-date-clear");
   if(dateFilter){const d=new Date(dateFilter+"T12:00:00");if(dateLabel){dateLabel.textContent=d.toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"});dateLabel.style.color="var(--text)";}if(clearBtn)clearBtn.style.display="block";}
   else{if(dateLabel){dateLabel.textContent="All entries";dateLabel.style.color="var(--muted)";}if(clearBtn)clearBtn.style.display="none";}
-  // Apply localStorage cancelled states
-  ENTRIES=ENTRIES.map(e=>{
+  const mine=ENTRIES.map(e=>{
     if(localStorage.getItem('cancelled_'+e.entry_id)==='1')return{...e,status:'cancelled'};
     return e;
-  });
-  const mine=ENTRIES.filter(e=>{
+  }).filter(e=>{
     const sid=String(e.seller_id||"").trim();
     const entryDate=normalizeDate(e.date||"");
     const matchesDate=!dateFilter||entryDate===dateFilter;
