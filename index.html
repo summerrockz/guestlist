@@ -1001,7 +1001,7 @@ async function deleteEntry(entryId,btn){
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
   ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
   renderMyGL();renderDashboard();
-  post({action:"cancel_entry",entry_id:entryId});
+  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
   if(entry){
     const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
