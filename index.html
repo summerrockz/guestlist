@@ -720,7 +720,11 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div id="vip-fields-wrap" style="display:none;">
       <label class="form-label">Name</label>
       <input type="text" class="input-field" id="vip-name" placeholder="Guest name">
-      <div id="vip-date-group"><label class="form-label">Date</label><input type="date" class="input-field" id="vip-date"></div>
+      <div id="vip-date-group"><label class="form-label">Date</label>
+<div style="position:relative;margin-bottom:16px;" onclick="document.getElementById('vip-date').showPicker ? document.getElementById('vip-date').showPicker() : document.getElementById('vip-date').click()">
+  <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:8px;">📅 <span id="vip-date-label" style="color:var(--muted);">Select date</span></div>
+  <input type="date" id="vip-date" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('vip-date-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('vip-date-label').style.color=this.value?'var(--text)':'var(--muted)';">
+</div></div>
       <div id="vip-time-group" style="display:none;"><label class="form-label">Time</label><select class="input-field" id="vip-time"><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option></select></div>
       <label class="form-label">Pax</label>
       <input type="number" class="input-field" id="vip-pax" placeholder="Number of people" min="1">
@@ -1262,9 +1266,20 @@ function filterVipEvents(){
   const q=(document.getElementById("vip-event-search").value||"").toLowerCase().trim();
   const results=document.getElementById("vip-event-results");
   const events=window._currentVipEvents||[];
-  if(!q){results.style.display="none";return;}
+  if(!q){results.style.display="none";
+    // If field is empty, clear selection
+    document.getElementById("vip-event").value="";
+    document.getElementById("vip-event-selected").style.display="none";
+    return;}
   const filtered=events.filter(ev=>ev.label.toLowerCase().includes(q)).slice(0,30);
-  if(!filtered.length){results.innerHTML=`<div style="padding:12px 16px;font-size:13px;color:var(--muted);">No events found</div>`;results.style.display="block";return;}
+  if(!filtered.length){
+    // No match — use typed text as custom event name (no date)
+    document.getElementById("vip-event").value=q+"||";
+    const sel=document.getElementById("vip-event-selected");
+    sel.textContent="✓ "+q+" (custom)";sel.style.display="block";
+    results.style.display="none";
+    return;
+  }
   results.innerHTML=filtered.map(ev=>{const safeVal=ev.value.replace(/"/g,'&quot;');const safeLabel=ev.label.replace(/"/g,'&quot;');return`<div data-val="${safeVal}" data-lbl="${safeLabel}" style="padding:12px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="selectVipEvent(this.dataset.val,this.dataset.lbl)">${ev.label}</div>`;}).join("");
   results.style.display="block";
 }
@@ -1281,7 +1296,7 @@ async function submitVipRequest(){
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
   const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
-  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
+  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select or type an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;if(!eventDate){msg.textContent="Select a date.";return;}}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Sending…";msg.textContent="";
   const request={request_id:genId(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,venue,event_name:eventName,event_date:eventDate,name,pax,ratio:document.getElementById("vip-ratio").value.trim(),nationality:document.getElementById("vip-nationality").value.trim(),special_occasion:document.getElementById("vip-occasion").value.trim(),budget:document.getElementById("vip-budget").value.trim(),preferred_zone:document.getElementById("vip-zone").value.trim(),email:document.getElementById("vip-email").value.trim(),phone:document.getElementById("vip-phone").value.trim(),time:document.getElementById("vip-time").value,dinnershow:document.getElementById("vip-dinnershow").value,type:venue.includes("Lio")?(venue.includes("Restaurant")?"restaurant":"vip_table"):"vip_table",status:"new",price_info:"",notes:"",created_at:new Date().toISOString()};
@@ -1652,6 +1667,8 @@ function openEditVipModal(requestId){
   if(hasEvents&&r.event_name&&r.event_date){selectVipEvent(r.event_name+"||"+r.event_date,r.event_name+" — "+formatDate(r.event_date));}
   document.getElementById("vip-name").value=r.name||"";
   document.getElementById("vip-date").value=r.event_date||"";
+  const vipDateLbl=document.getElementById("vip-date-label");
+  if(vipDateLbl){vipDateLbl.textContent=r.event_date?new Date(r.event_date+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"}):"Select date";vipDateLbl.style.color=r.event_date?"var(--text)":"var(--muted)";}
   document.getElementById("vip-pax").value=r.pax||"";
   document.getElementById("vip-ratio").value=r.ratio||"";
   document.getElementById("vip-nationality").value=r.nationality||"";
@@ -1675,7 +1692,7 @@ async function updateVipRequest(requestId){
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
   const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
-  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
+  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select or type an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Updating…";msg.textContent="";
   const updates={action:"update_vip_request",request_id:requestId,venue,event_name:eventName,event_date:eventDate,name,pax,ratio:document.getElementById("vip-ratio").value.trim(),nationality:document.getElementById("vip-nationality").value.trim(),special_occasion:document.getElementById("vip-occasion").value.trim(),budget:document.getElementById("vip-budget").value.trim(),preferred_zone:document.getElementById("vip-zone").value.trim(),email:document.getElementById("vip-email").value.trim(),phone:document.getElementById("vip-phone").value.trim(),time:document.getElementById("vip-time").value,dinnershow:document.getElementById("vip-dinnershow").value};
