@@ -1372,8 +1372,8 @@ const CLUB_COLORS={"Boat Party":"#3B82F6","Nobu":"#F97316","Ushuaia":"#E8192C","
 function getClubColor(c){return CLUB_COLORS[c]||"#6B7280";}
 function getFormatColor(format){
   const f=(format||'name').trim().toLowerCase();
-  if(f.includes('email'))return'#f97316';
-  return'#3b82f6';
+  if(f.includes('email'))return'#E8192C';
+  return'rgba(255,255,255,0.85)';
 }
 
 let progWeekStart=null;
@@ -1453,10 +1453,9 @@ function buildGLHtml(dayGl,dateStr){
     var closed=ds==='closed';
     var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';
     var ticketInfo=ev.free_condition||(ev.price_after?'€'+ev.price_after+' after':'');
-    var spotsColor=spots!==null&&spots<=10?'var(--red)':'rgba(255,255,255,0.5)';
     var timeHtml=ev.time?'<div style="font-size:11px;color:rgba(255,255,255,0.4);">⏰ '+ev.time+'</div>':'';
     var ticketHtml=ticketInfo?'<span style="color:rgba(255,255,255,0.5);">🎫 '+ticketInfo+'</span>':'';
-    var spotsHtml=spots!==null?'<span style="color:'+spotsColor+';font-weight:600;">👥 '+spots+' spots left</span>':'';
+    var spotsHtml=spots!==null?'<span style="color:var(--red);font-weight:600;">👥 '+spots+' spots left</span>':'';
     var notesHtml=ev.extra_notes?'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">📝 '+ev.extra_notes+'</div>':'';
     var name=(cl.club_name||ev.club_id)+(ev.event_name?' · '+ev.event_name:'');
     var actionHtml=disabled
