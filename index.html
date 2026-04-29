@@ -1014,6 +1014,8 @@ function renderMyGL(){
   }).filter(e=>{
     if(myglSort==='confirmed')return(e.sent_to_club||'').toLowerCase()==='yes';
     if(myglSort==='cancelled')return(e.status||'').toLowerCase()==='cancelled';
+    // Hide cancelled from all other views
+    if((e.status||'').toLowerCase()==='cancelled')return false;
     return true;
   }).sort((a,b)=>{
     if(myglSort==='last'){const pa=a.created_at||'';const pb=b.created_at||'';return pb.localeCompare(pa);}
