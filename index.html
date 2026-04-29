@@ -1688,7 +1688,7 @@ if(SELECTED_EVENTS.length>1){
   document.getElementById("modal-notes").style.display="none";
   document.getElementById("modal-notes").previousElementSibling&&(document.getElementById("modal-notes").previousElementSibling.style.display="none");
   const wrap=document.createElement("div");wrap.id="modal-per-club-notes";
-  wrap.innerHTML=SELECTED_EVENTS.map(sel=>`<label class="form-label" style="margin-top:8px;">📝 Note voor ${sel.club.club_name||sel.clubId}</label><textarea class="input-field" id="club-note-${sel.clubId}" placeholder="Optioneel…" style="min-height:60px;"></textarea>`).join("");
+  wrap.innerHTML=SELECTED_EVENTS.map(sel=>`<label class="form-label" style="margin-top:8px;">📝 Note for ${sel.club.club_name||sel.clubId}</label><textarea class="input-field" id="club-note-${sel.clubId}" placeholder="Optional…" style="min-height:60px;"></textarea>`).join("");
   notesWrap.insertBefore(wrap,document.getElementById("modal-notes"));
 }else{
   document.getElementById("modal-notes").style.display="";
