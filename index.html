@@ -1538,11 +1538,7 @@ function showSuccessModal(names,venues){
 }
 async function goToMyEntries(){
   document.getElementById('success-modal').style.display='none';
-  // Load fresh data with merge to preserve local changes
-  const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);
-  CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;
-  ENTRIES=mergeEntries(_fe);
-  // Manually switch to mygl without triggering loadData again
+  // Switch to mygl immediately with current local data (entry already in ENTRIES)
   document.querySelectorAll(".section").forEach(s=>{s.classList.remove("active");s.style.display="none";});
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   const sec=document.getElementById("section-mygl");
@@ -1550,6 +1546,8 @@ async function goToMyEntries(){
   const navEl=document.getElementById("nav-mygl");
   if(navEl)navEl.classList.add("active");
   renderMyGL();
+  // Refresh from sheet in background
+  try{const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;ENTRIES=mergeEntries(_fe);renderMyGL();}catch(e){}
 }
 function openMoreMenu(){document.getElementById("more-menu").style.display="block";document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("nav-more").classList.add("active");}
 function closeMoreMenu(){document.getElementById("more-menu").style.display="none";}
