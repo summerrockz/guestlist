@@ -1492,17 +1492,21 @@ function showCancelSuccessModal(name){
   btn.textContent='📋 View my entries';
   btn.onclick=goToMyEntries;
   btn.style.display='block';
+  btn.style.opacity='1';
   btn.disabled=false;
   document.getElementById('success-modal').style.display='flex';
 }
 function showEditSuccessModal(name){
-  const modal=document.getElementById('success-modal');
-  document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
-  modal.querySelector('div > div:nth-child(1)').textContent='✏️';
-  modal.querySelector('div > div:nth-child(2)').textContent='Entry updated!';
-  modal.querySelector('button').textContent='📋 View my entries';
-  modal.querySelector('button').onclick=goToMyEntries;
-  modal.style.display='flex';
+  document.getElementById('success-icon').textContent='✏️';
+  document.getElementById('success-title').textContent='Entry updated!';
+  document.getElementById('success-names').innerHTML='<div>'+name+'</div>';
+  var btn=document.getElementById('success-btn');
+  btn.textContent='📋 View my entries';
+  btn.onclick=goToMyEntries;
+  btn.style.display='block';
+  btn.style.opacity='1';
+  btn.disabled=false;
+  document.getElementById('success-modal').style.display='flex';
 }
 function showSuccessModal(names,venues){
   var venueHtml='';
