@@ -1505,6 +1505,8 @@ function showSuccessModal(names,venues){
   btn.textContent='📋 View my entries';
   btn.onclick=goToMyEntries;
   btn.style.display='block';
+  btn.style.opacity='1';
+  btn.disabled=false;
   modal.style.display='flex';
 }
 async function goToMyEntries(){
