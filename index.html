@@ -268,11 +268,14 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div class="section" id="section-mygl">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="section-title" style="margin-bottom:0;">My entries</div>
-        <div style="display:flex;gap:6px;">
-          <button id="mygl-sort-date-btn" onclick="setMyGLSort('date')" style="font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--red);border:1px solid var(--red);color:#fff;cursor:pointer;">By date</button>
-          <button id="mygl-sort-last-btn" onclick="setMyGLSort('last')" style="font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;">Last added</button>
-          <button id="mygl-history-btn" onclick="toggleMyGLHistory()" style="font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);cursor:pointer;">History</button>
-        </div>
+        <select id="mygl-sort-select" onchange="setMyGLSort(this.value)" style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:Poppins,sans-serif;-webkit-appearance:none;appearance:none;padding-right:28px;background-image:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"8\" viewBox=\"0 0 12 8\"><path fill=\"%23ffffff\" d=\"M6 8L0 0h12z\"/></svg>');background-repeat:no-repeat;background-position:right 10px center;">
+          <option value="date_asc">📅 Date (old → new)</option>
+          <option value="date_desc">📅 Date (new → old)</option>
+          <option value="last">🕐 Last added</option>
+          <option value="confirmed">✅ Confirmed</option>
+          <option value="cancelled">🚫 Cancelled</option>
+          <option value="history">📂 History</option>
+        </select>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
         <div style="flex:1;position:relative;" onclick="document.getElementById('mygl-date').showPicker ? document.getElementById('mygl-date').showPicker() : document.getElementById('mygl-date').click()">
@@ -957,13 +960,10 @@ let myglShowHistory=false;
 let myglSort='date';
 function setMyGLSort(sort){
   myglSort=sort;
-  const dateBtn=document.getElementById('mygl-sort-date-btn');
-  const lastBtn=document.getElementById('mygl-sort-last-btn');
-  if(dateBtn){dateBtn.style.background=sort==='date'?'var(--red)':'var(--input-bg)';dateBtn.style.borderColor=sort==='date'?'var(--red)':'var(--border)';dateBtn.style.color=sort==='date'?'#fff':'var(--muted)';}
-  if(lastBtn){lastBtn.style.background=sort==='last'?'var(--red)':'var(--input-bg)';lastBtn.style.borderColor=sort==='last'?'var(--red)':'var(--border)';lastBtn.style.color=sort==='last'?'#fff':'var(--muted)';}
+  myglShowHistory=sort==='history';
   renderMyGL();
 }
-function toggleMyGLHistory(){myglShowHistory=!myglShowHistory;const btn=document.getElementById("mygl-history-btn");if(btn)btn.textContent=myglShowHistory?"Hide history":"History";renderMyGL();}
+function toggleMyGLHistory(){myglShowHistory=!myglShowHistory;renderMyGL();}
 
 function renderMyGL(){
   const dateFilter=document.getElementById("mygl-date").value;
@@ -993,19 +993,27 @@ function renderMyGL(){
     const visible=(e.status||"").toLowerCase()!=="deleted";
     const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
     const yStr=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-    const notTooOld=myglShowHistory||dateFilter||entryDate>=yStr;
+    const notTooOld=myglShowHistory||dateFilter||myglSort==='history'||entryDate>=yStr;
     return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible&&notTooOld;
+  }).filter(e=>{
+    if(myglSort==='confirmed')return(e.sent_to_club||'').toLowerCase()==='yes';
+    if(myglSort==='cancelled')return(e.status||'').toLowerCase()==='cancelled';
+    return true;
   }).sort((a,b)=>{
-    if(myglSort==='last'){
-      const pa=a.created_at||'';const pb=b.created_at||'';
-      return pb.localeCompare(pa);
-    }
+    if(myglSort==='last'){const pa=a.created_at||'';const pb=b.created_at||'';return pb.localeCompare(pa);}
+    if(myglSort==='date_desc')return (b.date||"").localeCompare(a.date||"");
     return (a.date||"").localeCompare(b.date||"");
   });
   if(!mine.length){wrap.innerHTML=`<div class="empty">${dateFilter?"No entries for "+formatDate(dateFilter):"No entries yet."}</div>`;return;}
   const byDateClub={};
-  mine.forEach(e=>{const key=normalizeDate(e.date||"")+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[]};byDateClub[key].entries.push(e);});
-  wrap.innerHTML=Object.values(byDateClub).map(({date:d,club:clubName,entries})=>`
+  if(myglSort==='last'){
+    // For last added: group by created_at date, not event date
+    mine.forEach(e=>{const addedDate=(e.created_at||'').slice(0,10);const key=addedDate+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[],addedDate};byDateClub[key].entries.push(e);});
+  } else {
+    mine.forEach(e=>{const key=normalizeDate(e.date||"")+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[]};byDateClub[key].entries.push(e);});
+  }
+  const groups=myglSort==='last'?Object.values(byDateClub):Object.values(byDateClub);
+  wrap.innerHTML=groups.map(({date:d,club:clubName,entries})=>`
     <div class="day-group-label">${formatDate(d)} · ${clubName} · ${entries.length} entries</div>
     ${entries.map(e=>{const cancelled=(e.status||'').toLowerCase()==='cancelled';const confirmed=(e.sent_to_club||'').toLowerCase()==='yes';return`<div class="gl-card" style="padding:8px 12px;${cancelled?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><span class="gl-guest-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${cancelled?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</span><span class="gl-pax" style="flex-shrink:0;">+${parseInt(e.pax)-1||0}</span>${confirmed?`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);flex-shrink:0;">✓</span>`:''}</div>${cancelled?'':`<div style="display:flex;gap:4px;flex-shrink:0;"><button onclick="openEditEntryModal('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);font-size:11px;font-weight:600;cursor:pointer;">✏️</button><button onclick="deleteEntry('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">✕</button></div>`}</div><div class="gl-meta" style="font-size:11px;margin-top:2px;">${formatDate(normalizeDate(e.date))}${e.email?` · ${e.email}`:''}${e.notes?` · ${e.notes}`:''}</div>${cancelled?`<div style="font-size:10px;color:var(--red);margin-top:2px;">⚠️ Cancelled — notify the club</div>`:''}</div>`;}).join("")}
   `).join("");
