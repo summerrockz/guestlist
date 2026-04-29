@@ -1916,25 +1916,23 @@ function trackLocalChange(entryId, changes){
 }
 
 function mergeEntries(sheetEntries){
+  const sheetIds = new Set(sheetEntries.map(e => e.entry_id));
   const merged = sheetEntries.map(sheetEntry => {
-    // Check localStorage first - most reliable
     const lsKey = 'cancelled_'+sheetEntry.entry_id;
     if(localStorage.getItem(lsKey)==='1'){
       return {...sheetEntry, status:'cancelled'};
     }
     const local = _localChanges[sheetEntry.entry_id];
-    if(!local) return sheetEntry;
-    const age = Date.now() - local.ts;
-    if(age < 60000){
-      return {...sheetEntry, ...local, ts: undefined};
+    if(local){
+      // Entry confirmed in sheet - remove from localChanges
+      delete _localChanges[sheetEntry.entry_id];
     }
-    delete _localChanges[sheetEntry.entry_id];
     return sheetEntry;
   });
-  // Add locally added entries not yet in sheet - avoid duplicates
+  // Keep ALL local entries not yet in sheet - no time limit
   const mergedIds = new Set(merged.map(e => e.entry_id));
   ENTRIES.forEach(localEntry => {
-    if(!mergedIds.has(localEntry.entry_id) && (localEntry.status||'').toLowerCase() !== 'cancelled'){
+    if(!mergedIds.has(localEntry.entry_id) && (localEntry.status||'').toLowerCase() !== 'deleted'){
       merged.push(localEntry);
     }
   });
