@@ -1026,6 +1026,7 @@ async function deleteEntry(entryId,btn){
     // Update local change timestamp to now so merge keeps it protected for another 30s
     trackLocalChange(entryId,{status:"cancelled"});
   }catch(e){console.error("Cancel failed:",e);}
+  showCancelSuccessModal(entry?entry.guest_name:'Entry');
   if(entry){
     const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
@@ -1179,7 +1180,8 @@ const originalModalSubmit=async()=>{
     const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
     if(!names.length){msg.textContent="Enter at least one name.";return;}
     const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";
-    names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});
+    const posts=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return post({action:"add_entry",...entry});});
+    await Promise.all(posts);
     closeModal();btn.disabled=false;btn.textContent="Add to guestlist";
     showSuccessModal(names);renderDashboard();
     notifyClubAdmins(CURRENT_EVENT.club_id,cl.club_name||CURRENT_EVENT.club_id,names.join(", "),names.length,CURRENT_EVENT.event_name||"",formatDate(normalizeDate(CURRENT_EVENT.date||"")));
@@ -1192,8 +1194,10 @@ const originalModalSubmit=async()=>{
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
   const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};
   const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";msg.textContent="";
-  ENTRIES.push(entry);closeModal();showSuccessModal([entry.guest_name]);renderDashboard();
-  post({action:"add_entry",...entry}).finally(()=>{btn.disabled=false;btn.textContent="Add to guestlist";});
+  ENTRIES.push(entry);
+  try{await post({action:"add_entry",...entry});}catch(e){}
+  closeModal();btn.disabled=false;btn.textContent="Add to guestlist";
+  showSuccessModal([entry.guest_name]);renderDashboard();
   notifyClubAdmins(entry.club_id,entry.club_name,entry.guest_name,entry.pax,entry.event_name||"",formatDate(normalizeDate(entry.date||"")));
   const clNotif=CLUBS.find(c=>c.club_id===entry.club_id)||{};
   const adminIdsNotif=String(clNotif.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
@@ -1465,6 +1469,20 @@ function progJumpMonth(monthIndex){const first=new Date(2026,monthIndex,1);const
 
 document.getElementById("logout-btn").onclick=doLogout;
 function doLogout(){localStorage.removeItem("srz_seller");localStorage.removeItem("srz_notif_enabled");window.location.reload();}
+function showCancelSuccessModal(name){
+  document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
+  document.getElementById('success-modal').querySelector('div > div:nth-child(1)').textContent='🚫';
+  document.getElementById('success-modal').querySelector('div > div:nth-child(2)').textContent='Entry cancelled';
+  document.getElementById('success-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('success-modal').style.display='none',2000);
+}
+function showEditSuccessModal(name){
+  document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
+  document.getElementById('success-modal').querySelector('div > div:nth-child(1)').textContent='✏️';
+  document.getElementById('success-modal').querySelector('div > div:nth-child(2)').textContent='Entry updated!';
+  document.getElementById('success-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('success-modal').style.display='none',2000);
+}
 function showSuccessModal(names){
   document.getElementById('success-names').innerHTML=names.map(n=>'<div>'+n+'</div>').join('');
   document.getElementById('success-modal').style.display='flex';
@@ -1607,7 +1625,7 @@ async function updateVipRequest(requestId){
 function clearMultiGL(){SELECTED_EVENTS=[];document.querySelectorAll(".multi-gl-cb,.gl-card-cb").forEach(cb=>{cb.checked=false;});document.getElementById("multi-gl-bar").style.display="none";}
 function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-notes").value="";document.getElementById("modal-msg").textContent="";const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
 function toggleMultiGL(checkbox,eventId,clubId){const event=EVENTS.find(e=>e.event_id===eventId);const club=CLUBS.find(c=>c.club_id===clubId)||{};if(checkbox.checked){SELECTED_EVENTS.push({eventId,clubId,event,club});}else{SELECTED_EVENTS=SELECTED_EVENTS.filter(e=>e.eventId!==eventId);}const bar=document.getElementById("multi-gl-bar");const count=document.getElementById("multi-gl-count");if(SELECTED_EVENTS.length>0){bar.style.display="block";count.textContent=`+ Add to guestlist (${SELECTED_EVENTS.length})`;}else{bar.style.display="none";}}
-async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(!guestName){msg.textContent="Name is required.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});}}// Notify admins for each club
+async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(!guestName){msg.textContent="Name is required.";btn.disabled=false;return;}const _multiPosts=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiPosts.push(post({action:"add_entry",...entry}));}await Promise.all(_multiPosts);}// Notify admins for each club
   const notified=new Set();
   for(const sel of SELECTED_EVENTS){
     if(notified.has(sel.clubId))continue;notified.add(sel.clubId);
