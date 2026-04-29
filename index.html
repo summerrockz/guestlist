@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Poppins", sans-serif; }
+html { height: -webkit-fill-available; }
 
 :root {
   --red: #E8192C;
@@ -28,7 +29,7 @@
   --gold: #F59E0B;
 }
 
-body { background: var(--dark); color: var(--text); min-height: 100vh; }
+body { background: var(--dark); color: var(--text); min-height: 100vh; min-height: -webkit-fill-available; }
 .page { display: none; }
 .page.active { display: block; }
 
@@ -68,7 +69,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
 .header-user { font-size: 12px; color: var(--muted); }
 
 /* ── NAV ── */
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 480px; margin: 0 auto; background: #111; border-top: 1px solid var(--border); display: flex; z-index: 200; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 480px; margin: 0 auto; background: #111; border-top: 1px solid var(--border); display: flex; z-index: 999; padding-bottom: env(safe-area-inset-bottom, 0px); -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform; }
 .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; cursor: pointer; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; border: none; background: none; }
 .nav-item.active { color: var(--red); }
 .nav-icon { font-size: 20px; margin-bottom: 2px; }
@@ -932,7 +933,8 @@ function renderEvents(){
         const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''&&ev.spots_left!==null?parseInt(ev.spots_left):null;
         const isFull=spotsLeft!==null&&spotsLeft<=0;
         const freeText=ev.free_condition?ev.free_condition:(ev.price_after?`€${ev.price_after} ${ev.price_type||""}`:"Free");
-        return`<div class="event-card"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull||(ev.status||"").toLowerCase()==="inactive")?"disabled":""} onclick="${closed||isFull?"":"openModal('"+ev.event_id+"','"+clubId+"')"}">${closed?"Deadline passed":isFull?"Guestlist full":(ev.status||"").toLowerCase()==="inactive"?"Not available":"+ Add to guestlist"}</button></div>`;
+        const isInactive=(ev.status||"").toLowerCase()==="inactive";
+        return`<div class="event-card" style="${isInactive?'opacity:0.55;':''}"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull||(ev.status||"").toLowerCase()==="inactive")?"disabled":""} onclick="${closed||isFull?"":"openModal('"+ev.event_id+"','"+clubId+"')"}">${closed?"Deadline passed":isFull?"Guestlist full":(ev.status||"").toLowerCase()==="inactive"?"Guestlist not available":"+ Add to guestlist"}</button></div>`;
       }).join("");
     }).join("");
   }).join("");
@@ -1376,7 +1378,8 @@ function renderCalendar(){
 }
 function calSelectDay(dateStr){calSelectedDate=dateStr;calActiveView=null;document.getElementById("cal-detail").style.display="block";document.getElementById("cal-detail-title").textContent=formatDate(dateStr);document.getElementById("cal-detail-content").innerHTML="";renderCalendar();setTimeout(()=>document.getElementById("cal-detail").scrollIntoView({behavior:"smooth",block:"nearest"}),100);}
 function calShowMyGL(){calActiveView="mygl";const myId=String(SELLER.seller_id||"").trim();const entries=ENTRIES.filter(e=>normalizeDate(e.date||"")===calSelectedDate&&String(e.seller_id||"").trim()===myId&&(e.status||"").toLowerCase()!=="deleted");const wrap=document.getElementById("cal-detail-content");if(!entries.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No entries for this day.</div>`;return;}const byClub={};entries.forEach(e=>{if(!byClub[e.club_name])byClub[e.club_name]=[];byClub[e.club_name].push(e);});wrap.innerHTML=Object.entries(byClub).map(([clubName,ents])=>`<div class="day-group-label">${clubName} · ${ents.length} entries</div>${ents.map(e=>`<div class="gl-card"><div class="gl-card-top"><div class="gl-guest-name">${e.guest_name}</div><div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div></div>`).join("")}`).join("");}
-function calShowEvents(){calActiveView="events";const dayEvents=EVENTS.filter(e=>normalizeDate(e.date||"")===calSelectedDate);const wrap=document.getElementById("cal-detail-content");if(!dayEvents.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No events this day.</div>`;return;}const club=id=>CLUBS.find(c=>c.club_id===id)||{};wrap.innerHTML=dayEvents.map(ev=>{const cl=club(ev.club_id);const ds=deadlineStatus(cl.deadline,calSelectedDate);const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];const closed=ds==="closed";return`<div class="event-card"><div class="event-card-top"><div><div class="event-club">${cl.club_name||ev.club_id}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><button class="btn-add-gl" ${closed||"(ev.status||'').toLowerCase()==='inactive'"?"disabled":""}onclick="openModal('${ev.event_id}','${ev.club_id}')">${closed?"Deadline passed":"+ Add to guestlist"}</button></div>`;}).join("");}
+function calShowEvents(){calActiveView="events";const dayEvents=EVENTS.filter(e=>normalizeDate(e.date||"")===calSelectedDate);const wrap=document.getElementById("cal-detail-content");if(!dayEvents.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No events this day.</div>`;return;}const club=id=>CLUBS.find(c=>c.club_id===id)||{};wrap.innerHTML=dayEvents.map(ev=>{const cl=club(ev.club_id);const ds=deadlineStatus(cl.deadline,calSelectedDate);const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];const closed=ds==="closed";const isInactive=(ev.status||"").toLowerCase()==="inactive";
+        return`<div class="event-card" style="${isInactive?'opacity:0.55;':''}"><div class="event-card-top"><div><div class="event-club">${cl.club_name||ev.club_id}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><button class="btn-add-gl" ${closed||"(ev.status||'').toLowerCase()==='inactive'"?"disabled":""}onclick="openModal('${ev.event_id}','${ev.club_id}')">${closed?"Deadline passed":"+ Add to guestlist"}</button></div>`;}).join("");}
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calSelectedDate=null;calActiveView=null;document.getElementById("cal-detail").style.display="none";renderCalendar();}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calSelectedDate=null;calActiveView=null;document.getElementById("cal-detail").style.display="none";renderCalendar();}
 
