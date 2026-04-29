@@ -623,16 +623,16 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <button class="nav-item" onclick="showSection('section-products')" id="nav-products"><span class="nav-icon">🌶️</span>SR</button>
     <button class="nav-item" onclick="openMoreMenu()" id="nav-more"><span class="nav-icon">⋯</span>More</button>
   </nav>
+</div>
 
 <!-- SUCCESS MODAL -->
-<div id="success-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
+<div id="success-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
   <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:32px 24px;width:90%;max-width:380px;text-align:center;">
     <div style="font-size:64px;margin-bottom:16px;">✅</div>
     <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Successfully added!</div>
     <div id="success-names" style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:28px;line-height:1.8;"></div>
     <button onclick="goToMyEntries()" style="width:100%;padding:16px;border-radius:999px;background:#E8192C;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">📋 View my entries</button>
   </div>
-</div>
 </div>
 
 <!-- NOTIFICATION INBOX -->
@@ -1184,7 +1184,7 @@ const originalModalSubmit=async()=>{
     if(!names.length){msg.textContent="Enter at least one name.";return;}
     const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";
     const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
-    for(const _e of _entries){await post({action:"add_entry",..._e});}
+    for(const _e of _entries){await post({action:"add_entry",..._e});await new Promise(r=>setTimeout(r,300));}
     closeModal();btn.disabled=false;btn.textContent="Add to guestlist";
     showSuccessModal(names,[(cl.club_name||CURRENT_EVENT.club_id)+' · '+formatDate(normalizeDate(CURRENT_EVENT.date||''))]);renderDashboard();
     notifyClubAdmins(CURRENT_EVENT.club_id,cl.club_name||CURRENT_EVENT.club_id,names.join(", "),names.length,CURRENT_EVENT.event_name||"",formatDate(normalizeDate(CURRENT_EVENT.date||"")));
