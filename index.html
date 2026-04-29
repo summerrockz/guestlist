@@ -1017,15 +1017,11 @@ async function deleteEntry(entryId,btn){
   btn.textContent="Cancelling…";btn.disabled=true;
   const entry=ENTRIES.find(e=>e.entry_id===entryId);
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
-  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
-  trackLocalChange(entryId,{status:"cancelled"});
   localStorage.setItem('cancelled_'+entryId,'1');
-  renderMyGL();renderDashboard();
-  try{
-    await post({action:"cancel_entry",entry_id:entryId});
-    // Update local change timestamp to now so merge keeps it protected for another 30s
-    trackLocalChange(entryId,{status:"cancelled"});
-  }catch(e){console.error("Cancel failed:",e);}
+  trackLocalChange(entryId,{status:"cancelled"});
+  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
+  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+  btn.textContent="Cancel entry";btn.disabled=false;
   showCancelSuccessModal(entry?entry.guest_name:'Entry');
   if(entry){
     const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
@@ -1470,18 +1466,22 @@ function progJumpMonth(monthIndex){const first=new Date(2026,monthIndex,1);const
 document.getElementById("logout-btn").onclick=doLogout;
 function doLogout(){localStorage.removeItem("srz_seller");localStorage.removeItem("srz_notif_enabled");window.location.reload();}
 function showCancelSuccessModal(name){
+  const modal=document.getElementById('success-modal');
   document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
-  document.getElementById('success-modal').querySelector('div > div:nth-child(1)').textContent='🚫';
-  document.getElementById('success-modal').querySelector('div > div:nth-child(2)').textContent='Entry cancelled';
-  document.getElementById('success-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('success-modal').style.display='none',2000);
+  modal.querySelector('div > div:nth-child(1)').textContent='🚫';
+  modal.querySelector('div > div:nth-child(2)').textContent='Entry cancelled';
+  modal.querySelector('button').textContent='📋 View my entries';
+  modal.querySelector('button').onclick=goToMyEntries;
+  modal.style.display='flex';
 }
 function showEditSuccessModal(name){
+  const modal=document.getElementById('success-modal');
   document.getElementById('success-names').innerHTML='<div style="color:rgba(255,255,255,0.5);">'+name+'</div>';
-  document.getElementById('success-modal').querySelector('div > div:nth-child(1)').textContent='✏️';
-  document.getElementById('success-modal').querySelector('div > div:nth-child(2)').textContent='Entry updated!';
-  document.getElementById('success-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('success-modal').style.display='none',2000);
+  modal.querySelector('div > div:nth-child(1)').textContent='✏️';
+  modal.querySelector('div > div:nth-child(2)').textContent='Entry updated!';
+  modal.querySelector('button').textContent='📋 View my entries';
+  modal.querySelector('button').onclick=goToMyEntries;
+  modal.style.display='flex';
 }
 function showSuccessModal(names){
   document.getElementById('success-names').innerHTML=names.map(n=>'<div>'+n+'</div>').join('');
@@ -1489,8 +1489,17 @@ function showSuccessModal(names){
 }
 async function goToMyEntries(){
   document.getElementById('success-modal').style.display='none';
-  await loadData();
-  showSection('section-mygl');
+  // Load fresh data with merge to preserve local changes
+  const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);
+  CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;
+  ENTRIES=mergeEntries(_fe);
+  // Manually switch to mygl without triggering loadData again
+  document.querySelectorAll(".section").forEach(s=>{s.classList.remove("active");s.style.display="none";});
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  const sec=document.getElementById("section-mygl");
+  if(sec){sec.classList.add("active");sec.style.display="block";}
+  const navEl=document.getElementById("nav-mygl");
+  if(navEl)navEl.classList.add("active");
   renderMyGL();
 }
 function openMoreMenu(){document.getElementById("more-menu").style.display="block";document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("nav-more").classList.add("active");}
@@ -1671,7 +1680,7 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
   const submitBtn=document.getElementById("modal-submit");submitBtn.textContent="Add to guestlist";submitBtn.disabled=false;submitBtn.onclick=originalModalSubmit;}
 
 function openEditEntryModal(entryId){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(!entry)return;const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;CURRENT_EVENT=EVENTS.find(e=>e.event_id===entry.event_id)||{club_id:entry.club_id,event_name:entry.event_name,date:entry.date};document.getElementById("modal-club-name").textContent="✏️ Edit — "+(cl.club_name||entry.club_name);document.getElementById("modal-event-info").textContent=(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""));document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";document.getElementById("modal-guest-name").value=entry.guest_name||"";document.getElementById("modal-email").value=entry.email||"";document.getElementById("modal-pax").value=entry.pax||"1";document.getElementById("modal-notes").value=entry.notes||"";document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-msg").textContent="";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();setTimeout(()=>{const fields=document.querySelectorAll(".modal-multi-name");if(fields[0])fields[0].value=entry.guest_name||"";},50);}const btn=document.getElementById("modal-submit");btn.textContent="Save changes";btn.onclick=()=>saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax);document.getElementById("gl-modal").classList.add("open");}
-async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Saving…";let guestName,pax,email;if(nameOnly){const fields=Array.from(document.querySelectorAll(".modal-multi-name"));guestName=fields[0]?.value.trim()||"";pax=1;email="";}else{guestName=document.getElementById("modal-guest-name").value.trim();pax=document.getElementById("modal-pax").value;email=document.getElementById("modal-email").value.trim();}if(!guestName){msg.textContent="Name is required.";btn.disabled=false;btn.textContent="Save changes";return;}const modifiedAt=new Date().toISOString();ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,guest_name:guestName,pax,email,notes,modified_at:modifiedAt}:e);trackLocalChange(entryId,{guest_name:guestName,pax,email,notes,modified_at:modifiedAt});closeModal();renderMyGL();renderDashboard();post({action:"modify_entry",entry_id:entryId,guest_name:guestName,pax,email,notes,modified_at:modifiedAt});btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=originalModalSubmit;}
+async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Saving…";let guestName,pax,email;if(nameOnly){const fields=Array.from(document.querySelectorAll(".modal-multi-name"));guestName=fields[0]?.value.trim()||"";pax=1;email="";}else{guestName=document.getElementById("modal-guest-name").value.trim();pax=document.getElementById("modal-pax").value;email=document.getElementById("modal-email").value.trim();}if(!guestName){msg.textContent="Name is required.";btn.disabled=false;btn.textContent="Save changes";return;}const modifiedAt=new Date().toISOString();ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,guest_name:guestName,pax,email,notes,modified_at:modifiedAt}:e);trackLocalChange(entryId,{guest_name:guestName,pax,email,notes,modified_at:modifiedAt});try{await post({action:"modify_entry",entry_id:entryId,guest_name:guestName,pax,email,notes,modified_at:modifiedAt});}catch(e){}closeModal();renderMyGL();renderDashboard();btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=originalModalSubmit;showEditSuccessModal(guestName);}
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
