@@ -847,7 +847,7 @@ function showSection(id) {
   if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
   if(id==="section-admin"){renderAdminAndRestore();startAdminRefresh();}
   if(id==="section-dashboard")loadData().then(renderDashboard);
-  if(id==="section-vip")loadVipRequests().then(renderVipSeller);
+  if(id==="section-vip"){document.getElementById("vip-list").innerHTML='<div class="loading">Loading…</div>';loadVipRequests().then(renderVipSeller);}
   if(id==="section-vip-admin")loadVipRequests().then(renderVipAdmin);
   if(id==="section-calendar")loadData().then(renderCalendar);
   if(id==="section-products"){loadProducts();loadVenueInfo();}
@@ -1329,7 +1329,9 @@ function renderVipSeller(){
     const st=r.status||"new";
     const priceInfo=(r.price_info||"").trim();
     const hasPrice=priceInfo.length>0;
-    return`<div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}"><div class="vip-card-top"><div><div class="vip-venue-name">${r.venue}</div><div class="vip-event-name">${r.event_name||""} ${r.event_date?"· "+formatDate(r.event_date):""}</div></div><div class="vip-status-badge ${statusClass(st)}">${statusLabel(st)}</div></div><div class="vip-meta">👤 ${r.name} · 👥 ${r.pax} pax${r.ratio?` · ${r.ratio}`:""}${r.nationality?`<br>🌍 ${r.nationality}`:""}${r.budget?`<br>💰 ${r.budget}`:""}</div>${hasPrice?`<div class="vip-price-label">💬 Price info from Summerrockz</div><div class="vip-price-box">${priceInfo}</div><button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipPrices('${r.request_id}')" style="margin-top:10px;">📋 Copy prices</button>`:st==="new"?`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>`:""} ${st!=="cancelled"?`<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}',this)">✕ Cancel</button></div>`:""}</div>`;
+    const sellerStatusLabel=st==="new"?"⏳ Waiting for price":statusLabel(st);
+    const sellerStatusClass=st==="new"?"status-price_sent":statusClass(st);
+    return`<div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}"><div class="vip-card-top"><div><div class="vip-venue-name">${r.venue}</div><div class="vip-event-name">${r.event_name||""} ${r.event_date?"· "+formatDate(r.event_date):""}</div></div><div class="vip-status-badge ${sellerStatusClass}">${sellerStatusLabel}</div></div><div class="vip-meta">👤 ${r.name} · 👥 ${r.pax} pax${r.ratio?` · ${r.ratio}`:""}${r.nationality?`<br>🌍 ${r.nationality}`:""}${r.budget?`<br>💰 ${r.budget}`:""}</div>${hasPrice?`<div class="vip-price-label">💬 Price info from Summerrockz</div><div class="vip-price-box">${priceInfo}</div><button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipPrices('${r.request_id}')" style="margin-top:10px;">📋 Copy prices</button>`:st==="new"?`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>`:""} ${st!=="cancelled"?`<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}',this)">✕ Cancel</button></div>`:""}</div>`;
   }).join("");
 }
 
