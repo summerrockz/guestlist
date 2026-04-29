@@ -1406,7 +1406,7 @@ function renderProgram(){
     const glSection=progView!=='prog'&&glEvents.length>0?'<div style="border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Guestlists</div>'+buildGLHtml(glEvents,dateStr)+'</div>':'';
     html+='<div style="background:var(--card);border:2px solid '+(isToday?'var(--red)':'rgba(255,255,255,0.15)')+';border-radius:var(--radius);padding:14px 16px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+(isToday?'var(--red)':'var(--text)')+';margin-bottom:10px;">'+(isToday?'🔴 ':'')+fullDayName+'</div>'
-      +(progView!=='gl'&&clubs.length>0?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">'+clubs.map(c=>'<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(232,25,44,0.15);color:#E8192C;border:1px solid rgba(232,25,44,0.35);">'+c+'</span>').join('')+'</div>':'')
+      +(progView!=='gl'&&clubs.length>0?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">'+clubs.map(c=>'<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:#E8192C;color:#fff;">'+c+'</span>').join('')+'</div>':'')
       +glSection
       +'</div>';
   }
