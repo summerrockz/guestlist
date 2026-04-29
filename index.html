@@ -1006,8 +1006,13 @@ async function deleteEntry(entryId,btn){
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
   ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
   trackLocalChange(entryId,{status:"cancelled"});
+  localStorage.setItem('cancelled_'+entryId,'1');
   renderMyGL();renderDashboard();
-  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
+  try{
+    await post({action:"cancel_entry",entry_id:entryId});
+    // Update local change timestamp to now so merge keeps it protected for another 30s
+    trackLocalChange(entryId,{status:"cancelled"});
+  }catch(e){console.error("Cancel failed:",e);}
   if(entry){
     const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
@@ -1813,16 +1818,18 @@ function trackLocalChange(entryId, changes){
 }
 
 function mergeEntries(sheetEntries){
-  // Start with sheet data
   const merged = sheetEntries.map(sheetEntry => {
+    // Check localStorage first - most reliable
+    const lsKey = 'cancelled_'+sheetEntry.entry_id;
+    if(localStorage.getItem(lsKey)==='1'){
+      return {...sheetEntry, status:'cancelled'};
+    }
     const local = _localChanges[sheetEntry.entry_id];
     if(!local) return sheetEntry;
-    // If local change is recent (< 30s), keep local status
     const age = Date.now() - local.ts;
-    if(age < 30000){
+    if(age < 60000){
       return {...sheetEntry, ...local, ts: undefined};
     }
-    // Local change is old enough - sheet should have it now, use sheet
     delete _localChanges[sheetEntry.entry_id];
     return sheetEntry;
   });
@@ -1831,7 +1838,7 @@ function mergeEntries(sheetEntries){
     const inSheet = sheetEntries.some(e => e.entry_id === localEntry.entry_id);
     if(!inSheet){
       const age = Date.now() - (new Date(localEntry.created_at||0).getTime());
-      if(age < 60000) merged.push(localEntry); // keep for 60s
+      if(age < 60000) merged.push(localEntry);
     }
   });
   return merged;
@@ -1875,7 +1882,7 @@ function startGlobalAutoRefresh(){
 // PULL TO REFRESH
 let pullStartY=0;
 document.addEventListener("touchstart",e=>{if(window.scrollY===0)pullStartY=e.touches[0].clientY;},{passive:true});
-document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].clientY-pullStartY;if(dist<80)return;const ind=document.createElement("div");ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;";ind.innerHTML="🔄 Refreshing…";document.body.appendChild(ind);await loadData();const active=document.querySelector(".section.active");if(active){const id=active.id;if(id==="section-events")renderEvents();if(id==="section-mygl")renderMyGL();if(id==="section-admin")renderAdminAndRestore();if(id==="section-dashboard")renderDashboard();if(id==="section-vip"){loadVipRequests().then(renderVipSeller);}if(id==="section-vip-admin"){loadVipRequests().then(renderVipAdmin);}}setTimeout(()=>ind.remove(),800);},{passive:true});
+document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].clientY-pullStartY;if(dist<80)return;const ind=document.createElement("div");ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;";ind.innerHTML="🔄 Refreshing…";document.body.appendChild(ind);const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;ENTRIES=mergeEntries(_fe);const active=document.querySelector(".section.active");if(active){const id=active.id;if(id==="section-events")renderEvents();if(id==="section-mygl")renderMyGL();if(id==="section-admin")renderAdminAndRestore();if(id==="section-dashboard")renderDashboard();if(id==="section-vip"){loadVipRequests().then(renderVipSeller);}if(id==="section-vip-admin"){loadVipRequests().then(renderVipAdmin);}}setTimeout(()=>ind.remove(),800);},{passive:true});
 </script>
 
 <!-- Hidden plan card for PDF generation -->
