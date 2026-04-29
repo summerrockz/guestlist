@@ -1456,7 +1456,7 @@ function buildGLHtml(dayGl,dateStr){
     var spotsColor=spots!==null&&spots<=5?'var(--red)':spots!==null&&spots<=15?'var(--amber)':'var(--green)';
     var fc=getFormatColor(cl.format);
     var timeHtml=ev.time?'<div style="font-size:11px;color:var(--muted);">⏰ '+ev.time+'</div>':'';
-    var ticketHtml=ticketInfo?'<span style="color:var(--amber);">🎫 '+ticketInfo+'</span>':'';
+    var ticketHtml=ticketInfo?'<span style="color:var(--muted);">🎫 '+ticketInfo+'</span>':'';
     var spotsHtml=spots!==null?'<span style="color:'+spotsColor+';font-weight:600;">👥 Spots left: '+spots+'</span>':'';
     var notesHtml=ev.extra_notes?'<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📝 '+ev.extra_notes+'</div>':'';
     var name=(cl.club_name||ev.club_id)+(ev.event_name?' · '+ev.event_name:'');
