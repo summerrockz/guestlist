@@ -863,6 +863,7 @@ async function initApp() {
   document.getElementById("mygl-date").onchange=renderMyGL;
   await loadData(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
   setInterval(loadNotifications,60000);
+  startGlobalAutoRefresh();
 }
 
 async function setupPushNotifications() {
@@ -1004,6 +1005,7 @@ async function deleteEntry(entryId,btn){
   const entry=ENTRIES.find(e=>e.entry_id===entryId);
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
   ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+  trackLocalChange(entryId,{status:"cancelled"});
   renderMyGL();renderDashboard();
   try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
   if(entry){
@@ -1621,7 +1623,7 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
   const submitBtn=document.getElementById("modal-submit");submitBtn.textContent="Add to guestlist";submitBtn.disabled=false;submitBtn.onclick=originalModalSubmit;}
 
 function openEditEntryModal(entryId){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(!entry)return;const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;CURRENT_EVENT=EVENTS.find(e=>e.event_id===entry.event_id)||{club_id:entry.club_id,event_name:entry.event_name,date:entry.date};document.getElementById("modal-club-name").textContent="✏️ Edit — "+(cl.club_name||entry.club_name);document.getElementById("modal-event-info").textContent=(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""));document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";document.getElementById("modal-guest-name").value=entry.guest_name||"";document.getElementById("modal-email").value=entry.email||"";document.getElementById("modal-pax").value=entry.pax||"1";document.getElementById("modal-notes").value=entry.notes||"";document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-msg").textContent="";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();setTimeout(()=>{const fields=document.querySelectorAll(".modal-multi-name");if(fields[0])fields[0].value=entry.guest_name||"";},50);}const btn=document.getElementById("modal-submit");btn.textContent="Save changes";btn.onclick=()=>saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax);document.getElementById("gl-modal").classList.add("open");}
-async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Saving…";let guestName,pax,email;if(nameOnly){const fields=Array.from(document.querySelectorAll(".modal-multi-name"));guestName=fields[0]?.value.trim()||"";pax=1;email="";}else{guestName=document.getElementById("modal-guest-name").value.trim();pax=document.getElementById("modal-pax").value;email=document.getElementById("modal-email").value.trim();}if(!guestName){msg.textContent="Name is required.";btn.disabled=false;btn.textContent="Save changes";return;}const modifiedAt=new Date().toISOString();ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,guest_name:guestName,pax,email,notes,modified_at:modifiedAt}:e);closeModal();renderMyGL();renderDashboard();post({action:"modify_entry",entry_id:entryId,guest_name:guestName,pax,email,notes,modified_at:modifiedAt});btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=originalModalSubmit;}
+async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Saving…";let guestName,pax,email;if(nameOnly){const fields=Array.from(document.querySelectorAll(".modal-multi-name"));guestName=fields[0]?.value.trim()||"";pax=1;email="";}else{guestName=document.getElementById("modal-guest-name").value.trim();pax=document.getElementById("modal-pax").value;email=document.getElementById("modal-email").value.trim();}if(!guestName){msg.textContent="Name is required.";btn.disabled=false;btn.textContent="Save changes";return;}const modifiedAt=new Date().toISOString();ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,guest_name:guestName,pax,email,notes,modified_at:modifiedAt}:e);trackLocalChange(entryId,{guest_name:guestName,pax,email,notes,modified_at:modifiedAt});closeModal();renderMyGL();renderDashboard();post({action:"modify_entry",entry_id:entryId,guest_name:guestName,pax,email,notes,modified_at:modifiedAt});btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=originalModalSubmit;}
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
@@ -1801,6 +1803,74 @@ function cpAddCustom(){const date=document.getElementById('cp-custom-date').valu
 function cpRenderCustomList(){const customs=Object.entries(CP_SELECTED).filter(([k])=>k.includes('|custom|'));const wrap=document.getElementById('cp-custom-list');if(!wrap)return;wrap.innerHTML=customs.map(([key,item])=>{const d=new Date(item.dateStr+'T12:00:00');const dayFmt=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.06);border-radius:8px;margin-bottom:4px;font-size:12px;"><span><span style="color:var(--muted);">${dayFmt}</span> · ${item.name}</span><button onclick="cpRemoveCustom('${key}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;">×</button></div>`;}).join('');}
 function cpRemoveCustom(key){delete CP_SELECTED[key];cpRenderCustomList();cpUpdateCount();}
 function cpReset(){CP_SELECTED={};document.getElementById('cp-client-name').value='';document.getElementById('cp-date-from').value='';document.getElementById('cp-date-to').value='';const ef=document.getElementById('cp-custom-extra');if(ef)ef.value='';const customList=document.getElementById('cp-custom-list');if(customList)customList.innerHTML='';cpNextStep(1);}
+
+// GLOBAL AUTO-REFRESH WITH SMART MERGE
+let _globalRefreshTimer=null;
+let _localChanges={};  // track local changes: {entry_id: {status, modified_at}}
+
+function trackLocalChange(entryId, changes){
+  _localChanges[entryId]={...(changes||{}), ts: Date.now()};
+}
+
+function mergeEntries(sheetEntries){
+  // Start with sheet data
+  const merged = sheetEntries.map(sheetEntry => {
+    const local = _localChanges[sheetEntry.entry_id];
+    if(!local) return sheetEntry;
+    // If local change is recent (< 30s), keep local status
+    const age = Date.now() - local.ts;
+    if(age < 30000){
+      return {...sheetEntry, ...local, ts: undefined};
+    }
+    // Local change is old enough - sheet should have it now, use sheet
+    delete _localChanges[sheetEntry.entry_id];
+    return sheetEntry;
+  });
+  // Add locally added entries not yet in sheet
+  ENTRIES.forEach(localEntry => {
+    const inSheet = sheetEntries.some(e => e.entry_id === localEntry.entry_id);
+    if(!inSheet){
+      const age = Date.now() - (new Date(localEntry.created_at||0).getTime());
+      if(age < 60000) merged.push(localEntry); // keep for 60s
+    }
+  });
+  return merged;
+}
+
+function startGlobalAutoRefresh(){
+  if(_globalRefreshTimer)clearInterval(_globalRefreshTimer);
+  _globalRefreshTimer=setInterval(async()=>{
+    try{
+      const [newEntries, newVip] = await Promise.all([
+        fetchSheet("GL_ENTRIES"),
+        fetchSheet("VIP_REQUESTS")
+      ]);
+      const mergedEntries = mergeEntries(newEntries);
+      const entriesChanged = JSON.stringify(mergedEntries) !== JSON.stringify(ENTRIES);
+      const vipChanged = JSON.stringify(newVip) !== JSON.stringify(VIP_REQUESTS);
+      if(entriesChanged){
+        ENTRIES = mergedEntries;
+        const active = document.querySelector(".section.active");
+        if(active){
+          const id = active.id;
+          if(id==="section-mygl") renderMyGL();
+          if(id==="section-admin") renderAdminAndRestore();
+          if(id==="section-dashboard") renderDashboard();
+          if(id==="section-calendar") renderCalendar();
+        }
+      }
+      if(vipChanged){
+        VIP_REQUESTS = newVip;
+        const active = document.querySelector(".section.active");
+        if(active){
+          const id = active.id;
+          if(id==="section-vip") renderVipSeller();
+          if(id==="section-vip-admin") renderVipAdmin();
+        }
+      }
+    }catch(e){}
+  },30000);
+}
 
 // PULL TO REFRESH
 let pullStartY=0;
