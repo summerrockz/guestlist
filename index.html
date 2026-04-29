@@ -241,7 +241,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-stat"><div class="dash-stat-val" id="stat-total">–</div><div class="dash-stat-label">Total this week</div></div>
         </div>
         <div id="addgl-dash-card" class="dash-card" onclick="showSection('section-program')"><div class="dash-card-title">➕ Add Guestlist</div><div class="dash-card-sub">SR Events + Guestlist</div></div>
-        <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Table requests</div><div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div></div>
+        <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Table requests</div><div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS & Lio</div></div>
         <div id="admin-dash-card" class="dash-card" onclick="showSection('section-admin')" style="display:none;"><div class="dash-card-title">📤 Admin export</div><div class="dash-card-sub">Export guestlists per club</div></div>
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
@@ -385,7 +385,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="setVipPriceVenue('Hi')" class="prog-month-btn active" id="vpp-Hi">Hi</button>
         <button onclick="setVipPriceVenue('Ushuaia')" class="prog-month-btn" id="vpp-Ushuaia">Ushuaia</button>
         <button onclick="setVipPriceVenue('UNVRS')" class="prog-month-btn" id="vpp-UNVRS">UNVRS</button>
-        <button onclick="setVipPriceVenue('Chinois')" class="prog-month-btn" id="vpp-Chinois">Chinois</button>
         <button onclick="setVipPriceVenue('Lio')" class="prog-month-btn" id="vpp-Lio">Lio</button>
       </div>
       <div id="vip-prices-list"><div class="loading">Loading…</div></div>
@@ -708,7 +707,6 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <option value="Hi Ibiza">Hï Ibiza</option>
       <option value="Ushuaia">Ushuaïa</option>
       <option value="UNVRS">UNVRS</option>
-      <option value="Chinois">Chinois</option>
       <option value="Lio VIP">Lio — VIP Table</option>
       <option value="Lio Restaurant">Lio — Restaurant</option>
     </select>
@@ -797,12 +795,7 @@ const VIP_EVENTS = {
     {name:"Adriatique presents X",dates:["2026-09-17","2026-09-24"]},
     {name:"Indira Paganotto presents ARTCORE",dates:["2026-10-09"]}
   ],
-  "Chinois": [
-    {name:"Defected",dates:["2026-05-07","2026-05-14","2026-05-21","2026-05-28","2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24","2026-10-01","2026-10-08"]},
-    {name:"Claptone: The Masquerade",dates:["2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
-    {name:"Major League DJz Presents Echoes of Tomorrow",dates:["2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
-    {name:"Bedouin Presents Saga",dates:["2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]}
-  ]
+  "Chinois": []
 };
 
 function today() { return new Date().toISOString().slice(0,10); }
@@ -1255,7 +1248,7 @@ function closeVipModal(){document.getElementById("vip-modal").classList.remove("
 function onVenueChange(){
   const venue=document.getElementById("vip-venue").value;
   if(!venue){document.getElementById("vip-event-group").style.display="none";document.getElementById("vip-fields-wrap").style.display="none";return;}
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
   document.getElementById("vip-event-group").style.display=hasEvents?"block":"none";
   if(hasEvents){document.getElementById("vip-event-search").value="";document.getElementById("vip-event").value="";document.getElementById("vip-event-results").style.display="none";document.getElementById("vip-event-selected").style.display="none";window._currentVipEvents=[];const evList=VIP_EVENTS[venue]||[];evList.forEach(ev=>{ev.dates.forEach(d=>{window._currentVipEvents.push({label:`${ev.name} — ${formatDate(d)}`,value:`${ev.name}||${d}`});});});}
   document.getElementById("vip-fields-wrap").style.display="block";
@@ -1288,7 +1281,7 @@ async function submitVipRequest(){
   if(!name){msg.textContent="Name is required.";return;}
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
   if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;if(!eventDate){msg.textContent="Select a date.";return;}}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Sending…";msg.textContent="";
@@ -1656,7 +1649,7 @@ function toggleGLCard(eventId,clubId,labelEl){
 function openEditVipModal(requestId){
   const r=window._vipRequestsMap&&window._vipRequestsMap[requestId];if(!r)return;
   document.getElementById("vip-venue").value=r.venue;onVenueChange();
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(r.venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(r.venue);
   if(hasEvents&&r.event_name&&r.event_date){selectVipEvent(r.event_name+"||"+r.event_date,r.event_name+" — "+formatDate(r.event_date));}
   document.getElementById("vip-name").value=r.name||"";
   document.getElementById("vip-date").value=r.event_date||"";
@@ -1682,7 +1675,7 @@ async function updateVipRequest(requestId){
   if(!name){msg.textContent="Name is required.";return;}
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
   if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Updating…";msg.textContent="";
