@@ -1614,7 +1614,7 @@ function toggleGLCard(eventId,clubId,labelEl){
     if(SELECTED_EVENTS.some(e=>e.eventId===eventId))return;
     if(SELECTED_EVENTS.length>0){
       const firstClub=CLUBS.find(c=>c.club_id===SELECTED_EVENTS[0].clubId)||{};
-      const normalize=f=>(f||'name').trim().toLowerCase().replace(/\s+/g,' ');
+      const normalize=f=>{const s=(f||'name').trim().toLowerCase();if(s.includes('email'))return'email';if(s==='name')return'name';return s;};
       if(normalize(firstClub.format)!==normalize(club.format)){
         cb.checked=false;
         labels.forEach(lbl=>{lbl.style.background='rgba(232,25,44,0.08)';lbl.style.border='1px solid rgba(232,25,44,0.2)';lbl.style.color='var(--red)';});
