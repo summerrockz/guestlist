@@ -241,9 +241,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <div class="dash-stat"><div class="dash-stat-val" id="stat-total">–</div><div class="dash-stat-label">Total this week</div></div>
         </div>
         <div id="addgl-dash-card" class="dash-card" onclick="showSection('section-program')"><div class="dash-card-title">➕ Add Guestlist</div><div class="dash-card-sub">SR Events + Guestlist</div></div>
-        <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Table requests</div><div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS & Lio</div></div>
+        <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Table requests</div><div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div></div>
         <div id="admin-dash-card" class="dash-card" onclick="showSection('section-admin')" style="display:none;"><div class="dash-card-title">📤 Admin export</div><div class="dash-card-sub">Export guestlists per club</div></div>
-        <div id="vip-mgmt-dash-card" class="dash-card" onclick="showSection('section-vip-admin')" style="display:none;"><div class="dash-card-title">🍾 VIP Management</div><div class="dash-card-sub">Manage all VIP table requests</div></div>
         <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
       </div>
@@ -386,6 +385,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="setVipPriceVenue('Hi')" class="prog-month-btn active" id="vpp-Hi">Hi</button>
         <button onclick="setVipPriceVenue('Ushuaia')" class="prog-month-btn" id="vpp-Ushuaia">Ushuaia</button>
         <button onclick="setVipPriceVenue('UNVRS')" class="prog-month-btn" id="vpp-UNVRS">UNVRS</button>
+        <button onclick="setVipPriceVenue('Chinois')" class="prog-month-btn" id="vpp-Chinois">Chinois</button>
         <button onclick="setVipPriceVenue('Lio')" class="prog-month-btn" id="vpp-Lio">Lio</button>
       </div>
       <div id="vip-prices-list"><div class="loading">Loading…</div></div>
@@ -400,7 +400,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="setVipProcessTab('faq')" id="vpt-faq" style="flex:1;padding:8px;border-radius:999px;border:none;font-size:10px;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted);">FAQ</button>
         <button onclick="setVipProcessTab('commissions')" id="vpt-commissions" style="flex:1;padding:8px;border-radius:999px;border:none;font-size:10px;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted);">Commission</button>
       </div>
-      <div id="vpt-content-request"><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Hi Ibiza · Ushuaia · UNVRS</div><div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">Full name:<br>Club:<br>Event:<br>Date:<br>Pax:<br>Ratio:<br>Nationality:<br>Special occasion:<br>Budget:</div><button onclick="copyVipTemplate('hi')" id="copy-hi-btn" class="btn-copy" style="margin-top:14px;">Copy template</button></div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Lio</div><div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">Name:<br>Club:<br>Event:<br>Date:<br>Pax:<br>Budget:<br>Preferred zone:<br>Email:<br>Phone number:</div><button onclick="copyVipTemplate('lio')" id="copy-lio-btn" class="btn-copy" style="margin-top:14px;">Copy template</button></div></div>
+      <div id="vpt-content-request"><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Hi Ibiza · Ushuaia · UNVRS</div><div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">Full name:<br>Club:<br>Event:<br>Date:<br>Pax:<br>Ratio:<br>Nationality:<br>Special occasion:<br>Budget:</div><button onclick="copyVipTemplate('hi')" id="copy-hi-btn" class="btn-copy" style="margin-top:14px;">Copy template</button></div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Chinois · Lio</div><div style="font-size:13px;line-height:2;color:rgba(255,255,255,0.85);">Name:<br>Club:<br>Event:<br>Date:<br>Pax:<br>Budget:<br>Preferred zone:<br>Email:<br>Phone number:</div><button onclick="copyVipTemplate('lio')" id="copy-lio-btn" class="btn-copy" style="margin-top:14px;">Copy template</button></div></div>
       <div id="vpt-content-process" style="display:none;">
         <div style="display:flex;gap:14px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">1</div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Check VIP Prices first</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">Before sending a request, always check the <strong style="color:var(--text);">VIP Prices</strong> section first. Prices may already be available — this saves time and avoids unnecessary requests.</div></div></div>
         <div style="display:flex;gap:14px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">2</div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Not available? Send a request</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">If no prices are shown yet, send a VIP table request to the manager. Rates will be sent back to you based on your request.</div></div></div>
@@ -408,7 +408,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div style="display:flex;gap:14px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">4</div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Table confirmed</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">When the rate/table is confirmed, we receive a payment link.</div></div></div>
         <div style="display:flex;gap:14px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">5</div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Send payment link</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">We send you the payment link on WhatsApp. You forward it to the client — always 50% deposit.</div></div></div>
         <div style="display:flex;gap:14px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">6</div><div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;"><div style="font-size:14px;font-weight:600;margin-bottom:4px;">Monitor payment</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">You can monitor the link yourself to see if the client paid or not. Once paid — VIP TABLE BOOKED!</div></div></div>
-        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:6px;">Payment links</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;">For <strong>Hi, UNVRS &amp; Ushuaia</strong> — you receive the link from Rowan on WhatsApp.<br>For <strong>Lio</strong> — the client receives the link to pay by email.</div></div>
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);padding:14px;"><div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:6px;">Payment links</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;">For <strong>Hi, UNVRS &amp; Ushuaia</strong> — you receive the link from Rowan on WhatsApp.<br>For <strong>Lio &amp; Chinois</strong> — the client receives the link to pay by email.</div></div>
       </div>
       <div id="vpt-content-faq" style="display:none;">
         <div style="display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:var(--red);min-width:20px;">1.</div><div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.55;">You cannot send one request for multiple tables or venues.</div></div>
@@ -661,7 +661,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     
     <button onclick="moreNav('section-vip-prices')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">💶</span><div><div>VIP Prices</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Current table prices per venue</div></div></button>
     <button onclick="moreNav('section-vip-process')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🍾</span><div><div>VIP Process</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">How to request, FAQ & rates</div></div></button>
-    <button onclick="moreNav('section-vip-admin')" id="more-vip-admin" style="display:none;width:100%;display:none;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🍾</span><div><div>VIP Management</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Manage all VIP table requests</div></div></button>
+    <button onclick="moreNav('section-createprog')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">📋</span><div><div>Create Program</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Generate a personalised client program PDF</div></div></button>
     <button onclick="doLogout()" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;color:rgba(232,25,44,0.85);cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🚪</span><div>Log out</div></button>
   </div>
 </div>
@@ -708,11 +708,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <option value="Hi Ibiza">Hï Ibiza</option>
       <option value="Ushuaia">Ushuaïa</option>
       <option value="UNVRS">UNVRS</option>
+      <option value="Chinois">Chinois</option>
       <option value="Lio VIP">Lio — VIP Table</option>
       <option value="Lio Restaurant">Lio — Restaurant</option>
     </select>
     <div id="vip-event-group" style="display:none;">
-      <label class="form-label">Event & Date</label>
+      <label class="form-label">Event</label>
       <input type="text" class="input-field" id="vip-event-search" placeholder="Search event…" oninput="filterVipEvents()" autocomplete="off" style="margin-bottom:6px;">
       <div id="vip-event-results" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
       <input type="hidden" id="vip-event" value="">
@@ -721,11 +722,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div id="vip-fields-wrap" style="display:none;">
       <label class="form-label">Name</label>
       <input type="text" class="input-field" id="vip-name" placeholder="Guest name">
-      <div id="vip-date-group"><label class="form-label">Date</label>
-<div style="position:relative;margin-bottom:16px;" onclick="document.getElementById('vip-date').showPicker ? document.getElementById('vip-date').showPicker() : document.getElementById('vip-date').click()">
-  <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:999px;padding:13px 16px;font-size:13px;cursor:pointer;min-height:46px;display:flex;align-items:center;gap:8px;">📅 <span id="vip-date-label" style="color:var(--muted);">Select date</span></div>
-  <input type="date" id="vip-date" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" onchange="document.getElementById('vip-date-label').textContent=this.value?new Date(this.value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Select date';document.getElementById('vip-date-label').style.color=this.value?'var(--text)':'var(--muted)';">
-</div></div>
+      <div id="vip-date-group"><label class="form-label">Date</label><input type="date" class="input-field" id="vip-date"></div>
       <div id="vip-time-group" style="display:none;"><label class="form-label">Time</label><select class="input-field" id="vip-time"><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option></select></div>
       <label class="form-label">Pax</label>
       <input type="number" class="input-field" id="vip-pax" placeholder="Number of people" min="1">
@@ -755,51 +752,44 @@ let vipFilter = 'all', vipAdminFilter = 'all';
 
 const VIP_EVENTS = {
   "Hi Ibiza": [
-    {name:"CamelPhat",dates:["2026-05-01","2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
+    {name:"Hï Ibiza Opening Party",dates:["2026-04-25"]},
+    {name:"CamelPhat",dates:["2026-05-01","2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
     {name:"Argy & ARTBAT",dates:["2026-05-07","2026-05-14","2026-05-21","2026-05-28"]},
     {name:"Paco Osuna presents NOW HERE",dates:["2026-05-17"]},
     {name:"MEDUZA & James Hype Present Our House",dates:["2026-05-27","2026-06-03","2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-22","2026-07-29","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
-    {name:"Black Coffee",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
-    {name:"MESTIZA",dates:["2026-05-31","2026-06-07","2026-06-14","2026-06-21","2026-06-28","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]},
     {name:"Francis Mercier presents Solèy",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
     {name:"Eastenderz",dates:["2026-06-02","2026-06-09","2026-06-16","2026-06-23","2026-06-30","2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25","2026-09-01","2026-09-08","2026-09-15","2026-09-22","2026-09-29","2026-10-06"]},
     {name:"Dom Dolla",dates:["2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28"]},
-    {name:"Hugel Presents Make The Girls Dance",dates:["2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]}
+    {name:"Hugel Presents Make The Girls Dance",dates:["2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]},
+    {name:"MESTIZA",dates:["2026-05-31","2026-06-07","2026-06-14","2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]},
+    {name:"Black Coffee",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]}
   ],
   "Ushuaia": [
-    {name:"I Love Reggaeton Ibiza",dates:["2026-05-03","2026-05-10","2026-05-17","2026-05-24","2026-05-31","2026-06-07"]},
+    {name:"Ushuaïa Ibiza Opening Party",dates:["2026-04-26"]},
     {name:"ANTS",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
-    {name:"Tomorrowland and Dimitri Vegas & Like Mike",dates:["2026-05-06","2026-05-13","2026-05-20","2026-05-27","2026-06-03","2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-29","2026-08-05","2026-08-19","2026-08-26","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
+    {name:"I Love Reggaeton Ibiza",dates:["2026-05-03","2026-05-10","2026-05-17","2026-05-24","2026-05-31","2026-06-07"]},
+    {name:"Tomorrowland & Dimitri Vegas & Like Mike",dates:["2026-05-06","2026-05-13","2026-05-20","2026-05-27","2026-06-03","2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-29","2026-08-05","2026-08-19","2026-08-26","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
     {name:"Calvin Harris",dates:["2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
-    {name:"Calvin Harris (Tuesday)",dates:["2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25"]},
     {name:"F*** Me I'm Famous! by David Guetta",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
-    {name:"Armin van Buuren",dates:["2026-06-18"]},
-    {name:"J Balvin & DJ Snake",dates:["2026-06-14","2026-06-21"]},
-    {name:"Ozuna",dates:["2026-06-16","2026-06-23","2026-06-30"]},
-    {name:"Hugel presents Make the Girls Dance Day",dates:["2026-06-25"]},
     {name:"Swedish House Mafia",dates:["2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13"]},
-    {name:"Martin Garrix",dates:["2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]},
-    {name:"elrow Ushuaïa Ibiza",dates:["2026-07-22","2026-08-12","2026-09-02"]}
+    {name:"Martin Garrix",dates:["2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24"]}
   ],
   "UNVRS": [
-    {name:"ANTS",dates:["2026-05-02","2026-05-09","2026-05-16","2026-05-23","2026-05-30"]},
-    {name:"Charlotte de Witte",dates:["2026-05-29"]},
-    {name:"No Art Ibiza",dates:["2026-05-24","2026-09-29"]},
+    {name:"[UNVRS] Opening Party",dates:["2026-04-26"]},
     {name:"John Summit presents Experts Only",dates:["2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27"]},
     {name:"FISHER",dates:["2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10"]},
-    {name:"David Guetta Presents Galactic Circus",dates:["2026-06-05","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
-    {name:"elrow Ibiza",dates:["2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
     {name:"ANYMA",dates:["2026-06-09","2026-06-16","2026-06-23","2026-06-30","2026-07-07","2026-07-14","2026-07-21","2026-07-28","2026-08-04","2026-08-11","2026-08-18","2026-08-25","2026-09-01","2026-09-08","2026-09-15"]},
-    {name:"Jamie Jones presents Paradise: Starship Eden",dates:["2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-22","2026-07-29","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30","2026-10-07"]},
-    {name:"Peggy Gou presents Midnight Lobster Club",dates:["2026-06-12"]},
-    {name:"ANOTR",dates:["2026-06-14"]},
     {name:"Carl Cox",dates:["2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]},
+    {name:"Jamie Jones presents Paradise",dates:["2026-06-10","2026-06-17","2026-06-24","2026-07-01","2026-07-08","2026-07-15","2026-07-22","2026-07-29","2026-08-05","2026-08-12","2026-08-19","2026-08-26","2026-09-02","2026-09-09","2026-09-16","2026-09-23","2026-09-30"]},
     {name:"Tiësto",dates:["2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31"]},
-    {name:"Armin van Buuren presents A State of Trance",dates:["2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]},
-    {name:"Black Coffee",dates:["2026-05-27","2026-09-22","2026-10-01"]},
-    {name:"Adriatique presents X",dates:["2026-09-17","2026-09-24"]},
-    {name:"Indira Paganotto presents ARTCORE",dates:["2026-10-09"]}
+    {name:"Armin van Buuren presents A State of Trance",dates:["2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05"]}
   ],
+  "Chinois": [
+    {name:"Defected",dates:["2026-05-07","2026-05-14","2026-05-21","2026-05-28","2026-06-04","2026-06-11","2026-06-18","2026-06-25","2026-07-02","2026-07-09","2026-07-16","2026-07-23","2026-07-30","2026-08-06","2026-08-13","2026-08-20","2026-08-27","2026-09-03","2026-09-10","2026-09-17","2026-09-24","2026-10-01","2026-10-08"]},
+    {name:"Claptone: The Masquerade",dates:["2026-05-23","2026-05-30","2026-06-06","2026-06-13","2026-06-20","2026-06-27","2026-07-04","2026-07-11","2026-07-18","2026-07-25","2026-08-01","2026-08-08","2026-08-15","2026-08-22","2026-08-29","2026-09-05","2026-09-12","2026-09-19","2026-09-26","2026-10-03"]},
+    {name:"Major League DJz Presents Echoes of Tomorrow",dates:["2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02"]},
+    {name:"Bedouin Presents Saga",dates:["2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"]}
+  ]
 };
 
 function today() { return new Date().toISOString().slice(0,10); }
@@ -846,7 +836,7 @@ function showSection(id) {
   if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
   if(id==="section-admin"){renderAdminAndRestore();startAdminRefresh();}
   if(id==="section-dashboard")loadData().then(renderDashboard);
-  if(id==="section-vip"){document.getElementById("vip-list").innerHTML='<div class="loading">Loading…</div>';loadVipRequests().then(renderVipSeller);}
+  if(id==="section-vip")loadVipRequests().then(renderVipSeller);
   if(id==="section-vip-admin")loadVipRequests().then(renderVipAdmin);
   if(id==="section-calendar")loadData().then(renderCalendar);
   if(id==="section-products"){loadProducts();loadVenueInfo();}
@@ -934,10 +924,6 @@ function renderDashboard(){
   const isClubAdmin=CLUBS.some(c=>String(c.admin_id||"").split(",").map(x=>String(x).trim()).includes(String(myId)));
   const exportCard=document.getElementById("admin-dash-card");
   if(exportCard)exportCard.style.display=isClubAdmin?"block":"none";
-  const vipAdminBtn=document.getElementById("more-vip-admin");
-  if(vipAdminBtn)vipAdminBtn.style.display="none";
-  const vipMgmtCard=document.getElementById("vip-mgmt-dash-card");
-  if(vipMgmtCard)vipMgmtCard.style.display=String(myId)==="1"?"block":"none";
 }
 
 function renderEvents(){
@@ -1013,8 +999,6 @@ function renderMyGL(){
   }).filter(e=>{
     if(myglSort==='confirmed')return(e.sent_to_club||'').toLowerCase()==='yes';
     if(myglSort==='cancelled')return(e.status||'').toLowerCase()==='cancelled';
-    // Hide cancelled from all other views
-    if((e.status||'').toLowerCase()==='cancelled')return false;
     return true;
   }).sort((a,b)=>{
     if(myglSort==='last'){const pa=a.created_at||'';const pb=b.created_at||'';return pb.localeCompare(pa);}
@@ -1032,7 +1016,7 @@ function renderMyGL(){
   const groups=myglSort==='last'?Object.values(byDateClub):Object.values(byDateClub);
   wrap.innerHTML=groups.map(({date:d,club:clubName,entries})=>`
     <div class="day-group-label">${formatDate(d)} · ${clubName} · ${entries.length} entries</div>
-    ${entries.map(e=>{const cancelled=(e.status||'').toLowerCase()==='cancelled';const confirmed=(e.sent_to_club||'').toLowerCase()==='yes';return`<div class="gl-card" style="padding:8px 12px;${cancelled?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><span class="gl-guest-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${cancelled?'color:var(--muted);':''}">${e.guest_name}</span><span class="gl-pax" style="flex-shrink:0;">+${parseInt(e.pax)-1||0}</span>${confirmed?`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);flex-shrink:0;">✓</span>`:''}</div>${cancelled?'':`<div style="display:flex;gap:4px;flex-shrink:0;"><button onclick="openEditEntryModal('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);font-size:11px;font-weight:600;cursor:pointer;">✏️</button><button onclick="deleteEntry('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">✕</button></div>`}</div><div class="gl-meta" style="font-size:11px;margin-top:2px;">${formatDate(normalizeDate(e.date))}${e.email?` · ${e.email}`:''}${e.notes?` · ${e.notes}`:''}</div>${cancelled?`<div style="font-size:10px;color:var(--red);margin-top:2px;">⚠️ Cancelled — notify the club</div>`:''}</div>`;}).join("")}
+    ${entries.map(e=>{const cancelled=(e.status||'').toLowerCase()==='cancelled';const confirmed=(e.sent_to_club||'').toLowerCase()==='yes';return`<div class="gl-card" style="padding:8px 12px;${cancelled?'opacity:0.5;border-color:rgba(232,25,44,0.3);':''}"><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;"><span class="gl-guest-name" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${cancelled?'text-decoration:line-through;color:var(--muted);':''}">${e.guest_name}</span><span class="gl-pax" style="flex-shrink:0;">+${parseInt(e.pax)-1||0}</span>${confirmed?`<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:999px;background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);flex-shrink:0;">✓</span>`:''}</div>${cancelled?'':`<div style="display:flex;gap:4px;flex-shrink:0;"><button onclick="openEditEntryModal('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--blue);font-size:11px;font-weight:600;cursor:pointer;">✏️</button><button onclick="deleteEntry('${e.entry_id}',this)" style="padding:4px 8px;border-radius:999px;background:rgba(232,25,44,0.15);border:1px solid rgba(232,25,44,0.3);color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">✕</button></div>`}</div><div class="gl-meta" style="font-size:11px;margin-top:2px;">${formatDate(normalizeDate(e.date))}${e.email?` · ${e.email}`:''}${e.notes?` · ${e.notes}`:''}</div>${cancelled?`<div style="font-size:10px;color:var(--red);margin-top:2px;">⚠️ Cancelled — notify the club</div>`:''}</div>`;}).join("")}
   `).join("");
 }
 
@@ -1127,8 +1111,7 @@ function renderAdmin(){
       const paxNum=parseInt(e.pax)||1;const plusPax=paxNum>1?` +${paxNum-1}`:"";
       const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
       const notesPart=e.notes&&!e.notes.includes("🍹")?` · ${e.notes}`:"";
-      const hasNotes=!!(e.notes&&!e.notes.includes("🍹")&&e.notes.trim());
-      const line=`${e.guest_name}${plusPax}${emailPart}`;
+      const line=`${e.guest_name}${plusPax}${emailPart}${notesPart}`;
       const copyLine=`${e.guest_name}${plusPax}${emailPart}`;
       const sentKey="sent_"+cardKey+"_"+e.entry_id;
       const isSent=(e.sent_to_club||"").toLowerCase()==="yes"||localStorage.getItem(sentKey)==="1";
@@ -1137,13 +1120,11 @@ function renderAdmin(){
       const effectivelySent=isSent&&!isModified;
       const rowOpacity=isCancelled?"0.5":(effectivelySent?"0.4":"1");
       const checkbox=!isCancelled?`<input type="checkbox" ${effectivelySent?"checked":""} style="width:16px;height:16px;accent-color:#22C55E;cursor:pointer;flex-shrink:0;" onchange="this.closest('div').style.opacity=this.checked?'0.4':'1';markEntrySent('${e.entry_id}',this.checked)" data-key="${sentKey}" class="admin-entry-cb">`:`<span style="color:#E8192C;font-size:13px;">✕</span>`;
-      const textStyle=isCancelled?"color:#E8192C;":"";
+      const textStyle=isCancelled?"text-decoration:line-through;color:#E8192C;":"";
       const text=isCancelled?line+" ⚠️ CANCELLED":line;
       const newBadge=isModified&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(59,130,246,0.2);color:var(--blue);border:1px solid rgba(59,130,246,0.4);flex-shrink:0;">MODIFIED</span>`:isNew&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.4);flex-shrink:0;">NEW</span>`:"";
       const sellerTag=e.seller_name?`<span style="font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;">${e.seller_name}</span>`:"";
-      const notesBtn=hasNotes?`<button onclick="showNotePopup(event,'${(e.notes||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--amber);border-radius:999px;padding:1px 6px;font-size:11px;cursor:pointer;flex-shrink:0;" title="${(e.notes||'').replace(/"/g,'&quot;')}">📝</button>`:"";
-      const rightSide = `<div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">${newBadge}${notesBtn}${sellerTag}</div>`;
-      return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span data-copy="${copyLine}" data-cancelled="${isCancelled}" style="font-family:monospace;font-size:11px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${rightSide}</div>`;
+      return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span data-copy="${copyLine}" style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${sellerTag}</div>`;
     }).join("");
     return`<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${clubName}</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">${formatDate(eventDate)}${cl.deadline?" · "+deadlineLabel(cl.deadline):""}</div></div><div class="admin-count">${totalPax} pax</div></div><div class="export-box" id="export-${cardKey}" style="font-family:inherit;">${entryRows}</div><button class="btn-copy" onclick="copyExport('${cardKey}',this)" style="margin-top:10px;">📋 Copy list</button></div>`;
   }).join("");
@@ -1151,7 +1132,7 @@ function renderAdmin(){
 
 function copyExport(clubId,btn){
   const box=document.getElementById(`export-${clubId}`);
-  const lines=Array.from(box.querySelectorAll("div")).filter(row=>{const cb=row.querySelector("input[type=checkbox]");const span=row.querySelector("span[style*='font-family:monospace']");if(!span)return false;if(span.dataset.cancelled==="true")return false;if(cb&&cb.checked)return false;return true;}).map(row=>{const span=row.querySelector("span[style*='font-family:monospace']");return span?(span.dataset.copy||span.textContent.trim()):"";}).filter(Boolean).join("\n");
+  const lines=Array.from(box.querySelectorAll("div")).filter(row=>{const cb=row.querySelector("input[type=checkbox]");const span=row.querySelector("span[style*='font-family:monospace']");if(!span)return false;if(span.style.textDecoration&&span.style.textDecoration.includes("line-through"))return false;if(cb&&cb.checked)return false;return true;}).map(row=>{const span=row.querySelector("span[style*='font-family:monospace']");return span?(span.dataset.copy||span.textContent.trim()):"";}).filter(Boolean).join("\n");
   if(!lines){btn.textContent="Nothing to copy";setTimeout(()=>{btn.textContent="📋 Copy list";},2000);return;}
   navigator.clipboard.writeText(lines).then(()=>{btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy list";btn.classList.remove("copied");},2000);});
 }
@@ -1165,7 +1146,7 @@ async function markEntrySent(entryId,isSent){
   // Save to localStorage so checkbox persists after refresh
   if(sentKey){if(isSent)localStorage.setItem(sentKey,"1");else localStorage.removeItem(sentKey);}
   try{await post({action:"mark_sent",entry_id:entryId,sent_to_club:isSent?"yes":""});ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,sent_to_club:isSent?"yes":""}:e);
-  if(isSent){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(entry){const paxStr=parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"";fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"✅ Confirmed: "+entry.club_name,body:entry.guest_name+paxStr+" · "+(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""))+" — confirmed by "+SELLER.seller_name,sellerId:entry.seller_id})}).catch(()=>{});addNotification("confirmed",entry.seller_id,{club:entry.club_name,guest:entry.guest_name+paxStr,event:(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||"")),date:entry.date,by:SELLER.seller_name});}}
+  if(isSent){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(entry){const paxStr=parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"";fetch(VERCEL_URL+"/api/notify",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"srz2026secret"},body:JSON.stringify({title:"✅ Confirmed: "+entry.club_name,body:entry.guest_name+paxStr+" · "+(entry.event_name||"")+" — confirmed by "+SELLER.seller_name,sellerId:entry.seller_id})}).catch(()=>{});addNotification("confirmed",entry.seller_id,{club:entry.club_name,guest:entry.guest_name+paxStr,event:entry.event_name||"",date:entry.date,by:SELLER.seller_name});}}
   }catch(e){}}
 
 function openModal(eventId,clubId){
@@ -1258,13 +1239,13 @@ function closeVipModal(){document.getElementById("vip-modal").classList.remove("
 function onVenueChange(){
   const venue=document.getElementById("vip-venue").value;
   if(!venue){document.getElementById("vip-event-group").style.display="none";document.getElementById("vip-fields-wrap").style.display="none";return;}
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
   document.getElementById("vip-event-group").style.display=hasEvents?"block":"none";
   if(hasEvents){document.getElementById("vip-event-search").value="";document.getElementById("vip-event").value="";document.getElementById("vip-event-results").style.display="none";document.getElementById("vip-event-selected").style.display="none";window._currentVipEvents=[];const evList=VIP_EVENTS[venue]||[];evList.forEach(ev=>{ev.dates.forEach(d=>{window._currentVipEvents.push({label:`${ev.name} — ${formatDate(d)}`,value:`${ev.name}||${d}`});});});}
   document.getElementById("vip-fields-wrap").style.display="block";
   ["vip-ratio-group","vip-nationality-group","vip-occasion-group","vip-zone-group","vip-email-group","vip-phone-group","vip-time-group","vip-dinnershow-group","vip-budget-group","vip-date-group"].forEach(id=>document.getElementById(id).style.display="none");
   if(["Hi Ibiza","Ushuaia","UNVRS"].includes(venue)){["vip-ratio-group","vip-nationality-group","vip-occasion-group","vip-budget-group"].forEach(id=>document.getElementById(id).style.display="block");}
-  
+  if(venue==="Chinois"){["vip-budget-group","vip-zone-group","vip-email-group","vip-phone-group"].forEach(id=>document.getElementById(id).style.display="block");}
   if(venue==="Lio VIP"){["vip-date-group","vip-budget-group","vip-zone-group","vip-email-group","vip-phone-group"].forEach(id=>document.getElementById(id).style.display="block");}
   if(venue==="Lio Restaurant"){["vip-date-group","vip-time-group","vip-email-group","vip-phone-group","vip-dinnershow-group"].forEach(id=>document.getElementById(id).style.display="block");}
 }
@@ -1273,20 +1254,9 @@ function filterVipEvents(){
   const q=(document.getElementById("vip-event-search").value||"").toLowerCase().trim();
   const results=document.getElementById("vip-event-results");
   const events=window._currentVipEvents||[];
-  if(!q){results.style.display="none";
-    // If field is empty, clear selection
-    document.getElementById("vip-event").value="";
-    document.getElementById("vip-event-selected").style.display="none";
-    return;}
+  if(!q){results.style.display="none";return;}
   const filtered=events.filter(ev=>ev.label.toLowerCase().includes(q)).slice(0,30);
-  if(!filtered.length){
-    // No match — use typed text as custom event name (no date)
-    document.getElementById("vip-event").value=q+"||";
-    const sel=document.getElementById("vip-event-selected");
-    sel.textContent="✓ "+q+" (custom)";sel.style.display="block";
-    results.style.display="none";
-    return;
-  }
+  if(!filtered.length){results.innerHTML=`<div style="padding:12px 16px;font-size:13px;color:var(--muted);">No events found</div>`;results.style.display="block";return;}
   results.innerHTML=filtered.map(ev=>{const safeVal=ev.value.replace(/"/g,'&quot;');const safeLabel=ev.label.replace(/"/g,'&quot;');return`<div data-val="${safeVal}" data-lbl="${safeLabel}" style="padding:12px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="selectVipEvent(this.dataset.val,this.dataset.lbl)">${ev.label}</div>`;}).join("");
   results.style.display="block";
 }
@@ -1302,8 +1272,8 @@ async function submitVipRequest(){
   if(!name){msg.textContent="Name is required.";return;}
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
-  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select or type an event.";return;}[eventName,eventDate]=evVal.split("||");}
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;if(!eventDate){msg.textContent="Select a date.";return;}}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Sending…";msg.textContent="";
   const request={request_id:genId(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,venue,event_name:eventName,event_date:eventDate,name,pax,ratio:document.getElementById("vip-ratio").value.trim(),nationality:document.getElementById("vip-nationality").value.trim(),special_occasion:document.getElementById("vip-occasion").value.trim(),budget:document.getElementById("vip-budget").value.trim(),preferred_zone:document.getElementById("vip-zone").value.trim(),email:document.getElementById("vip-email").value.trim(),phone:document.getElementById("vip-phone").value.trim(),time:document.getElementById("vip-time").value,dinnershow:document.getElementById("vip-dinnershow").value,type:venue.includes("Lio")?(venue.includes("Restaurant")?"restaurant":"vip_table"):"vip_table",status:"new",price_info:"",notes:"",created_at:new Date().toISOString()};
@@ -1330,9 +1300,7 @@ function renderVipSeller(){
     const st=r.status||"new";
     const priceInfo=(r.price_info||"").trim();
     const hasPrice=priceInfo.length>0;
-    const sellerStatusLabel=st==="new"?"⏳ Waiting for price":statusLabel(st);
-    const sellerStatusClass=st==="new"?"status-price_sent":statusClass(st);
-    return`<div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}"><div class="vip-card-top"><div><div class="vip-venue-name">${r.venue}</div><div class="vip-event-name">${r.event_name||""} ${r.event_date?"· "+formatDate(r.event_date):""}</div></div><div class="vip-status-badge ${sellerStatusClass}">${sellerStatusLabel}</div></div><div class="vip-meta">👤 ${r.name} · 👥 ${r.pax} pax${r.ratio?` · ${r.ratio}`:""}${r.nationality?`<br>🌍 ${r.nationality}`:""}${r.budget?`<br>💰 ${r.budget}`:""}</div>${hasPrice?`<div class="vip-price-label">💬 Price info from Summerrockz</div><div class="vip-price-box">${priceInfo}</div><button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipPrices('${r.request_id}')" style="margin-top:10px;">📋 Copy prices</button>`:st==="new"?`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>`:""} ${st!=="cancelled"?`<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}',this)">✕ Cancel</button></div>`:""}</div>`;
+    return`<div class="vip-request-card" style="${st==='cancelled'?'opacity:0.55;':''}"><div class="vip-card-top"><div><div class="vip-venue-name">${r.venue}</div><div class="vip-event-name">${r.event_name||""} ${r.event_date?"· "+formatDate(r.event_date):""}</div></div><div class="vip-status-badge ${statusClass(st)}">${statusLabel(st)}</div></div><div class="vip-meta">👤 ${r.name} · 👥 ${r.pax} pax${r.ratio?` · ${r.ratio}`:""}${r.nationality?`<br>🌍 ${r.nationality}`:""}${r.budget?`<br>💰 ${r.budget}`:""}</div>${hasPrice?`<div class="vip-price-label">💬 Price info from Summerrockz</div><div class="vip-price-box">${priceInfo}</div><button class="btn-copy" id="copy-btn-${r.request_id}" onclick="copyVipPrices('${r.request_id}')" style="margin-top:10px;">📋 Copy prices</button>`:st==="new"?`<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;">Awaiting price info…</div>`:""} ${st!=="cancelled"?`<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;" onclick="openEditVipModal('${r.request_id}')">✏️ Edit</button><button class="btn-secondary" style="flex:1;padding:8px;font-size:12px;color:var(--red);border-color:rgba(232,25,44,0.3);" onclick="cancelVipRequest('${r.request_id}',this)">✕ Cancel</button></div>`:""}</div>`;
   }).join("");
 }
 
@@ -1367,7 +1335,7 @@ async function cancelVipRequest(requestId,btn){if(!confirm("Cancel this request?
 
 let VIP_PRICES_DATA=[],vipPriceVenue='Hi';
 async function loadVipPrices(){const wrap=document.getElementById("vip-prices-list");wrap.innerHTML='<div class="loading">Loading…</div>';try{VIP_PRICES_DATA=await fetchSheet("VIP_PRICES");renderVipPrices();}catch(e){wrap.innerHTML='<div class="empty">Could not load prices.</div>';}}
-function setVipPriceVenue(venue){vipPriceVenue=venue;['Hi','Ushuaia','UNVRS','Lio'].forEach(v=>{const btn=document.getElementById("vpp-"+v);if(btn)btn.classList.toggle("active",v===venue);});renderVipPrices();}
+function setVipPriceVenue(venue){vipPriceVenue=venue;['Hi','Ushuaia','UNVRS','Chinois','Lio'].forEach(v=>{const btn=document.getElementById("vpp-"+v);if(btn)btn.classList.toggle("active",v===venue);});renderVipPrices();}
 let vipPriceCalYear=null,vipPriceCalMonth=null,vipPriceOpenDate=null;
 function renderVipPrices(){const wrap=document.getElementById("vip-prices-list");const todayStr=today();const now=new Date();if(!vipPriceCalYear){vipPriceCalYear=now.getFullYear();vipPriceCalMonth=now.getMonth();}const prices=VIP_PRICES_DATA.filter(p=>(p.venue||"").toLowerCase()===vipPriceVenue.toLowerCase());const priceByDate={};prices.forEach(p=>{const d=normalizeDate(p.event_date||"");if(d)priceByDate[d]=p;});const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];const firstDay=new Date(vipPriceCalYear,vipPriceCalMonth,1);const daysInMonth=new Date(vipPriceCalYear,vipPriceCalMonth+1,0).getDate();const startDow=firstDay.getDay()===0?6:firstDay.getDay()-1;const daysInPrev=new Date(vipPriceCalYear,vipPriceCalMonth,0).getDate();let calHtml="";for(let i=startDow-1;i>=0;i--)calHtml+=`<div class="cal-day-cell other-month"><div class="cal-day-num">${daysInPrev-i}</div></div>`;for(let d=1;d<=daysInMonth;d++){const dateStr=`${vipPriceCalYear}-${String(vipPriceCalMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;const isToday=dateStr===todayStr;const isSelected=dateStr===vipPriceOpenDate;const hasPrice=!!priceByDate[dateStr];let dotColor="#22C55E";if(hasPrice&&priceByDate[dateStr]){const rec=normalizeDate(priceByDate[dateStr].received_date||"");if(rec){const daysOld=Math.floor((new Date()-new Date(rec+"T12:00:00"))/(1000*60*60*24));dotColor=daysOld>5?"#E8192C":daysOld>=4?"#F59E0B":"#22C55E";}}calHtml+=`<div class="cal-day-cell${isToday?" today":""}${isSelected?" selected":""}" onclick="toggleVipPriceDay('${dateStr}')"><div class="cal-day-num">${d}</div>${hasPrice?`<div class="cal-dots"><div class="cal-dot" style="background:${dotColor};"></div></div>`:""}</div>`;}const total=startDow+daysInMonth;const rem=total%7===0?0:7-(total%7);for(let i=1;i<=rem;i++)calHtml+=`<div class="cal-day-cell other-month"><div class="cal-day-num">${i}</div></div>`;let cardHtml="";if(vipPriceOpenDate&&priceByDate[vipPriceOpenDate]){const p=priceByDate[vipPriceOpenDate];const priceInfo=(p.price_info||"").trim();cardHtml=`<div style="background:var(--card);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius);padding:16px;margin-top:16px;"><div style="font-size:15px;font-weight:700;">${p.event_name||""}</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${formatDate(vipPriceOpenDate)}</div>${priceInfo?`<div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,0.9);white-space:pre-wrap;line-height:1.7;margin-bottom:12px;">${priceInfo}</div><button class="btn-copy" onclick="copyVipPriceByDate('${vipPriceOpenDate}')" id="copy-price-date">📋 Copy prices</button>`:`<div style="font-size:12px;color:var(--muted);font-style:italic;">No price info yet.</div>`}</div>`;}else if(vipPriceOpenDate&&!priceByDate[vipPriceOpenDate]){cardHtml=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;margin-top:12px;">No prices available for this date yet.</div>`;}wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><button onclick="vipPriceCalPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">‹</button><div style="font-size:13px;font-weight:600;">${MONTHS[vipPriceCalMonth]} ${vipPriceCalYear}</div><button onclick="vipPriceCalNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;">›</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);">${d}</div>`).join("")}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${calHtml}</div>${cardHtml}`;}
 function toggleVipPriceDay(dateStr){vipPriceOpenDate=vipPriceOpenDate===dateStr?null:dateStr;renderVipPrices();}
@@ -1567,7 +1535,11 @@ function showSuccessModal(names,venues){
 }
 async function goToMyEntries(){
   document.getElementById('success-modal').style.display='none';
-  // Switch to mygl immediately with current local data (entry already in ENTRIES)
+  // Load fresh data with merge to preserve local changes
+  const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);
+  CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;
+  ENTRIES=mergeEntries(_fe);
+  // Manually switch to mygl without triggering loadData again
   document.querySelectorAll(".section").forEach(s=>{s.classList.remove("active");s.style.display="none";});
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   const sec=document.getElementById("section-mygl");
@@ -1575,8 +1547,6 @@ async function goToMyEntries(){
   const navEl=document.getElementById("nav-mygl");
   if(navEl)navEl.classList.add("active");
   renderMyGL();
-  // Refresh from sheet in background
-  try{const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;ENTRIES=mergeEntries(_fe);renderMyGL();}catch(e){}
 }
 function openMoreMenu(){document.getElementById("more-menu").style.display="block";document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("nav-more").classList.add("active");}
 function closeMoreMenu(){document.getElementById("more-menu").style.display="none";}
@@ -1620,7 +1590,7 @@ function buildGLHtml(dayGl,dateStr){
     var name=(cl.club_name||ev.club_id)+(ev.event_name?' · '+ev.event_name:'');
     var actionHtml=disabled
       ?'<div style="width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.04);text-align:center;font-size:12px;font-weight:600;color:var(--muted);">'+(closed?'⛔ Deadline passed':isFull?'👥 Guestlist full':'Not available')+'</div>'
-      :'<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-'+ev.event_id+'" onclick="toggleGLCard(this.dataset.eid,this.dataset.cid,this)" data-eid="'+ev.event_id+'" data-cid="'+ev.club_id+'"><input type="checkbox" class="gl-card-cb" data-event-id="'+ev.event_id+'" data-club-id="'+ev.club_id+'" style="display:none;" id="gl-cb-'+ev.event_id+'"><span id="gl-label-text-'+ev.event_id+'">Add to guestlist</span></label>';
+      :'<label style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:9px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);cursor:pointer;font-size:13px;font-weight:600;" id="gl-label-'+ev.event_id+'" onclick="toggleGLCard(this.dataset.eid,this.dataset.cid,this)" data-eid="'+ev.event_id+'" data-cid="'+ev.club_id+'"><input type="checkbox" class="gl-card-cb" data-event-id="'+ev.event_id+'" data-club-id="'+ev.club_id+'" style="width:18px;height:18px;accent-color:#E8192C;pointer-events:none;" id="gl-cb-'+ev.event_id+'"><span id="gl-label-text-'+ev.event_id+'">Add to guestlist</span></label>';
     return'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:9px 11px;'+(disabled?'opacity:0.55;':'')+'">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;"><div style="font-size:12px;font-weight:700;color:#fff;line-height:1.3;">'+name+'</div><span style="font-size:9px;font-weight:700;letter-spacing:0.12em;color:rgba(255,255,255,0.3);padding:2px 6px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;flex-shrink:0;">'+(cl.format&&cl.format.includes('email')?'EMAIL':'NAME')+'</span></div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-bottom:6px;">'+timeHtml+ticketHtml+spotsHtml+'</div>'
@@ -1672,12 +1642,10 @@ function toggleGLCard(eventId,clubId,labelEl){
 function openEditVipModal(requestId){
   const r=window._vipRequestsMap&&window._vipRequestsMap[requestId];if(!r)return;
   document.getElementById("vip-venue").value=r.venue;onVenueChange();
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(r.venue);
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(r.venue);
   if(hasEvents&&r.event_name&&r.event_date){selectVipEvent(r.event_name+"||"+r.event_date,r.event_name+" — "+formatDate(r.event_date));}
   document.getElementById("vip-name").value=r.name||"";
   document.getElementById("vip-date").value=r.event_date||"";
-  const vipDateLbl=document.getElementById("vip-date-label");
-  if(vipDateLbl){vipDateLbl.textContent=r.event_date?new Date(r.event_date+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"long"}):"Select date";vipDateLbl.style.color=r.event_date?"var(--text)":"var(--muted)";}
   document.getElementById("vip-pax").value=r.pax||"";
   document.getElementById("vip-ratio").value=r.ratio||"";
   document.getElementById("vip-nationality").value=r.nationality||"";
@@ -1700,8 +1668,8 @@ async function updateVipRequest(requestId){
   if(!name){msg.textContent="Name is required.";return;}
   if(!pax){msg.textContent="Pax is required.";return;}
   let eventName="",eventDate="";
-  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS"].includes(venue);
-  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select or type an event.";return;}[eventName,eventDate]=evVal.split("||");}
+  const hasEvents=["Hi Ibiza","Ushuaia","UNVRS","Chinois"].includes(venue);
+  if(hasEvents){const evVal=document.getElementById("vip-event").value;if(!evVal){msg.textContent="Select an event.";return;}[eventName,eventDate]=evVal.split("||");}
   else{eventDate=document.getElementById("vip-date").value;}
   const btn=document.getElementById("vip-submit");btn.disabled=true;btn.textContent="Updating…";msg.textContent="";
   const updates={action:"update_vip_request",request_id:requestId,venue,event_name:eventName,event_date:eventDate,name,pax,ratio:document.getElementById("vip-ratio").value.trim(),nationality:document.getElementById("vip-nationality").value.trim(),special_occasion:document.getElementById("vip-occasion").value.trim(),budget:document.getElementById("vip-budget").value.trim(),preferred_zone:document.getElementById("vip-zone").value.trim(),email:document.getElementById("vip-email").value.trim(),phone:document.getElementById("vip-phone").value.trim(),time:document.getElementById("vip-time").value,dinnershow:document.getElementById("vip-dinnershow").value};
@@ -1710,25 +1678,9 @@ async function updateVipRequest(requestId){
   finally{btn.disabled=false;btn.textContent="Update request";btn.onclick=submitVipRequest;}
 }
 function clearMultiGL(){SELECTED_EVENTS=[];document.querySelectorAll(".multi-gl-cb,.gl-card-cb").forEach(cb=>{cb.checked=false;});document.getElementById("multi-gl-bar").style.display="none";}
-function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-msg").textContent="";
-// Per-club notes
-const notesWrap=document.getElementById("modal-notes").parentElement;
-let perClubNotesEl=document.getElementById("modal-per-club-notes");
-if(perClubNotesEl)perClubNotesEl.remove();
-if(SELECTED_EVENTS.length>1){
-  document.getElementById("modal-notes").style.display="none";
-  document.getElementById("modal-notes").previousElementSibling&&(document.getElementById("modal-notes").previousElementSibling.style.display="none");
-  const wrap=document.createElement("div");wrap.id="modal-per-club-notes";
-  wrap.innerHTML=SELECTED_EVENTS.map(sel=>`<label class="form-label" style="margin-top:8px;">📝 Note for ${sel.club.club_name||sel.clubId}</label><textarea class="input-field" id="club-note-${sel.clubId}" placeholder="Optional…" style="min-height:60px;"></textarea>`).join("");
-  notesWrap.insertBefore(wrap,document.getElementById("modal-notes"));
-}else{
-  document.getElementById("modal-notes").style.display="";
-  document.getElementById("modal-notes").previousElementSibling&&(document.getElementById("modal-notes").previousElementSibling.style.display="");
-  document.getElementById("modal-notes").value="";
-}
-const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
+function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-notes").value="";document.getElementById("modal-msg").textContent="";const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
 function toggleMultiGL(checkbox,eventId,clubId){const event=EVENTS.find(e=>e.event_id===eventId);const club=CLUBS.find(c=>c.club_id===clubId)||{};if(checkbox.checked){SELECTED_EVENTS.push({eventId,clubId,event,club});}else{SELECTED_EVENTS=SELECTED_EVENTS.filter(e=>e.eventId!==eventId);}const bar=document.getElementById("multi-gl-bar");const count=document.getElementById("multi-gl-count");if(SELECTED_EVENTS.length>0){bar.style.display="block";count.textContent=`+ Add to guestlist (${SELECTED_EVENTS.length})`;}else{bar.style.display="none";}}
-async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");const usePerClub=SELECTED_EVENTS.length>1&&document.getElementById("modal-per-club-notes");const getNotesForClub=(clubId)=>usePerClub?(document.getElementById("club-note-"+clubId)?.value.trim()||""):(document.getElementById("modal-notes").value.trim());const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;const notes=getNotesForClub(sel.clubId);names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(!guestName){msg.textContent="Name is required.";btn.disabled=false;return;}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const notes=getNotesForClub(sel.clubId);const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
+async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(!guestName){msg.textContent="Name is required.";btn.disabled=false;return;}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
   const notified=new Set();
   for(const sel of SELECTED_EVENTS){
     if(notified.has(sel.clubId))continue;notified.add(sel.clubId);
@@ -1775,18 +1727,6 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
 
 function openEditEntryModal(entryId){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(!entry)return;const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;CURRENT_EVENT=EVENTS.find(e=>e.event_id===entry.event_id)||{club_id:entry.club_id,event_name:entry.event_name,date:entry.date};document.getElementById("modal-club-name").textContent="✏️ Edit — "+(cl.club_name||entry.club_name);document.getElementById("modal-event-info").textContent=(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""));document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";document.getElementById("modal-guest-name").value=entry.guest_name||"";document.getElementById("modal-email").value=entry.email||"";document.getElementById("modal-pax").value=entry.pax||"1";document.getElementById("modal-notes").value=entry.notes||"";document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-msg").textContent="";if(nameOnly){const paxCountEl=document.getElementById("modal-pax-count");if(paxCountEl){paxCountEl.value="1";paxCountEl.closest("div").previousElementSibling&&(paxCountEl.closest("div").previousElementSibling.style.display="none");paxCountEl.style.display="none";const lbl=paxCountEl.previousElementSibling;if(lbl&&lbl.tagName==="LABEL")lbl.style.display="none";}renderNameFields();setTimeout(()=>{const fields=document.querySelectorAll(".modal-multi-name");if(fields[0])fields[0].value=entry.guest_name||"";},50);}const btn=document.getElementById("modal-submit");btn.textContent="Save changes";btn.onclick=()=>saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax);document.getElementById("gl-modal").classList.add("open");}
 async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const msg=document.getElementById("modal-msg");const notes=document.getElementById("modal-notes").value.trim();const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Saving…";let guestName,pax,email;if(nameOnly){const fields=Array.from(document.querySelectorAll(".modal-multi-name"));guestName=fields[0]?.value.trim()||"";pax=1;email="";}else{guestName=document.getElementById("modal-guest-name").value.trim();pax=document.getElementById("modal-pax").value;email=document.getElementById("modal-email").value.trim();}if(!guestName){msg.textContent="Name is required.";btn.disabled=false;btn.textContent="Save changes";return;}const modifiedAt=new Date().toISOString();ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,guest_name:guestName,pax,email,notes,modified_at:modifiedAt}:e);trackLocalChange(entryId,{guest_name:guestName,pax,email,notes,modified_at:modifiedAt});try{await post({action:"modify_entry",entry_id:entryId,guest_name:guestName,pax,email,notes,modified_at:modifiedAt});}catch(e){}closeModal();renderMyGL();renderDashboard();btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=originalModalSubmit;showEditSuccessModal(guestName);}
-
-function showNotePopup(event, note) {
-  event.stopPropagation();
-  let existing = document.getElementById('note-popup');
-  if (existing) existing.remove();
-  const popup = document.createElement('div');
-  popup.id = 'note-popup';
-  popup.style.cssText = 'position:fixed;z-index:9999;background:#1a1a1a;border:1px solid rgba(245,158,11,0.4);border-radius:14px;padding:14px 16px;width:80%;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-size:13px;color:rgba(255,255,255,0.9);line-height:1.6;top:50%;left:50%;transform:translate(-50%,-50%);';
-  popup.innerHTML = '<div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">📝 Note</div>' + note.replace(/\n/g,'<br>') + '<button onclick="document.getElementById(\'note-popup\').remove()" style="display:block;margin-top:10px;width:100%;padding:6px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;">Sluiten</button>';
-  document.body.appendChild(popup);
-  setTimeout(() => document.addEventListener('click', function closePopup() { const p = document.getElementById('note-popup'); if(p) p.remove(); document.removeEventListener('click', closePopup); }, {once:true}), 100);
-}
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
