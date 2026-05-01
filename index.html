@@ -1055,7 +1055,7 @@ function renderMyGL(){
   const byDateClub={};
   if(myglSort==='last'){
     // For last added: group by created_at date, not event date
-    mine.forEach(e=>{const addedDate=(e.created_at||'').slice(0,10);const key=addedDate+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[],addedDate};byDateClub[key].entries.push(e);});
+    mine.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||'')).forEach(e=>{const addedDate=(e.created_at||'').slice(0,10);const key=addedDate+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[],addedDate};byDateClub[key].entries.push(e);});
   } else {
     mine.forEach(e=>{const key=normalizeDate(e.date||"")+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[]};byDateClub[key].entries.push(e);});
   }
