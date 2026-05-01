@@ -1164,7 +1164,7 @@ function renderAdmin(){
     const format=cl.format||"name";
     const cardKey=clubId+"_"+eventDate;
     const allEntries=ENTRIES.filter(e=>normalizeDate(e.date||"")===eventDate&&e.club_id===clubId&&["active","cancelled"].includes((e.status||"").toLowerCase()));
-    const normalEntries=allEntries.filter(e=>!(e.notes||"").includes("🍹 Drink package:"));
+    const normalEntries=allEntries.filter(e=>!(e.notes||"").includes("🍹 Drink package:")).sort((a,b)=>{const aM=!!(a.modified_at&&isRecent(a.modified_at,24));const bM=!!(b.modified_at&&isRecent(b.modified_at,24));return aM===bM?0:aM?1:-1;});
     const drinkEntries=allEntries.filter(e=>(e.notes||"").includes("🍹 Drink package:"));
     const totalPax=allEntries.filter(e=>(e.status||"").toLowerCase()==="active").reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
     const entryRows=normalEntries.map(e=>{
@@ -1175,7 +1175,7 @@ function renderAdmin(){
       const line=`${e.guest_name}${plusPax}${emailPart}`;
       const copyLine=`${e.guest_name}${plusPax}${emailPart}`;
       const sentKey="sent_"+cardKey+"_"+e.entry_id;
-      const isSent=(e.sent_to_club||"").toLowerCase()==="yes"||localStorage.getItem(sentKey)==="1";
+      const isSent=((e.sent_to_club||"").toLowerCase()==="yes"||localStorage.getItem(sentKey)==="1")&&!isModified;
       const isNew=isRecent(e.created_at,2);
       const isModified=!!(e.modified_at&&isRecent(e.modified_at,24));
       const effectivelySent=isSent&&!isModified;
