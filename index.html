@@ -237,8 +237,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div style="padding-top:16px;position:relative;">
         <div style="position:fixed;inset:0;z-index:-1;background:url('https://i.ibb.co/Ng3J0PPt/IMG-4307.jpg') center center/cover no-repeat;opacity:0.18;pointer-events:none;max-width:480px;margin:0 auto;"></div>
         <div class="dash-grid">
-          <div class="dash-stat"><div class="dash-stat-val" id="stat-today">–</div><div class="dash-stat-label">My entries today</div></div>
-          <div class="dash-stat"><div class="dash-stat-val" id="stat-total">–</div><div class="dash-stat-label">Total this week</div></div>
+          <div class="dash-stat"><div class="dash-stat-val" id="stat-today">–</div><div class="dash-stat-label">People today</div></div>
+          <div class="dash-stat"><div class="dash-stat-val" id="stat-total">–</div><div class="dash-stat-label">People this week</div></div>
         </div>
         <div id="addgl-dash-card" class="dash-card" onclick="showSection('section-program')"><div class="dash-card-title">➕ Add Guestlist</div><div class="dash-card-sub">SR Events + Guestlist</div></div>
         <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Table requests</div><div class="dash-card-sub">Request tables at Hi, Ushuaia, UNVRS, Chinois & Lio</div></div>
@@ -921,8 +921,12 @@ async function loadVipRequests(){VIP_REQUESTS=await fetchSheet("VIP_REQUESTS");}
 function renderDashboard(){
   const t=today(),myId=String(SELLER.seller_id||"").trim();
   const myEntries=ENTRIES.filter(e=>String(e.seller_id||"").trim()===myId&&(e.status||"").toLowerCase()==="active");
-  document.getElementById("stat-today").textContent=myEntries.filter(e=>isRecent(e.created_at,24)).length;
-  document.getElementById("stat-total").textContent=myEntries.filter(e=>isRecent(e.created_at,168)).length;
+  const todayEntries=myEntries.filter(e=>isRecent(e.created_at,24));
+  const weekEntries=myEntries.filter(e=>isRecent(e.created_at,168));
+  const todayPax=todayEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
+  const weekPax=weekEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
+  document.getElementById("stat-today").textContent=todayPax;
+  document.getElementById("stat-total").textContent=weekPax;
   const isClubAdmin=CLUBS.some(c=>String(c.admin_id||"").split(",").map(x=>String(x).trim()).includes(String(myId)));
   const exportCard=document.getElementById("admin-dash-card");
   if(exportCard)exportCard.style.display=isClubAdmin?"block":"none";
