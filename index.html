@@ -939,8 +939,12 @@ function renderDashboard(){
   document.getElementById("stat-total").textContent=weekPax;
   const pendingEl=document.getElementById("stat-pending");
   const confirmedEl=document.getElementById("stat-confirmed");
-  if(pendingEl)pendingEl.textContent=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()!=="yes"&&(e.status||"").toLowerCase()==="active").length;
-  if(confirmedEl)confirmedEl.textContent=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()==="yes").length;
+  const pendingEntries=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()!=="yes"&&(e.status||"").toLowerCase()==="active");
+  const confirmedEntries=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()==="yes");
+  const pendingPax=pendingEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
+  const confirmedPax=confirmedEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
+  if(pendingEl)pendingEl.textContent=pendingPax;
+  if(confirmedEl)confirmedEl.textContent=confirmedPax;
   const isClubAdmin=CLUBS.some(c=>String(c.admin_id||"").split(",").map(x=>String(x).trim()).includes(String(myId)));
   const exportCard=document.getElementById("admin-dash-card");
   if(exportCard)exportCard.style.display=isClubAdmin?"block":"none";
