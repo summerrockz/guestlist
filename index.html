@@ -916,7 +916,7 @@ async function enableNotifications() {
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
     const response=await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:sub,sellerId:SELLER.seller_id})});
     const result=await response.json();
-    if(result.ok){document.getElementById("notif-btn").textContent="✅ Notifications enabled";document.getElementById("notif-btn").disabled=true;localStorage.setItem("srz_notif_enabled","1");}
+    if(result.ok){document.getElementById("notif-btn").textContent="✅ Notifications enabled";document.getElementById("notif-btn").disabled=true;localStorage.setItem("srz_notif_enabled","1");const hint=document.getElementById("notif-hint");if(hint)hint.style.display="none";}
   }catch(e){alert("Could not enable: "+e.message);}
 }
 
