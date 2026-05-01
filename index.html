@@ -1612,7 +1612,7 @@ function renderProgram(){
     const isToday=dateStr===todayStr;
     const clubs=source[dateStr]||[];
     const fullDayName=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-    const glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||"")===dateStr&&(ev.status||"").toLowerCase()!=="inactive");
+    const glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||"")===dateStr);
     const glSection=progView!=='prog'&&glEvents.length>0?'<div style="'+(clubs.length>0?'border-top:1px solid var(--border);padding-top:10px;':'')+';"><div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Guestlists</div>'+buildGLHtml(glEvents,dateStr)+'</div>':'';
     html+='<div style="background:var(--card);border:2px solid '+(isToday?'var(--red)':'rgba(255,255,255,0.15)')+';border-radius:var(--radius);padding:14px 16px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+(isToday?'var(--red)':'var(--text)')+';margin-bottom:10px;">'+(isToday?'🔴 ':'')+fullDayName+'</div>'
