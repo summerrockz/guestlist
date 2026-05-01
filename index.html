@@ -286,7 +286,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
           <option value="date_asc">📅 Date (old → new)</option>
           <option value="date_desc">📅 Date (new → old)</option>
           <option value="last">🕐 Last added</option>
-          <option value="confirmed">✅ Confirmed</option>
+          <option value="pending">⏳ Pending</option>
+<option value="confirmed">✅ Confirmed</option>
           <option value="cancelled">🚫 Cancelled</option>
           <option value="history">📂 History</option>
         </select>
@@ -1038,6 +1039,7 @@ function renderMyGL(){
     const notTooOld=myglShowHistory||dateFilter||myglSort==='history'||entryDate>=yStr;
     return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible&&notTooOld;
   }).filter(e=>{
+    if(myglSort==='pending')return(e.sent_to_club||'').toLowerCase()!=='yes'&&(e.status||'').toLowerCase()==='active';
     if(myglSort==='confirmed')return(e.sent_to_club||'').toLowerCase()==='yes';
     if(myglSort==='cancelled')return(e.status||'').toLowerCase()==='cancelled';
     if((e.status||'').toLowerCase()==='cancelled')return false;
