@@ -921,7 +921,7 @@ async function initApp() {
     renderEvents();
   };
   document.getElementById("mygl-date").onchange=renderMyGL;
-  await loadData(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
+  await loadData(); await loadVipRequests(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
   setInterval(loadNotifications,60000);
   startGlobalAutoRefresh();
 }
