@@ -903,7 +903,7 @@ async function setupPushNotifications() {
       const existing=await reg.pushManager.getSubscription();
       if(existing){if(btn){btn.textContent="✅ Notifications enabled";btn.disabled=true;}localStorage.setItem("srz_notif_enabled","1");await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:existing,sellerId:SELLER.seller_id})}).catch(()=>{});}
     }
-    if(localStorage.getItem("srz_notif_enabled")==="1"){if(btn){btn.textContent="✅ Notifications enabled";btn.disabled=true;}}
+    if(localStorage.getItem("srz_notif_enabled")==="1"){if(btn){btn.textContent="✅ Notifications enabled";btn.disabled=true;}const hint=document.getElementById("notif-hint");if(hint)hint.style.display="none";}
   }catch(e){console.log("SW registration failed:",e);}
 }
 
