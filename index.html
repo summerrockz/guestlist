@@ -1509,7 +1509,7 @@ function copyVipPriceByDate(dateStr){
   if(!p){alert('No price data found.');return;}
   const text=`${p.venue} — ${p.event_name}\n${formatDate(dateStr)}\n\n${p.price_info||""}`;
   navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById("copy-price-date");if(btn){btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy prices";btn.classList.remove("copied");},2000);}}).catch(()=>alert('Could not copy. Try again.'));
-}const p=VIP_PRICES_DATA.find(p=>normalizeDate(p.event_date||"")===dateStr&&(p.venue||"").toLowerCase()===venueToUse.toLowerCase());if(!p)return;const text=`${p.venue} — ${p.event_name}\n${formatDate(dateStr)}\n\n${p.price_info||""}`;navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById("copy-price-date");if(btn){btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy prices";btn.classList.remove("copied");},2000);}});}
+}
 
 let PRODUCTS=[];
 async function loadProducts(){const wrap=document.getElementById("products-list");wrap.innerHTML='<div class="loading">Loading…</div>';try{PRODUCTS=await fetchSheet("PRODUCTS");renderProducts();}catch(e){wrap.innerHTML='<div class="empty">Could not load products.</div>';}}
