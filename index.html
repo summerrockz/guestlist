@@ -1414,7 +1414,13 @@ function vipInlineSelectDay(dateStr){vipInlineOpenDate=vipInlineOpenDate===dateS
 function vipInlineCalPrev(){vipInlineCalMonth--;if(vipInlineCalMonth<0){vipInlineCalMonth=11;vipInlineCalYear--;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
 function vipInlineCalNext(){vipInlineCalMonth++;if(vipInlineCalMonth>11){vipInlineCalMonth=0;vipInlineCalYear++;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
 
-function copyVipPriceByDate(dateStr){const p=VIP_PRICES_DATA.find(p=>normalizeDate(p.event_date||"")===dateStr&&(p.venue||"").toLowerCase()===vipPriceVenue.toLowerCase());if(!p)return;const text=`${p.venue} — ${p.event_name}\n${formatDate(dateStr)}\n\n${p.price_info||""}`;navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById("copy-price-date");if(btn){btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy prices";btn.classList.remove("copied");},2000);}});}
+function copyVipPriceByDate(dateStr){
+  const venueToUse=vipInlineVenue||vipSectionVenue||vipPriceVenue;
+  const p=VIP_PRICES_DATA.find(p=>normalizeDate(p.event_date||"")===dateStr&&(p.venue||"").toLowerCase()===venueToUse.toLowerCase());
+  if(!p){alert('No price data found.');return;}
+  const text=`${p.venue} — ${p.event_name}\n${formatDate(dateStr)}\n\n${p.price_info||""}`;
+  navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById("copy-price-date");if(btn){btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy prices";btn.classList.remove("copied");},2000);}}).catch(()=>alert('Could not copy. Try again.'));
+}
 function toggleVipPriceDay(dateStr){vipPriceOpenDate=vipPriceOpenDate===dateStr?null:dateStr;renderVipPrices();}
 function vipPriceCalPrev(){vipPriceCalMonth--;if(vipPriceCalMonth<0){vipPriceCalMonth=11;vipPriceCalYear--;}vipPriceOpenDate=null;renderVipPrices();}
 function vipPriceCalNext(){vipPriceCalMonth++;if(vipPriceCalMonth>11){vipPriceCalMonth=0;vipPriceCalYear++;}vipPriceOpenDate=null;renderVipPrices();}
