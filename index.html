@@ -1100,6 +1100,7 @@ async function deleteEntry(entryId,btn){
   trackLocalChange(entryId,{status:"cancelled"});
   try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
   ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+if(entry&&entry.event_id){const paxNum=parseInt(entry.pax)||1;EVENTS=EVENTS.map(ev=>ev.event_id===entry.event_id&&ev.spots_left!==undefined&&ev.spots_left!==''?{...ev,spots_left:Math.max(0,(parseInt(ev.spots_left)||0)+paxNum)}:ev);}
   btn.textContent="Cancel entry";btn.disabled=false;
   showCancelSuccessModal(entry?entry.guest_name:'Entry');
   if(entry){
