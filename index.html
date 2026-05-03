@@ -897,7 +897,7 @@ document.getElementById("login-btn").onclick = async () => {
   msg.textContent="Checking…";
   try {
     const sellers=await fetchSheet("SELLERS");
-    const match=sellers.find(s=>((s.seller_email||"").trim().toLowerCase()===email||(s.seller_name||"").trim().toLowerCase()===email)&&(s.seller_code||"").trim()===code&&(s.status||"").toLowerCase()==="active");
+    const match=sellers.find(s=>((s.seller_email||"").trim().toLowerCase()===email||(s.seller_name||"").trim().toLowerCase()===email)&&(s.seller_code||"").trim().toLowerCase()===code.toLowerCase()&&(s.status||"").toLowerCase()==="active");
     if(!match){msg.textContent="Incorrect login details.";return;}
     SELLER=match; localStorage.setItem("srz_seller",JSON.stringify(match)); await initApp();
   } catch(e){msg.textContent="Could not connect. Try again.";}
