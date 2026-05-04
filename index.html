@@ -974,7 +974,7 @@ function renderDashboard(){
   const pendingEl=document.getElementById("stat-pending");
   const confirmedEl=document.getElementById("stat-confirmed");
   const pendingEntries=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()!=="yes"&&(e.status||"").toLowerCase()==="active");
-  const confirmedEntries=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()==="yes");
+  const confirmedEntries=myEntries.filter(e=>(e.sent_to_club||"").toLowerCase()==="yes"&&normalizeDate(e.date||"")>=today());
   const pendingPax=pendingEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
   const confirmedPax=confirmedEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
   if(pendingEl)pendingEl.textContent=pendingPax;
