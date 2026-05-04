@@ -1037,6 +1037,7 @@ function renderMyGL(){
   const isManagerOrAdmin=myRole==="manager"||myRole==="admin";
   const sellerFilterWrap=document.getElementById("mygl-seller-filter");
   if(sellerFilterWrap)sellerFilterWrap.style.display=isManagerOrAdmin?"block":"none";
+  if(isManagerOrAdmin){const sel=document.getElementById("mygl-seller-select");if(sel&&sel.options.length<=1){const managed=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(myId);});managed.forEach(s=>{const opt=document.createElement("option");opt.value=String(s.seller_id).trim();opt.textContent=s.seller_name||s.seller_id;sel.appendChild(opt);});}}
   const dateLabel=document.getElementById("mygl-date-label");
   const clearBtn=document.getElementById("mygl-date-clear");
   if(dateFilter){const d=new Date(dateFilter+"T12:00:00");if(dateLabel){dateLabel.textContent=d.toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"});dateLabel.style.color="var(--text)";}if(clearBtn)clearBtn.style.display="block";}
