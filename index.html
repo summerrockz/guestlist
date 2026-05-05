@@ -1227,7 +1227,7 @@ function openModal(eventId,clubId){
   document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";
   document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";
   if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}
-  const maxPax=needsPax?(parseInt(cl.max_pax_per_email)||4):1;
+  const maxPax=(needsPax||needsEmail)?(parseInt(cl.max_pax_per_email)||4):1;
   const paxSel=document.getElementById("modal-pax");paxSel.innerHTML="";
   for(let i=1;i<=maxPax;i++){const opt=document.createElement("option");opt.value=i;opt.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSel.appendChild(opt);}
   document.getElementById("modal-guest-name").value="";
@@ -1271,6 +1271,8 @@ const originalModalSubmit=async()=>{
   }
   if(!guestName){msg.textContent="Guest name is required.";return;}
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
+const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(CURRENT_EVENT.date||"")&&e.club_id===CURRENT_EVENT.club_id&&(e.status||"").toLowerCase()==="active");
+if(dupEmail){msg.textContent="⚠️ This email is already on the guestlist for this event.";return;}
   const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};
   const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";msg.textContent="";
   ENTRIES.push(entry);
