@@ -662,7 +662,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="showSection('section-dashboard')" id="nav-dashboard"><span class="nav-icon">🏠</span>Dashboard</button>
     <button class="nav-item" onclick="showSection('section-mygl')" id="nav-mygl"><span class="nav-icon">☑️</span>Entries</button>
-    <button class="nav-item" onclick="showSection('section-events')" id="nav-addgl"><span class="nav-icon">➕</span>Add GL</button>
+    <button class="nav-item" onclick="showSection('section-program')" id="nav-addgl"><span class="nav-icon">➕</span>Add GL</button>
     <button class="nav-item" onclick="showSection('section-products')" id="nav-products"><span class="nav-icon">🌶️</span>SR</button>
     <button class="nav-item" onclick="openMoreMenu()" id="nav-more"><span class="nav-icon">⋯</span>More</button>
   </nav>
@@ -874,7 +874,7 @@ function showSection(id) {
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   const sec=document.getElementById(id);
   if(sec){sec.classList.add("active");sec.style.display="block";}
-  const navMap={"section-dashboard":"nav-dashboard","section-program":"nav-program","section-mygl":"nav-mygl","section-calendar":"nav-calendar","section-events":"nav-addgl","section-admin":"nav-more","section-vip":"nav-more","section-vip-admin":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-products","section-vip-prices":"nav-more","section-createprog":"nav-more","section-product-detail":"nav-products"};
+  const navMap={"section-dashboard":"nav-dashboard","section-program":"nav-program","section-mygl":"nav-mygl","section-calendar":"nav-calendar","section-events":"nav-more","section-admin":"nav-more","section-vip":"nav-more","section-vip-admin":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-products","section-vip-prices":"nav-more","section-createprog":"nav-more","section-product-detail":"nav-products"};
   const navEl=document.getElementById(navMap[id]);
   if(navEl)navEl.classList.add("active");
   if(id==="section-events")loadData().then(renderEvents);
