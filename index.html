@@ -1417,8 +1417,8 @@ function renderVipPrices(){const wrap=document.getElementById("vip-prices-list")
   wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><button onclick="vipPriceCalPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:4px 12px;font-size:16px;cursor:pointer;">‹</button><div style="font-size:12px;font-weight:600;">${MONTHS[vipPriceCalMonth]} ${vipPriceCalYear}</div><button onclick="vipPriceCalNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:4px 12px;font-size:16px;cursor:pointer;">›</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);">${d}</div>`).join("")}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${calHtml}</div>${cardHtml}`;
 }
 function vipInlineSelectDay(dateStr){vipInlineOpenDate=vipInlineOpenDate===dateStr?null:dateStr;renderVipInlinePrices(vipInlineVenue);}
-function vipInlineCalPrev(){vipInlineCalMonth--;if(vipInlineCalMonth<0){vipInlineCalMonth=11;vipInlineCalYear--;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
-function vipInlineCalNext(){vipInlineCalMonth++;if(vipInlineCalMonth>11){vipInlineCalMonth=0;vipInlineCalYear++;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
+function vipInlineCalPrev(){if(vipInlineCalYear===2026&&vipInlineCalMonth<=3)return;vipInlineCalMonth--;if(vipInlineCalMonth<0){vipInlineCalMonth=11;vipInlineCalYear--;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
+function vipInlineCalNext(){if(vipInlineCalYear===2026&&vipInlineCalMonth>=9)return;vipInlineCalMonth++;if(vipInlineCalMonth>11){vipInlineCalMonth=0;vipInlineCalYear++;}vipInlineOpenDate=null;renderVipInlinePrices(vipInlineVenue);}
 
 function copyVipPriceByDate(dateStr){
   const venueToUse=vipInlineVenue||vipSectionVenue||vipPriceVenue;
@@ -1428,8 +1428,8 @@ function copyVipPriceByDate(dateStr){
   navigator.clipboard.writeText(text).then(()=>{const btn=document.getElementById("copy-price-date");if(btn){btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="📋 Copy prices";btn.classList.remove("copied");},2000);}}).catch(()=>alert('Could not copy. Try again.'));
 }
 function toggleVipPriceDay(dateStr){vipPriceOpenDate=vipPriceOpenDate===dateStr?null:dateStr;renderVipPrices();}
-function vipPriceCalPrev(){vipPriceCalMonth--;if(vipPriceCalMonth<0){vipPriceCalMonth=11;vipPriceCalYear--;}vipPriceOpenDate=null;renderVipPrices();}
-function vipPriceCalNext(){vipPriceCalMonth++;if(vipPriceCalMonth>11){vipPriceCalMonth=0;vipPriceCalYear++;}vipPriceOpenDate=null;renderVipPrices();}
+function vipPriceCalPrev(){if(vipPriceCalYear===2026&&vipPriceCalMonth<=3)return;vipPriceCalMonth--;if(vipPriceCalMonth<0){vipPriceCalMonth=11;vipPriceCalYear--;}vipPriceOpenDate=null;renderVipPrices();}
+function vipPriceCalNext(){if(vipPriceCalYear===2026&&vipPriceCalMonth>=9)return;vipPriceCalMonth++;if(vipPriceCalMonth>11){vipPriceCalMonth=0;vipPriceCalYear++;}vipPriceOpenDate=null;renderVipPrices();}
   let vipSectionVenue='Hi',vipSectionOpenDate=null,vipSectionCalYear=null,vipSectionCalMonth=null;
 function setVipSectionVenue(venue){vipSectionVenue=venue;['Hi','Ushuaia','UNVRS','Chinois','Lio'].forEach(v=>{const btn=document.getElementById("vsp-"+v);if(btn)btn.classList.toggle("active",v===venue);});vipSectionOpenDate=null;renderVipSectionPrices();}
 function renderVipSectionPrices(){
@@ -1468,8 +1468,8 @@ function renderVipSectionPrices(){
   wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><button onclick="vipSectionCalPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:4px 12px;font-size:16px;cursor:pointer;">‹</button><div style="font-size:12px;font-weight:600;">${MONTHS[vipSectionCalMonth]} ${vipSectionCalYear}</div><button onclick="vipSectionCalNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:4px 12px;font-size:16px;cursor:pointer;">›</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">${["Mo","Tu","We","Th","Fr","Sa","Su"].map(d=>`<div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);">${d}</div>`).join("")}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">${calHtml}</div>${cardHtml}`;
 }
 function vipSectionSelectDay(dateStr){vipSectionOpenDate=vipSectionOpenDate===dateStr?null:dateStr;renderVipSectionPrices();}
-function vipSectionCalPrev(){vipSectionCalMonth--;if(vipSectionCalMonth<0){vipSectionCalMonth=11;vipSectionCalYear--;}vipSectionOpenDate=null;renderVipSectionPrices();}
-function vipSectionCalNext(){vipSectionCalMonth++;if(vipSectionCalMonth>11){vipSectionCalMonth=0;vipSectionCalYear++;}vipSectionOpenDate=null;renderVipSectionPrices();}
+function vipSectionCalPrev(){if(vipSectionCalYear===2026&&vipSectionCalMonth<=3)return;vipSectionCalMonth--;if(vipSectionCalMonth<0){vipSectionCalMonth=11;vipSectionCalYear--;}vipSectionOpenDate=null;renderVipSectionPrices();}
+function vipSectionCalNext(){if(vipSectionCalYear===2026&&vipSectionCalMonth>=9)return;vipSectionCalMonth++;if(vipSectionCalMonth>11){vipSectionCalMonth=0;vipSectionCalYear++;}vipSectionOpenDate=null;renderVipSectionPrices();}
 
 let vipInlineVenue='',vipInlineOpenDate=null,vipInlineCalYear=null,vipInlineCalMonth=null;
 function renderVipInlinePrices(venue){
