@@ -874,7 +874,7 @@ function showSection(id) {
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   const sec=document.getElementById(id);
   if(sec){sec.classList.add("active");sec.style.display="block";}
-  const navMap={"section-dashboard":"nav-dashboard","section-program":"nav-program","section-mygl":"nav-mygl","section-calendar":"nav-calendar","section-events":"nav-more","section-admin":"nav-more","section-vip":"nav-more","section-vip-admin":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-products","section-vip-prices":"nav-more","section-createprog":"nav-more","section-product-detail":"nav-products"};
+  const navMap={"section-dashboard":"nav-dashboard","section-program":"nav-program","section-mygl":"nav-mygl","section-calendar":"nav-calendar","section-events":"nav-addgl","section-admin":"nav-more","section-vip":"nav-more","section-vip-admin":"nav-more","section-vip-process":"nav-more","section-commissions":"nav-more","section-products":"nav-products","section-vip-prices":"nav-more","section-createprog":"nav-more","section-product-detail":"nav-products"};
   const navEl=document.getElementById(navMap[id]);
   if(navEl)navEl.classList.add("active");
   if(id==="section-events")loadData().then(renderEvents);
