@@ -879,7 +879,8 @@ function showSection(id) {
   if(navEl)navEl.classList.add("active");
   if(id==="section-events")loadData().then(renderEvents);
   if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
-if(id==="section-admin"){fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).then(fresh=>{ENTRIES=fresh;renderAdminAndRestore();startAdminRefresh();}).catch(()=>{renderAdminAndRestore();startAdminRefresh();});}  if(id==="section-dashboard")loadData().then(renderDashboard);
+if(id==="section-admin"){loadData().then(()=>{fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).then(fresh=>{ENTRIES=fresh;renderAdminAndRestore();startAdminRefresh();}).catch(()=>{renderAdminAndRestore();startAdminRefresh();});});}
+  if(id==="section-dashboard")loadData().then(renderDashboard);
   if(id==="section-vip"){loadVipRequests().then(renderVipSeller);if(VIP_PRICES_DATA.length)renderVipSectionPrices();else loadVipPrices().then(()=>renderVipSectionPrices());}
   if(id==="section-vip-admin")loadVipRequests().then(renderVipAdmin);
   if(id==="section-calendar")loadData().then(renderCalendar);
