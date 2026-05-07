@@ -879,8 +879,7 @@ function showSection(id) {
   if(navEl)navEl.classList.add("active");
   if(id==="section-events")loadData().then(renderEvents);
   if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
-  if(id==="section-admin"){renderAdminAndRestore();startAdminRefresh();}
-  if(id==="section-dashboard")loadData().then(renderDashboard);
+if(id==="section-admin"){fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).then(fresh=>{ENTRIES=fresh;renderAdminAndRestore();startAdminRefresh();}).catch(()=>{renderAdminAndRestore();startAdminRefresh();});}  if(id==="section-dashboard")loadData().then(renderDashboard);
   if(id==="section-vip"){loadVipRequests().then(renderVipSeller);if(VIP_PRICES_DATA.length)renderVipSectionPrices();else loadVipPrices().then(()=>renderVipSectionPrices());}
   if(id==="section-vip-admin")loadVipRequests().then(renderVipAdmin);
   if(id==="section-calendar")loadData().then(renderCalendar);
@@ -1904,8 +1903,8 @@ async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const ms
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
-function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const newEntries=await fetchSheet("GL_ENTRIES");if(newEntries){ENTRIES=newEntries;renderAdminAndRestore();const el=document.getElementById("admin-last-updated");if(el){const now=new Date();el.textContent="Updated "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0");}}},20000);}
-function stopAdminRefresh(){if(adminRefreshTimer){clearInterval(adminRefreshTimer);adminRefreshTimer=null;}}
+function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const newEntries=await fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).catch(()=>null);if(newEntries){ENTRIES=newEntries;renderAdminAndRestore();const el=document.getElementById("admin-last-updated");if(el){const now=new Date();el.textContent="Updated "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0");}}},20000);}
+  function stopAdminRefresh(){if(adminRefreshTimer){clearInterval(adminRefreshTimer);adminRefreshTimer=null;}}
 
 const _deadlineNotifSent={};
 function checkDeadlines(){if(!CLUBS||!EVENTS||!SELLER)return;const now=new Date();const todayStr=now.toISOString().slice(0,10);const banner=document.getElementById("deadline-banner");if(!banner)return;const warnings=[];CLUBS.forEach(cl=>{if(!cl.deadline)return;const[h,m]=cl.deadline.split(":").map(Number);const deadline=new Date();deadline.setHours(h,m,0,0);if(h<6)deadline.setDate(deadline.getDate()+1);const diff=deadline-now;const minsLeft=Math.round(diff/60000);if(diff>0&&diff<30*60*1000){const hasEvent=EVENTS.some(ev=>ev.club_id===cl.club_id&&normalizeDate(ev.date||"")===todayStr&&(ev.status||"").toLowerCase()!=="inactive");if(hasEvent)warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);}});if(warnings.length){banner.textContent=warnings.join("  ·  ");banner.style.display="block";}else{banner.style.display="none";}}
