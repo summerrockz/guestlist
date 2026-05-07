@@ -996,7 +996,8 @@ function renderEvents(){
   if(search)dayEvents=dayEvents.filter(e=>{const cl=club(e.club_id);return(e.event_name||"").toLowerCase().includes(search)||(cl.club_name||"").toLowerCase().includes(search);});
   if(!dayEvents.length){wrap.innerHTML=`<div class="empty">No events for this period.</div>`;return;}
   const byDateClub={};
-  dayEvents.forEach(e=>{const d=normalizeDate(e.date||"");if(!byDateClub[d])byDateClub[d]={};if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[];byDateClub[d][e.club_id].push(e);});
+dayEvents.sort((a,b)=>{const da=normalizeDate(a.date||""),db=normalizeDate(b.date||"");if(da!==db)return da.localeCompare(db);const clA=CLUBS.find(c=>c.club_id===a.club_id)||{};const clB=CLUBS.find(c=>c.club_id===b.club_id)||{};const closedA=deadlineStatus(clA.deadline,da)==="closed"?1:0;const closedB=deadlineStatus(clB.deadline,db)==="closed"?1:0;if(closedA!==closedB)return closedA-closedB;const ta=a.time||"99:99",tb=b.time||"99:99";return ta.localeCompare(tb);});
+dayEvents.forEach(e=>{const d=normalizeDate(e.date||"");if(!byDateClub[d])byDateClub[d]={};if(!byDateClub[d][e.club_id])byDateClub[d][e.club_id]=[];byDateClub[d][e.club_id].push(e);});
   wrap.innerHTML=Object.keys(byDateClub).sort().map(date=>{
     const byClub=byDateClub[date];
     return`<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>`+
