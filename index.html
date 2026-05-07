@@ -1748,6 +1748,7 @@ document.addEventListener("change",function(e){if(e.target.classList.contains("m
 
 function buildGLHtml(dayGl,dateStr){
   if(!dayGl.length)return'';
+  dayGl.sort(function(a,b){const cl_a=CLUBS.find(function(c){return c.club_id===a.club_id;})||{};const cl_b=CLUBS.find(function(c){return c.club_id===b.club_id;})||{};const closedA=deadlineStatus(cl_a.deadline,a.date||"")==="closed"?1:0;const closedB=deadlineStatus(cl_b.deadline,b.date||"")==="closed"?1:0;if(closedA!==closedB)return closedA-closedB;const ta=a.time||"99:99",tb=b.time||"99:99";return ta.localeCompare(tb);});
   var items=dayGl.map(function(ev){
     var cl=CLUBS.find(function(c){return c.club_id===ev.club_id;})||{};
     var spots=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
