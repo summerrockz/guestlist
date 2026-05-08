@@ -322,7 +322,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
       <div id="admin-date-wrap" style="display:none;margin-bottom:12px;"><div class="date-bar"><input type="date" id="admin-date" onchange="renderAdmin()"></div></div>
       <div id="admin-club-wrap" style="display:none;margin-bottom:12px;"><select class="input-field" id="admin-club-picker" onchange="setAdminFilter('club',document.getElementById('admin-filter-club'))"><option value="">All my clubs</option></select></div>
-      <div id="admin-list"><div class="loading">Loading…</div></div>
+      <button id="copy-all-today-btn" onclick="copyAllToday()" style="display:none;width:100%;padding:14px;border-radius:999px;background:linear-gradient(135deg,#E8192C,#c01524);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;font-family:Poppins,sans-serif;">📋 Copy all confirmed for today</button>
+<div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
 
     <!-- CALENDAR -->
@@ -1146,6 +1147,8 @@ function renderAdmin(){
   const myClubs=CLUBS.filter(c=>{const adminIds=String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);return adminIds.includes(myId);}).map(c=>c.club_id);
   const date=document.getElementById("admin-date").value||today();
   const wrap=document.getElementById("admin-list");
+  const todayBtn=document.getElementById("copy-all-today-btn");
+if(todayBtn)todayBtn.style.display=String(myId)==="1"?"block":"none";
   if(!myClubs.length){wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`;return;}
   const selectedClub=adminTimeFilter==='club'?(document.getElementById("admin-club-picker")?.value||""):"";
   let filteredEntries=ENTRIES.filter(e=>{
@@ -2159,7 +2162,8 @@ function startGlobalAutoRefresh(){
 let pullStartY=0;
 document.addEventListener("touchstart",e=>{if(window.scrollY===0)pullStartY=e.touches[0].clientY;},{passive:true});
 document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].clientY-pullStartY;if(dist<80)return;const ind=document.createElement("div");ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;";ind.innerHTML="🔄 Refreshing…";document.body.appendChild(ind);try{const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;ENTRIES=mergeEntries(_fe);const active=document.querySelector(".section.active");if(active){const id=active.id;if(id==="section-events")renderEvents();if(id==="section-mygl")renderMyGL();if(id==="section-admin")renderAdminAndRestore();if(id==="section-dashboard")renderDashboard();if(id==="section-vip"){loadVipRequests().then(renderVipSeller);}if(id==="section-vip-admin"){loadVipRequests().then(renderVipAdmin);}}}catch(e){}finally{ind.remove();}},{passive:true});
-</script>
+
+function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const todayStr=today();const lines=[];myClubs.forEach(cl=>{const clubEntries=ENTRIES.filter(e=>e.club_id===cl.club_id&&normalizeDate(e.date||"")===todayStr&&(e.status||"").toLowerCase()==="active"&&(e.sent_to_club||"").toLowerCase()==="yes");if(!clubEntries.length)return;const totalPax=clubEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);lines.push(`${(cl.club_name||"").toUpperCase()} — ${formatDate(todayStr)} (${totalPax} pax)`);clubEntries.forEach(e=>{const paxNum=parseInt(e.pax)||1;const plus=paxNum>1?` +${paxNum-1}`:"";lines.push(`${e.guest_name}${plus}`);});lines.push("");});if(!lines.length){alert("No confirmed entries for today.");return;}const text=lines.join("\n").trim();const btn=document.getElementById("copy-all-today-btn");navigator.clipboard.writeText(text).then(()=>{btn.textContent="✓ Copied!";btn.style.background="linear-gradient(135deg,#22C55E,#16a34a)";setTimeout(()=>{btn.textContent="📋 Copy all confirmed for today";btn.style.background="linear-gradient(135deg,#E8192C,#c01524)";},2500);});}</script>
   <!-- Hidden plan card for PDF generation -->
 <div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#111111;font-family:Poppins,Arial,sans-serif;display:none;">
 
