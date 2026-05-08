@@ -1731,7 +1731,7 @@ function openMoreMenu(){document.getElementById("more-menu").style.display="bloc
 function closeMoreMenu(){document.getElementById("more-menu").style.display="none";}
 function moreNav(sectionId){closeMoreMenu();showSection(sectionId);}
 
-window.addEventListener("DOMContentLoaded",async()=>{const saved=localStorage.getItem("srz_seller");if(saved){SELLER=JSON.parse(saved);await initApp();}else{document.getElementById("access-page").style.display="flex";}});
+window.addEventListener("DOMContentLoaded",async()=>{const saved=localStorage.getItem("srz_seller");if(saved){try{SELLER=JSON.parse(saved);await initApp();}catch(e){localStorage.removeItem("srz_seller");document.getElementById("access-page").classList.add("active");document.getElementById("access-page").style.display="flex";}}else{document.getElementById("access-page").classList.add("active");document.getElementById("access-page").style.display="flex";}});
 document.getElementById("modal-submit").onclick=originalModalSubmit;
 document.getElementById("gl-modal").addEventListener("click",function(e){if(e.target===this)closeModal();});
 document.getElementById("vip-modal").addEventListener("click",function(e){if(e.target===this)closeVipModal();});
