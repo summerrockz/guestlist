@@ -870,6 +870,7 @@ async function fetchSheet(tab) { const r=await fetch(`${OPEN_URL}/${tab}`); retu
 async function post(body) { const p=new URLSearchParams(body).toString(); return fetch(`${SCRIPT_URL}?${p}`); }
 
 function showSection(id) {
+  stopAdminRefresh();
   document.querySelectorAll(".section").forEach(s=>{s.classList.remove("active");s.style.display="none";});
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   const sec=document.getElementById(id);
