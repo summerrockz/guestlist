@@ -881,7 +881,7 @@ function showSection(id) {
   if(id==="section-events")loadData().then(renderEvents);
   if(id==="section-mygl"){loadData().then(renderMyGL);setTimeout(()=>{const s=document.getElementById("mygl-search");if(s)s.oninput=renderMyGL;},100);}
 if(id==="section-admin"){
-  fetchSheet("GL_ENTRIES").then(fresh=>{ENTRIES=mergeEntries(fresh);renderAdminAndRestore();});
+  loadData().then(()=>{fetchSheet("GL_ENTRIES").then(fresh=>{ENTRIES=mergeEntries(fresh);renderAdminAndRestore();}).catch(()=>renderAdminAndRestore());}).catch(()=>renderAdminAndRestore());
   startAdminRefresh();
 }
   if(id==="section-dashboard")loadData().then(renderDashboard);
