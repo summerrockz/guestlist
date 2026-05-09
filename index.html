@@ -1196,7 +1196,8 @@ if(todayBtn)todayBtn.style.display=String(myId)==="1"?"block":"none";
       const newBadge=isModified&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(59,130,246,0.2);color:var(--blue);border:1px solid rgba(59,130,246,0.4);flex-shrink:0;">MODIFIED</span>`:isNew&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.4);flex-shrink:0;">NEW</span>`:"";
       const sellerTag=e.seller_name?`<span style="font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;">${e.seller_name}</span>`:"";
       const noteBadge=e.notes&&!e.notes.includes("🍹")?`<span onclick="event.stopPropagation();showNotePopup('${e.notes.replace(/'/g,"\\'")}')" style="font-size:13px;cursor:pointer;flex-shrink:0;">📝</span>`:"";
-return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span data-copy="${copyLine}" style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${noteBadge}${sellerTag}</div>`;
+const cancelBtn=!isCancelled?`<button onclick="adminCancelEntry('${e.entry_id}',this)" style="background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:13px;padding:2px 4px;flex-shrink:0;" title="Cancel entry">✕</button>`:``;
+return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span data-copy="${copyLine}" style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${noteBadge}${sellerTag}${cancelBtn}</div>`;
     }).join("");
     return`<div class="admin-club-card"><div class="admin-club-header"><div><div class="admin-club-name">${clubName}</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">${formatDate(eventDate)}${cl.deadline?" · "+deadlineLabel(cl.deadline):""}</div></div><div class="admin-count">${totalPax} pax</div></div><div class="export-box" id="export-${cardKey}" style="font-family:inherit;">${entryRows}</div><button class="btn-copy" onclick="copyExport('${cardKey}',this)" style="margin-top:10px;">📋 Copy list</button></div>`;
   }).join("");
@@ -2168,7 +2169,24 @@ function startGlobalAutoRefresh(){
 let pullStartY=0;
 document.addEventListener("touchstart",e=>{if(window.scrollY===0)pullStartY=e.touches[0].clientY;},{passive:true});
 document.addEventListener("touchend",async e=>{const dist=e.changedTouches[0].clientY-pullStartY;if(dist<80)return;const ind=document.createElement("div");ind.style.cssText="position:fixed;top:0;left:0;right:0;background:#E8192C;color:#fff;font-size:13px;font-weight:600;padding:14px 20px;z-index:9999;text-align:center;";ind.innerHTML="🔄 Refreshing…";document.body.appendChild(ind);try{const [_fe,_fc,_fev,_fs]=await Promise.all([fetchSheet("GL_ENTRIES"),fetchSheet("CLUBS"),fetchSheet("EVENTS"),fetchSheet("SELLERS")]);CLUBS=_fc;EVENTS=_fev;SELLERS=_fs;ENTRIES=mergeEntries(_fe);const active=document.querySelector(".section.active");if(active){const id=active.id;if(id==="section-events")renderEvents();if(id==="section-mygl")renderMyGL();if(id==="section-admin")renderAdminAndRestore();if(id==="section-dashboard")renderDashboard();if(id==="section-vip"){loadVipRequests().then(renderVipSeller);}if(id==="section-vip-admin"){loadVipRequests().then(renderVipAdmin);}}}catch(e){}finally{ind.remove();}},{passive:true});
-
+async function adminCancelEntry(entryId,btn){
+  if(!confirm("Cancel this entry?"))return;
+  btn.disabled=true;btn.textContent="…";
+  const entry=ENTRIES.find(e=>e.entry_id===entryId);
+  const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
+  localStorage.setItem('cancelled_'+entryId,'1');
+  trackLocalChange(entryId,{status:"cancelled"});
+  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){}
+  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+  if(entry){
+    const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
+    const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
+    for(const adminId of adminIds){
+      addNotification("cancelled",adminId,{club:cl.club_name||entry.club_name,guest:(entry.guest_name||"")+(parseInt(entry.pax)>1?" +"+(parseInt(entry.pax)-1):"")+(wasSent?" ⚠️ Already sent!":""),event:entry.event_name||"",date:entry.date,by:SELLER.seller_name});
+    }
+  }
+  renderAdminAndRestore();
+}
 function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const todayStr=today();const lines=[];myClubs.forEach(cl=>{const clubEntries=ENTRIES.filter(e=>e.club_id===cl.club_id&&normalizeDate(e.date||"")===todayStr&&(e.status||"").toLowerCase()==="active"&&(e.sent_to_club||"").toLowerCase()==="yes");if(!clubEntries.length)return;const totalPax=clubEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);lines.push(`${(cl.club_name||"").toUpperCase()} — ${formatDate(todayStr)} (${totalPax} pax)`);clubEntries.forEach(e=>{const paxNum=parseInt(e.pax)||1;const plus=paxNum>1?` +${paxNum-1}`:"";lines.push(`${e.guest_name}${plus}${e.seller_name?' — '+e.seller_name:''}`);});lines.push("");});if(!lines.length){alert("No confirmed entries for today.");return;}const text=lines.join("\n").trim();const btn=document.getElementById("copy-all-today-btn");navigator.clipboard.writeText(text).then(()=>{btn.textContent="✓ Copied!";btn.style.background="linear-gradient(135deg,#22C55E,#16a34a)";setTimeout(()=>{btn.textContent="📋 Copy all confirmed for today";btn.style.background="linear-gradient(135deg,#E8192C,#c01524)";},2500);});}</script>
   <!-- Hidden plan card for PDF generation -->
 <div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#111111;font-family:Poppins,Arial,sans-serif;display:none;">
