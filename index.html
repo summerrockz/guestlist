@@ -1248,7 +1248,7 @@ function openModal(eventId,clubId){
   document.getElementById("modal-email").value="";
   document.getElementById("modal-notes").value="";
   document.getElementById("modal-msg").textContent="";
-  document.getElementById("modal-drink-group").style.display="none";
+  const maxPaxMulti=parseInt(cl.max_pax_per_email)||3;const paxSelM=document.getElementById("modal-pax");paxSelM.innerHTML="";for(let i=1;i<=maxPaxMulti;i++){const opt=document.createElement("option");opt.value=i;opt.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSelM.appendChild(opt);}document.getElementById("modal-drink-group").style.display="none";
   document.getElementById("modal-girls-only-group").style.display=(CURRENT_EVENT?.girls_only||"").toLowerCase()==="yes"?"block":"none";
   document.getElementById("gl-modal").classList.add("open");
 }
