@@ -849,10 +849,17 @@ function formatDate(d) {
   return new Date(d+'T12:00:00').toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"});
 }
 function genId() { return "VIP-"+Date.now().toString(36).toUpperCase(); }
-function deadlineStatus(deadlineStr, eventDate) {
-  if (!deadlineStr) return "ok";
-  const now = new Date();
+function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
   if (eventDate !== today()) return "ok";
+  const now = new Date();
+  // Check event end time first
+  if (eventEndTime) {
+    const [eh,em] = eventEndTime.split(":").map(Number);
+    const endTime = new Date(); endTime.setHours(eh,em,0,0);
+    if (eh<6) endTime.setDate(endTime.getDate()+1);
+    if (now > endTime) return "closed";
+  }
+  if (!deadlineStr) return "ok";
   const [h,m] = deadlineStr.split(":").map(Number);
   const deadline = new Date(); deadline.setHours(h,m,0,0);
   if (h<6) deadline.setDate(deadline.getDate()+1);
@@ -1008,7 +1015,7 @@ dayEvents.forEach(e=>{const d=normalizeDate(e.date||"");if(!byDateClub[d])byDate
     return`<div class="day-group-label" style="font-size:12px;font-weight:700;color:var(--text);margin-top:16px;">${formatDate(date)}</div>`+
     Object.entries(byClub).map(([clubId,events])=>{
       const cl=club(clubId);
-      const ds=deadlineStatus(cl.deadline,date);
+      const evEndTime=ev.time?ev.time.split("-").pop().trim():null;const ds=deadlineStatus(cl.deadline,date,evEndTime);
       const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
       const closed=ds==="closed";
       return events.map(ev=>{
@@ -1617,7 +1624,7 @@ function renderCalendar(){
 }
 function calSelectDay(dateStr){calSelectedDate=dateStr;calActiveView=null;document.getElementById("cal-detail").style.display="block";document.getElementById("cal-detail-title").textContent=formatDate(dateStr);document.getElementById("cal-detail-content").innerHTML="";renderCalendar();setTimeout(()=>document.getElementById("cal-detail").scrollIntoView({behavior:"smooth",block:"nearest"}),100);}
 function calShowMyGL(){calActiveView="mygl";const myId=String(SELLER.seller_id||"").trim();const entries=ENTRIES.filter(e=>normalizeDate(e.date||"")===calSelectedDate&&String(e.seller_id||"").trim()===myId&&(e.status||"").toLowerCase()!=="deleted");const wrap=document.getElementById("cal-detail-content");if(!entries.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No entries for this day.</div>`;return;}const byClub={};entries.forEach(e=>{if(!byClub[e.club_name])byClub[e.club_name]=[];byClub[e.club_name].push(e);});wrap.innerHTML=Object.entries(byClub).map(([clubName,ents])=>`<div class="day-group-label">${clubName} · ${ents.length} entries</div>${ents.map(e=>`<div class="gl-card"><div class="gl-card-top"><div class="gl-guest-name">${e.guest_name}</div><div class="gl-pax">+${parseInt(e.pax)-1||0}</div></div></div>`).join("")}`).join("");}
-function calShowEvents(){calActiveView="events";const dayEvents=EVENTS.filter(e=>normalizeDate(e.date||"")===calSelectedDate);const wrap=document.getElementById("cal-detail-content");if(!dayEvents.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No events this day.</div>`;return;}const club=id=>CLUBS.find(c=>c.club_id===id)||{};wrap.innerHTML=dayEvents.map(ev=>{const cl=club(ev.club_id);const ds=deadlineStatus(cl.deadline,calSelectedDate);const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];const closed=ds==="closed";const isInactive=(ev.status||"").toLowerCase()==="inactive";
+function calShowEvents(){calActiveView="events";const dayEvents=EVENTS.filter(e=>normalizeDate(e.date||"")===calSelectedDate);const wrap=document.getElementById("cal-detail-content");if(!dayEvents.length){wrap.innerHTML=`<div class="empty" style="padding:20px;">No events this day.</div>`;return;}const club=id=>CLUBS.find(c=>c.club_id===id)||{};wrap.innerHTML=dayEvents.map(ev=>{const cl=club(ev.club_id);const evEndTime=ev.time?ev.time.split("-").pop().trim():null;const ds=deadlineStatus(cl.deadline,calSelectedDate,evEndTime);const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];const closed=ds==="closed";const isInactive=(ev.status||"").toLowerCase()==="inactive";
         return`<div class="event-card" style="${isInactive?'opacity:0.55;':''}"><div class="event-card-top"><div><div class="event-club">${cl.club_name||ev.club_id}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><button class="btn-add-gl" ${closed||"(ev.status||'').toLowerCase()==='inactive'"?"disabled":""}onclick="openModal('${ev.event_id}','${ev.club_id}')">${closed?"Deadline passed":"+ Add to guestlist"}</button></div>`;}).join("");}
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calSelectedDate=null;calActiveView=null;document.getElementById("cal-detail").style.display="none";renderCalendar();}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calSelectedDate=null;calActiveView=null;document.getElementById("cal-detail").style.display="none";renderCalendar();}
@@ -1767,7 +1774,7 @@ function buildGLHtml(dayGl,dateStr){
     var cl=CLUBS.find(function(c){return c.club_id===ev.club_id;})||{};
     var spots=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
     var isFull=spots!==null&&spots<=0;
-    var ds=deadlineStatus(cl.deadline,dateStr);
+    var evEndTime=ev.time?ev.time.split("-").pop().trim():null;var ds=deadlineStatus(cl.deadline,dateStr,evEndTime);
     var closed=ds==='closed';
     var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';
     var ticketInfo=ev.free_condition||(ev.price_after?'€'+ev.price_after+' after':'');
