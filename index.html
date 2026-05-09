@@ -1233,7 +1233,14 @@ function openModal(eventId,clubId){
   document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";
   document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";
   document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";
-  if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}
+  if(nameOnly){
+  const maxNames=parseInt(cl.max_pax_per_email)||10;
+  const paxCountEl=document.getElementById("modal-pax-count");
+  paxCountEl.innerHTML="";
+  for(let i=1;i<=maxNames;i++){const opt=document.createElement("option");opt.value=i;opt.textContent=i;paxCountEl.appendChild(opt);}
+  paxCountEl.value="1";
+  renderNameFields();
+}
   const maxPax=(needsPax||needsEmail)?(parseInt(cl.max_pax_per_email)||4):1;
   const paxSel=document.getElementById("modal-pax");paxSel.innerHTML="";
   for(let i=1;i<=maxPax;i++){const opt=document.createElement("option");opt.value=i;opt.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSel.appendChild(opt);}
