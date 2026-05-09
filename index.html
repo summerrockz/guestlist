@@ -850,6 +850,7 @@ function formatDate(d) {
 }
 function genId() { return "VIP-"+Date.now().toString(36).toUpperCase(); }
 function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
+  if (eventDate < today()) return "closed";
   if (eventDate !== today()) return "ok";
   const now = new Date();
   // Check event end time first
