@@ -850,19 +850,26 @@ function formatDate(d) {
 }
 function genId() { return "VIP-"+Date.now().toString(36).toUpperCase(); }
 function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
-  if (eventDate < today()) return "closed";
-  if (eventDate !== today()) return "ok";
   const now = new Date();
-  // Check event end time first
+  const isToday = eventDate === today();
+  const isYesterday = eventDate === new Date(now.getFullYear(), now.getMonth(), now.getDate()-1).toISOString().slice(0,10);
+  if (!isToday && !isYesterday) {
+    if (eventDate < today()) return "closed";
+    return "ok";
+  }
   if (eventEndTime) {
     const [eh,em] = eventEndTime.split(":").map(Number);
-    const endTime = new Date(); endTime.setHours(eh,em,0,0);
+    const endTime = new Date();
+    if (isYesterday) endTime.setDate(endTime.getDate()-1);
+    endTime.setHours(eh,em,0,0);
     if (eh<6) endTime.setDate(endTime.getDate()+1);
     if (now > endTime) return "closed";
   }
   if (!deadlineStr) return "ok";
   const [h,m] = deadlineStr.split(":").map(Number);
-  const deadline = new Date(); deadline.setHours(h,m,0,0);
+  const deadline = new Date();
+  if (isYesterday) deadline.setDate(deadline.getDate()-1);
+  deadline.setHours(h,m,0,0);
   if (h<6) deadline.setDate(deadline.getDate()+1);
   const diff = deadline-now;
   if (diff<0) return "closed";
