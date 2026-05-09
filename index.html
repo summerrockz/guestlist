@@ -1026,8 +1026,7 @@ dayEvents.forEach(e=>{const d=normalizeDate(e.date||"");if(!byDateClub[d])byDate
       return events.map(ev=>{
         const evEndTime=ev.time?ev.time.split("-").pop().trim():null;const ds=deadlineStatus(cl.deadline,date,evEndTime);
         const dsClass={ok:"deadline-ok",warn:"deadline-warn",closed:"deadline-closed"}[ds];
-      const closed=ds==="closed";
-      return events.map(ev=>{
+        const closed=ds==="closed";
         const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''&&ev.spots_left!==null?parseInt(ev.spots_left):null;
         const isFull=spotsLeft!==null&&spotsLeft<=0;
         const freeText=ev.free_condition?ev.free_condition:(ev.price_after?`€${ev.price_after} ${ev.price_type||""}`:"Free");
