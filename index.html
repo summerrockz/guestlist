@@ -862,7 +862,7 @@ function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
     const endTime = new Date();
     if (isYesterday) endTime.setDate(endTime.getDate()-1);
     endTime.setHours(eh,em,0,0);
-    if (eh<6) endTime.setDate(endTime.getDate()+1);
+    if (eh<=6) endTime.setDate(endTime.getDate()+1);
     if (now > endTime) return "closed";
   }
   if (!deadlineStr) return "ok";
