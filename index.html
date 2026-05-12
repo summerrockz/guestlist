@@ -1163,7 +1163,8 @@ function renderAdmin(){
   const date=document.getElementById("admin-date").value||today();
   const wrap=document.getElementById("admin-list");
   const todayBtn=document.getElementById("copy-all-today-btn");
-if(todayBtn)todayBtn.style.display=(String(myId)==="1"||String(myId)==="66")?"block":"none";
+const _isAdmin=CLUBS.some(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));
+if(todayBtn)todayBtn.style.display=_isAdmin?"block":"none";
   if(!myClubs.length){wrap.innerHTML=`<div class="empty">No clubs assigned to you.</div>`;return;}
   const selectedClub=adminTimeFilter==='club'?(document.getElementById("admin-club-picker")?.value||""):"";
   let filteredEntries=ENTRIES.filter(e=>{
