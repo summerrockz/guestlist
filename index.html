@@ -2135,11 +2135,13 @@ function mergeEntries(sheetEntries){
     }
     return sheetEntry;
   });
-  // Keep ALL local entries not yet in sheet - no time limit
+  // Keep local entries not yet in sheet, but only if added in last 5 minutes
   const mergedIds = new Set(merged.map(e => e.entry_id));
+  const fiveMinAgo = Date.now() - 5*60*1000;
   ENTRIES.forEach(localEntry => {
     if(!mergedIds.has(localEntry.entry_id) && (localEntry.status||'').toLowerCase() !== 'deleted'){
-      merged.push(localEntry);
+      const ts = new Date(localEntry.created_at||0).getTime();
+      if(ts > fiveMinAgo) merged.push(localEntry);
     }
   });
   return merged;
