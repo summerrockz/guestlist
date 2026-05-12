@@ -1079,8 +1079,11 @@ function renderMyGL(){
     if(myglSort==='pending')return(e.sent_to_club||'').toLowerCase()!=='yes'&&(e.status||'').toLowerCase()==='active';
     if(myglSort==='confirmed')return(e.sent_to_club||'').toLowerCase()==='yes';
     if(myglSort==='cancelled')return(e.status||'').toLowerCase()==='cancelled';
-    if((e.status||'').toLowerCase()==='cancelled')return false;
-    return true;
+    if((e.status||'').toLowerCase()==='cancelled'){
+  const wasSent=(e.sent_to_club||'').toLowerCase()==='yes';
+  return wasSent;
+}
+return true;
   }).sort((a,b)=>{
     if(myglSort==='last'){const pa=a.created_at||'';const pb=b.created_at||'';return pb.localeCompare(pa);}
     if(myglSort==='date_desc')return (b.date||"").localeCompare(a.date||"");
