@@ -1117,8 +1117,8 @@ async function deleteEntry(entryId,btn){
   modal.style.display='flex';
   localStorage.setItem('cancelled_'+entryId,'1');
   trackLocalChange(entryId,{status:"cancelled"});
-  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){console.error("Cancel failed:",e);}
-  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+  const cancelNote=' · ❌ Cancelled by '+SELLER.seller_name;try{await post({action:"cancel_entry",entry_id:entryId,notes:(entry.notes||'')+cancelNote});}catch(e){console.error("Cancel failed:",e);}
+  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled",notes:(e.notes||'')+cancelNote}:e);
 if(entry&&entry.event_id){const paxNum=parseInt(entry.pax)||1;EVENTS=EVENTS.map(ev=>ev.event_id===entry.event_id&&ev.spots_left!==undefined&&ev.spots_left!==''?{...ev,spots_left:Math.max(0,(parseInt(ev.spots_left)||0)+paxNum)}:ev);}
   btn.textContent="Cancel entry";btn.disabled=false;
   showCancelSuccessModal(entry?entry.guest_name:'Entry');
@@ -2197,8 +2197,8 @@ async function adminCancelEntry(entryId,btn){
   const wasSent=entry&&(entry.sent_to_club||"").toLowerCase()==="yes";
   localStorage.setItem('cancelled_'+entryId,'1');
   trackLocalChange(entryId,{status:"cancelled"});
-  try{await post({action:"cancel_entry",entry_id:entryId});}catch(e){}
-  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled"}:e);
+const cancelNote=' · ❌ Cancelled by '+SELLER.seller_name;try{await post({action:"cancel_entry",entry_id:entryId,notes:(entry.notes||'')+cancelNote});}catch(e){}
+  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,status:"cancelled",notes:(e.notes||'')+cancelNote}:e);
   if(entry){
     const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};
     const adminIds=String(cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
