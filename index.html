@@ -1287,7 +1287,10 @@ const originalModalSubmit=async()=>{
   if(nameOnly){
     const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));
     const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
-    if(!names.length){msg.textContent="Enter at least one name.";return;}
+    const _goGroup=document.getElementById('modal-girls-only-group');
+const _goCb=document.getElementById('modal-girls-only-cb');
+if(_goGroup&&_goGroup.style.display!=='none'&&_goCb&&!_goCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
+if(!names.length){msg.textContent="Enter at least one name.";return;}
     const btn=document.getElementById("modal-submit");if(btn._submitting)return;btn._submitting=true;btn.disabled=true;btn.textContent="Adding…";
     const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
     for(const _e of _entries){await post({action:"add_entry",..._e});await new Promise(r=>setTimeout(r,600));}
@@ -1300,6 +1303,8 @@ const originalModalSubmit=async()=>{
     adminIds2.forEach(adminId=>addNotification("new_entry",adminId,{club:cl2.club_name||CURRENT_EVENT.club_id,guest:names.join(", ")+" ("+names.length+" pax)",event:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,by:SELLER.seller_name}));
     return;
   }
+  const girlsOnlyCb=document.getElementById('modal-girls-only-cb');
+if(girlsOnlyCb&&girlsOnlyCb.closest('[style*="display: block"]')&&!girlsOnlyCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
   if(!guestName){msg.textContent="Guest name is required.";return;}
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
 const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(CURRENT_EVENT.date||"")&&e.club_id===CURRENT_EVENT.club_id&&(e.status||"").toLowerCase()==="active");
