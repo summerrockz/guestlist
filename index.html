@@ -927,7 +927,7 @@ async function initApp() {
   document.getElementById("main-app").style.display="flex";
   const teamFlag=SELLER.team?" "+SELLER.team:"";
   document.getElementById("header-user").textContent=SELLER.seller_name+teamFlag;
-  document.getElementById("admin-date").value=today();
+  const adminDateEl=document.getElementById("admin-date");if(adminDateEl)adminDateEl.value=today();
   document.getElementById("events-date-from").onchange=function(){
     const lbl=document.getElementById("events-from-label");
     if(lbl){if(this.value){const d=new Date(this.value+"T12:00:00");lbl.textContent=d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"});lbl.style.color="var(--text)";}else{lbl.textContent="From date";lbl.style.color="var(--muted)";}}
