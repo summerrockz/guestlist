@@ -321,7 +321,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button class="vip-filter-btn" id="admin-filter-history" onclick="setAdminFilter('history',this)">History</button>
       </div>
       <div id="admin-date-wrap" style="display:none;margin-bottom:12px;"><div class="date-bar"><input type="date" id="admin-date" onchange="renderAdmin()"></div></div>
-      <div id="admin-club-wrap" style="display:none;margin-bottom:12px;"><select class="input-field" id="admin-club-picker" onchange="setAdminFilter('club',document.getElementById('admin-filter-club'))"><option value="">All my clubs</option></select></div>
+      <div id="admin-club-wrap" style="display:none;margin-bottom:12px;"><select class="input-field" id="admin-club-picker" onchange="renderAdminAndRestore()"><option value="">All my clubs</option></select></div>
       <button id="copy-all-today-btn" onclick="copyAllToday()" style="display:none;width:100%;padding:14px;border-radius:999px;background:linear-gradient(135deg,#E8192C,#c01524);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;font-family:Poppins,sans-serif;">📋 Copy all confirmed for today</button>
 <div id="admin-list"><div class="loading">Loading…</div></div>
     </div>
@@ -1142,7 +1142,7 @@ function setAdminFilter(f,btn){
   const dateWrap=document.getElementById('admin-date-wrap');
   const clubWrap=document.getElementById('admin-club-wrap');
   if(dateWrap)dateWrap.style.display=f==='date'?'block':'none';
-  if(clubWrap){clubWrap.style.display=f==='club'?'block':'none';if(f==='club'){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const picker=document.getElementById("admin-club-picker");if(picker&&picker.options.length<=1){myClubs.forEach(c=>{const opt=document.createElement("option");opt.value=c.club_id;opt.textContent=c.club_name;picker.appendChild(opt);})}}}
+  if(clubWrap){clubWrap.style.display=f==='club'?'block':'none';if(f==='club'){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const picker=document.getElementById("admin-club-picker");if(picker){picker.innerHTML='<option value="">All my clubs</option>';myClubs.forEach(c=>{const opt=document.createElement("option");opt.value=c.club_id;opt.textContent=c.club_name;picker.appendChild(opt);});}}}
   renderAdminAndRestore();
 }
 
