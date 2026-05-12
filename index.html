@@ -2126,6 +2126,11 @@ function mergeEntries(sheetEntries){
   const merged = sheetEntries.map(sheetEntry => {
     const lsKey = 'cancelled_'+sheetEntry.entry_id;
     if(localStorage.getItem(lsKey)==='1'){
+      // If sheet says active again, clear local cancel flag
+      if((sheetEntry.status||'').toLowerCase()==='active'){
+        localStorage.removeItem(lsKey);
+        return sheetEntry;
+      }
       return {...sheetEntry, status:'cancelled'};
     }
     const local = _localChanges[sheetEntry.entry_id];
