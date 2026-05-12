@@ -1158,7 +1158,7 @@ function isRecent(createdAt,hours){
 function renderAdmin(){
   const myId=String(SELLER.seller_id||"").trim();
   const myClubs=CLUBS.filter(c=>{const adminIds=String(c.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);return adminIds.includes(myId);}).map(c=>c.club_id);
-  const date=document.getElementById("admin-date").value||today();
+  const date=(document.getElementById("admin-date")?.value)||today();
   const wrap=document.getElementById("admin-list");
   const todayBtn=document.getElementById("copy-all-today-btn");
 const _isAdmin=CLUBS.some(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));
