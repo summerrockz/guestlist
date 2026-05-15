@@ -810,9 +810,25 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <button onclick="fpCloseModal()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
     </div>
     <div class="modal-sub" id="fp-modal-sub"></div>
-    <span id="fp-modal-badge" style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;"></span>
+    <label class="form-label">Table type</label>
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button onclick="fpSetType('ultra')" id="fp-type-ultra" style="flex:1;padding:8px;border-radius:999px;border:1px solid rgba(232,25,44,0.4);background:rgba(232,25,44,0.15);color:#E8192C;font-size:11px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">Ultra VIP</button>
+      <button onclick="fpSetType('super')" id="fp-type-super" style="flex:1;padding:8px;border-radius:999px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.1);color:#F59E0B;font-size:11px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">Super VIP</button>
+      <button onclick="fpSetType('vip')" id="fp-type-vip" style="flex:1;padding:8px;border-radius:999px;border:1px solid rgba(59,130,246,0.4);background:rgba(59,130,246,0.1);color:#3B82F6;font-size:11px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif;">VIP</button>
+    </div>
     <label class="form-label">Guest name</label>
     <input type="text" class="input-field" id="fp-modal-guest" placeholder="Full name…">
+    <label class="form-label">Seller</label>
+    <input type="text" class="input-field" id="fp-modal-seller" placeholder="Seller name…">
+    <label class="form-label">Nationality</label>
+    <input type="text" class="input-field" id="fp-modal-nationality" placeholder="e.g. Dutch, British…">
+    <label class="form-label">Gender</label>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <div style="flex:1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Males</label><input type="number" class="input-field" id="fp-modal-males" placeholder="0" min="0" style="margin-bottom:0;"></div>
+      <div style="flex:1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Females</label><input type="number" class="input-field" id="fp-modal-females" placeholder="0" min="0" style="margin-bottom:0;"></div>
+    </div>
+    <label class="form-label">Bottles</label>
+    <div id="fp-modal-bottles-options" style="margin-bottom:16px;"></div>
     <label class="form-label">Pax</label>
     <input type="number" class="input-field" id="fp-modal-pax" placeholder="Number of guests" min="1">
     <label class="form-label">Notes</label>
