@@ -2387,7 +2387,7 @@ async function fpLoadEvent(){
   try{
     const rows=await fetchSheet('CDM_TABLES');
     rows.filter(r=>r.event_date===fpCurrentEvent).forEach(r=>{
-      fpTableData[r.table_id]={guest:r.guest||'',pax:r.pax||'',notes:r.notes||''};
+      fpTableData[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
     });
   }catch(e){}
   fpRenderAll();
@@ -2397,7 +2397,7 @@ async function fpLoadEvent(){
       const rows=await fetchSheet('CDM_TABLES');
       const fresh={};
       rows.filter(r=>r.event_date===fpCurrentEvent).forEach(r=>{
-        fresh[r.table_id]={guest:r.guest||'',pax:r.pax||'',notes:r.notes||''};
+        fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
       });
       fpTableData=fresh;fpRenderAll();
       const ind=document.getElementById('fp-refresh-ind');
