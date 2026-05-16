@@ -791,7 +791,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div id="modal-drink-fields" style="display:none;"><label class="form-label">Drink package</label><select class="input-field" id="modal-drink-package"><option value="">— select package —</option></select><label class="form-label">Phone number <span style="color:var(--red);">*</span></label><input type="tel" class="input-field" id="modal-drink-phone" placeholder="+34 600 000 000"></div>
     </div>
     <div id="modal-girls-only-group" style="display:none;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:12px;cursor:pointer;" onclick="document.getElementById('modal-girls-only-cb').click()">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:12px;cursor:pointer;" onclick="if(event.target.id!=='modal-girls-only-cb')document.getElementById('modal-girls-only-cb').click()">
         <input type="checkbox" id="modal-girls-only-cb" style="width:18px;height:18px;accent-color:#EC4899;cursor:pointer;flex-shrink:0;">
         <div style="font-size:13px;font-weight:600;color:#EC4899;">💃 I confirm all guests are female</div>
       </div>
@@ -2458,22 +2458,42 @@ function fpSetType(type){
   if(saveBtn)saveBtn.style.background=colors[type];
 }
 
+const FP_BOTTLE_MAX={vip:1,super:2,ultra:0};
+
 function fpRenderBottles(type){
   const wrap=document.getElementById('fp-modal-bottles-options');
   if(!wrap)return;
   const options=FP_BOTTLES[type]||[];
-  const current=window._fpSelectedBottles||[];
-  wrap.innerHTML=options.map(b=>{
-    const sel=current.includes(b);
-    return`<div onclick="fpToggleBottle('${b}',this)" style="display:inline-block;margin:3px;padding:6px 12px;border-radius:999px;border:1px solid ${sel?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.15)'};background:${sel?'rgba(255,255,255,0.12)':'transparent'};color:${sel?'#fff':'rgba(255,255,255,0.5)'};font-size:12px;cursor:pointer;font-family:Poppins,sans-serif;" data-bottle="${b}">${b}</div>`;
+  const counts=window._fpBottleCounts||{};
+  const max=FP_BOTTLE_MAX[type]||99;
+  const total=Object.values(counts).reduce((s,v)=>s+v,0);
+  if(!options.length){wrap.innerHTML='<div style="font-size:12px;color:var(--muted);">No bottle options for this table type.</div>';return;}
+  wrap.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${total}/${max} bottles selected</div>`
+  +options.map(b=>{
+    const count=counts[b]||0;
+    const minDisabled=count===0;
+    const maxDisabled=total>=max;
+    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:8px 12px;border-radius:12px;background:${count>0?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.03)'};border:1px solid ${count>0?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.08)'};">
+      <div style="flex:1;font-size:13px;color:${count>0?'#fff':'rgba(255,255,255,0.5)'};">${b}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="fpBottleChange('${b.replace(/'/g,"\\'")}',−1)" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;line-height:1;${minDisabled?'opacity:0.3;cursor:not-allowed;':''}">−</button>
+        <span style="font-size:14px;font-weight:700;color:#fff;min-width:16px;text-align:center;">${count}</span>
+        <button onclick="fpBottleChange('${b.replace(/'/g,"\\'")}',1)" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;line-height:1;${maxDisabled?'opacity:0.3;cursor:not-allowed;':''}">+</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
-function fpToggleBottle(name,el){
-  if(!window._fpSelectedBottles)window._fpSelectedBottles=[];
-  const idx=window._fpSelectedBottles.indexOf(name);
-  if(idx>-1){window._fpSelectedBottles.splice(idx,1);el.style.border='1px solid rgba(255,255,255,0.15)';el.style.background='transparent';el.style.color='rgba(255,255,255,0.5)';}
-  else{window._fpSelectedBottles.push(name);el.style.border='1px solid rgba(255,255,255,0.4)';el.style.background='rgba(255,255,255,0.12)';el.style.color='#fff';}
+function fpBottleChange(name,delta){
+  if(!window._fpBottleCounts)window._fpBottleCounts={};
+  const max=FP_BOTTLE_MAX[fpCurrentType]||99;
+  const total=Object.values(window._fpBottleCounts).reduce((s,v)=>s+v,0);
+  const current=window._fpBottleCounts[name]||0;
+  if(delta>0&&total>=max)return;
+  if(delta<0&&current<=0)return;
+  window._fpBottleCounts[name]=current+delta;
+  if(window._fpBottleCounts[name]<=0)delete window._fpBottleCounts[name];
+  fpRenderBottles(fpCurrentType);
 }
 
 function fpOpenTable(id){
@@ -2482,7 +2502,12 @@ function fpOpenTable(id){
   const d=fpTableData[id];
   fpCurrentTableId=id;
   fpCurrentType=d?.type||t.type;
-  window._fpSelectedBottles=d?.bottles?d.bottles.split(',').map(b=>b.trim()).filter(Boolean):[];
+  window._fpBottleCounts={};
+  if(d?.bottles){
+    d.bottles.split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>{
+      window._fpBottleCounts[b]=(window._fpBottleCounts[b]||0)+1;
+    });
+  }
   document.getElementById('fp-modal-title').textContent='Table '+id;
   const zone=id.endsWith('C')?'Sky':parseInt(id)>=7?'Sun':'Sea';
   document.getElementById('fp-modal-sub').textContent='Zone: '+zone;
@@ -2510,7 +2535,7 @@ async function fpSaveTable(){
   const females=document.getElementById('fp-modal-females').value.trim();
   const pax=document.getElementById('fp-modal-pax').value.trim();
   const notes=document.getElementById('fp-modal-notes').value.trim();
-  const bottles=(window._fpSelectedBottles||[]).join(', ');
+  const bottles=Object.entries(window._fpBottleCounts||{}).flatMap(([b,n])=>Array(n).fill(b)).join(', ');
   const type=fpCurrentType;
   const btn=document.getElementById('fp-modal-save');
   btn.textContent='Saving…';btn.disabled=true;
@@ -2528,7 +2553,7 @@ async function fpClearTable(){
   if(!fpCurrentTableId||!fpCurrentEvent)return;
   if(!confirm('Clear this table?'))return;
   delete fpTableData[fpCurrentTableId];
-  window._fpSelectedBottles=[];
+  window._fpBottleCounts={};
   fpRenderTable(fpCurrentTableId);fpUpdateStats();
   try{
     const params=new URLSearchParams({action:'clear_cdm_table',event_date:fpCurrentEvent,table_id:fpCurrentTableId});
