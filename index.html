@@ -559,10 +559,15 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <select id="fp-cdm-event" class="input-field" style="margin-bottom:0;flex:1;" onchange="fpLoadEvent()"><option value="">— Select event date —</option></select>
       <div id="fp-refresh-ind" style="font-size:10px;color:var(--muted);white-space:nowrap;"></div>
     </div>
-    <div style="display:flex;gap:0;margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
+    <div style="display:flex;gap:0;margin-bottom:8px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
       <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-stat-booked" style="font-size:18px;font-weight:700;color:var(--amber);">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Booked</div></div>
       <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-stat-free" style="font-size:18px;font-weight:700;color:var(--green);">31</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Free</div></div>
       <div style="text-align:center;flex:1;"><div id="fp-stat-pax" style="font-size:18px;font-weight:700;color:var(--red);">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Pax</div></div>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
+      <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-stat-ultra" style="font-size:18px;font-weight:700;color:#E8192C;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Ultra VIP</div></div>
+      <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-stat-super" style="font-size:18px;font-weight:700;color:#F59E0B;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Super VIP</div></div>
+      <div style="text-align:center;flex:1;"><div id="fp-stat-vip" style="font-size:18px;font-weight:700;color:#3B82F6;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">VIP</div></div>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
       <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#E8192C;"></div>Ultra VIP</div>
@@ -2431,12 +2436,21 @@ function fpRenderTable(id){
 function fpUpdateStats(){
   const booked=Object.values(fpTableData).filter(d=>d&&d.guest).length;
   const pax=Object.values(fpTableData).reduce((s,d)=>s+(parseInt(d?.pax)||0),0);
+  const ultraCount=Object.values(fpTableData).filter(d=>d&&d.guest&&d.type==='ultra').length;
+  const superCount=Object.values(fpTableData).filter(d=>d&&d.guest&&d.type==='super').length;
+  const vipCount=Object.values(fpTableData).filter(d=>d&&d.guest&&d.type==='vip').length;
   const b=document.getElementById('fp-stat-booked');
   const f=document.getElementById('fp-stat-free');
   const p=document.getElementById('fp-stat-pax');
+  const u=document.getElementById('fp-stat-ultra');
+  const sv=document.getElementById('fp-stat-super');
+  const v=document.getElementById('fp-stat-vip');
   if(b)b.textContent=booked;
   if(f)f.textContent=FP_CDM_TABLES.length-booked;
   if(p)p.textContent=pax;
+  if(u)u.textContent=ultraCount;
+  if(sv)sv.textContent=superCount;
+  if(v)v.textContent=vipCount;
 }
 
 let fpCurrentType='vip';
