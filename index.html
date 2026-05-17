@@ -1192,7 +1192,7 @@ function renderMyGL(){
     const visible=(e.status||"").toLowerCase()!=="deleted";
     const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
     const yStr=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-    const notTooOld=myglShowHistory||dateFilter||myglSort==='history'||entryDate>=yStr;
+    const todayStr2=today();const yesterday2=new Date();yesterday2.setDate(yesterday2.getDate()-1);const yStr2=`${yesterday2.getFullYear()}-${String(yesterday2.getMonth()+1).padStart(2,'0')}-${String(yesterday2.getDate()).padStart(2,'0')}`;const notTooOld=myglShowHistory||dateFilter||myglSort==='history'||(myglSort==='last'?entryDate>=yStr2:entryDate>=yStr);
     return isOwn&&matchesDate&&matchesSearch&&matchesSeller&&visible&&notTooOld;
   }).filter(e=>{
     if(myglSort==='pending')return(e.sent_to_club||'').toLowerCase()!=='yes'&&(e.status||'').toLowerCase()==='active';
@@ -1211,8 +1211,7 @@ return true;
   if(!mine.length){wrap.innerHTML=`<div class="empty">${dateFilter?"No entries for "+formatDate(dateFilter):"No entries yet."}</div>`;return;}
   const byDateClub={};
   if(myglSort==='last'){
-    // For last added: group by created_at date, not event date
-    mine.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||'')).forEach(e=>{const key=e.entry_id;if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[e],addedDate:e.created_at||''};});
+    mine.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||'')).forEach(e=>{const key=normalizeDate(e.date||"")+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[],addedDate:e.created_at||''};byDateClub[key].entries.push(e);});
   } else {
     mine.forEach(e=>{const key=normalizeDate(e.date||"")+"_"+(e.club_name||"");if(!byDateClub[key])byDateClub[key]={date:normalizeDate(e.date||""),club:e.club_name,entries:[]};byDateClub[key].entries.push(e);});
   }
