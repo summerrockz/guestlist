@@ -1425,6 +1425,7 @@ if(!names.length){msg.textContent="Enter at least one name.";return;}
   const girlsOnlyCb=document.getElementById('modal-girls-only-cb');
 if(girlsOnlyCb&&girlsOnlyCb.closest('[style*="display: block"]')&&!girlsOnlyCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
   if(!guestName){msg.textContent="Guest name is required.";return;}
+if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
 const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(CURRENT_EVENT.date||"")&&e.club_id===CURRENT_EVENT.club_id&&(e.status||"").toLowerCase()==="active");
 if(dupEmail){msg.textContent="⚠️ This email is already on the guestlist for this event.";return;}
