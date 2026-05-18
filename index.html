@@ -1290,7 +1290,7 @@ if(todayBtn)todayBtn.style.display=_isAdmin?"block":"none";
     const status=(e.status||"").toLowerCase();
     if(status==="deleted")return false;
     if(!myClubs.includes(e.club_id))return false;
-    if(adminTimeFilter==='all')return normalizeDate(e.date||"")>=today();
+    if(adminTimeFilter==='all'){const _now2=new Date();const _sh2=new Date(_now2);if(_now2.getHours()<3)_sh2.setDate(_sh2.getDate()-1);const _t2=`${_sh2.getFullYear()}-${String(_sh2.getMonth()+1).padStart(2,'0')}-${String(_sh2.getDate()).padStart(2,'0')}`;return normalizeDate(e.date||"")>=_t2;}
     if(adminTimeFilter==='history')return normalizeDate(e.date||"")<today();
     if(adminTimeFilter==='today'){
       const parseGSDate=s=>{if(!s)return"";const str=String(s).trim();const m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;const m2=str.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m2)return`${m2[1]}-${m2[2]}-${m2[3]}`;return"";};
