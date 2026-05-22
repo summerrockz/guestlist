@@ -946,7 +946,7 @@ const VIP_EVENTS = {
   ]
 };
 
-function today() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function today() { const d=new Date(); const s=new Date(d); if(d.getHours()<3)s.setDate(s.getDate()-1); return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}`; }
 function normalizeDate(d) {
   if (!d) return "";
   d = String(d).trim();
