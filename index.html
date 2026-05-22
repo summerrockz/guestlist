@@ -962,7 +962,7 @@ function genId() { return "VIP-"+Date.now().toString(36).toUpperCase(); }
 function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
   const now = new Date();
   const isToday = eventDate === today();
-  const isYesterday = eventDate === new Date(now.getFullYear(), now.getMonth(), now.getDate()-1).toISOString().slice(0,10);
+  const yest=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);const isYesterday=eventDate===`${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
   if (!isToday && !isYesterday) {
     if (eventDate < today()) return "closed";
     return "ok";
