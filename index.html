@@ -1127,7 +1127,7 @@ function renderEvents(){
   const club=id=>CLUBS.find(c=>c.club_id===id)||{};
   const now=new Date();
 const shifted=new Date(now);
-if(now.getHours()<6)shifted.setDate(shifted.getDate()-1);
+if(now.getHours()<3)shifted.setDate(shifted.getDate()-1);
 const todayStr=`${shifted.getFullYear()}-${String(shifted.getMonth()+1).padStart(2,'0')}-${String(shifted.getDate()).padStart(2,'0')}`;
   let dayEvents=EVENTS.filter(e=>{const ed=normalizeDate(e.date||"");if(dateFrom&&dateTo)return ed>=dateFrom&&ed<=dateTo;if(dateFrom)return ed>=dateFrom;if(dateTo)return ed<=dateTo&&ed>=todayStr;return ed>=todayStr;});
   if(search)dayEvents=dayEvents.filter(e=>{const cl=club(e.club_id);return(e.event_name||"").toLowerCase().includes(search)||(cl.club_name||"").toLowerCase().includes(search);});
