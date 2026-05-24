@@ -1308,7 +1308,7 @@ if(todayBtn)todayBtn.style.display=_isAdmin?"block":"none";
     const cl=CLUBS.find(c=>c.club_id===clubId)||{};
     const format=cl.format||"name";
     const cardKey=clubId+"_"+eventDate;
-    const allEntries=ENTRIES.filter(e=>normalizeDate(e.date||"")===eventDate&&e.club_id===clubId&&((e.status||"").toLowerCase()==="active"||(( e.status||"").toLowerCase()==="cancelled"&&(e.sent_to_club||"").toLowerCase()==="yes")));
+    const allEntries=filteredEntries.filter(e=>normalizeDate(e.date||"")===eventDate&&e.club_id===clubId&&((e.status||"").toLowerCase()==="active"||((e.status||"").toLowerCase()==="cancelled"&&(e.sent_to_club||"").toLowerCase()==="yes")));
     const normalEntries=allEntries.filter(e=>!(e.notes||"").includes("🍹 Drink package:")).sort((a,b)=>{const aM=!!(a.modified_at&&isRecent(a.modified_at,24));const bM=!!(b.modified_at&&isRecent(b.modified_at,24));return aM===bM?0:aM?1:-1;});
     const drinkEntries=allEntries.filter(e=>(e.notes||"").includes("🍹 Drink package:"));
     const totalPax=allEntries.filter(e=>(e.status||"").toLowerCase()==="active").reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);
