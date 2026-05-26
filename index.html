@@ -2658,8 +2658,7 @@ function renderWeeklyCal(){
   html+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
     const CLUB_LOGOS={'Lio':'https://i.ibb.co/1J6BsgFv/Untitled-150-x-150-px-41.png','Beachhouse':'https://i.ibb.co/C5PRwSZz/Untitled-150-x-150-px-42.png'};
-html+=`<tr style="height:1px;"><td style="padding:4px 4px;vertical-align:top;border-bottom:1px solid var(--border);">${CLUB_LOGOS[clubName]?`<img src="${CLUB_LOGOS[clubName]}" style="width:28px;height:28px;border-radius:6px;object-fit:contain;display:block;">`:``}<div style="font-size:9px;font-weight:700;color:var(--text);line-height:1.3;margin-top:2px;">${clubName}</div></td>`;
-    dates.forEach(dateStr=>{
+html+=`<tr style="height:1px;"><td style="padding:2px 2px;vertical-align:top;border-bottom:1px solid var(--border);width:50px;">${CLUB_LOGOS[clubName]?`<img src="${CLUB_LOGOS[clubName]}" style="width:24px;height:24px;border-radius:4px;object-fit:contain;display:block;" title="${clubName}">`:''}<div style="font-size:8px;font-weight:700;color:var(--text);line-height:1.2;margin-top:1px;max-width:46px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${CLUB_LOGOS[clubName]?'':clubName}</div></td>`;    dates.forEach(dateStr=>{
       const evs=data.events[dateStr]||[];
       if(!evs.length){html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;"><div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;border:1px solid rgba(255,255,255,0.05);height:100%;"><div style="font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;text-align:center;padding:8px 0;">—</div></div></td>`;return;}
      html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;height:inherit;">`;
@@ -2670,7 +2669,7 @@ html+=`<tr style="height:1px;"><td style="padding:4px 4px;vertical-align:top;bor
         const freeText=ev.free_condition||'Free';
         const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
         const dotColor=closed?'#E8192C':ds==='warn'?'#F59E0B':'#22C55E';
-        html+=`<div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;margin-bottom:3px;border:1px solid rgba(255,255,255,0.07);"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div><div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||''}</div></div>${ev.time?`<div style="font-size:9px;color:rgba(255,255,255,0.4);">⏰ ${ev.time}</div>`:''}<div style="font-size:9px;color:rgba(255,255,255,0.4);">🎫 ${freeText}</div>${spotsLeft!==null?`<div style="font-size:9px;color:${spotsLeft<=5?'var(--red)':spotsLeft<=15?'var(--amber)':'rgba(255,255,255,0.4)'};">👥 ${spotsLeft}</div>`:''}</div>`;
+        html+=`<div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;margin-bottom:3px;border:1px solid rgba(255,255,255,0.07);"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div><div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||''}</div></div>${ev.time?`<div style="font-size:9px;color:rgba(255,255,255,0.4);">⏰ ${ev.time}</div>`:''}<div style="font-size:9px;color:rgba(255,255,255,0.4);">🎫 ${freeText}</div>${ev.extra_notes?`<div style="font-size:9px;color:rgba(255,255,255,0.35);">📝 ${ev.extra_notes}</div>`:''}</div>`;
       });
       html+=`</td>`;
     });
@@ -2727,8 +2726,7 @@ html+=`<tr style="height:1px;"><td style="padding:4px 4px;vertical-align:top;bor
         const closed=ds==='closed';
         const freeText=ev.free_condition||'Free';
         const dotColor=closed?'#E8192C':ds==='warn'?'#F59E0B':'#22C55E';
-        bodyHtml+=`<div style="background:#1a1a1a;border-radius:6px;padding:5px 6px;margin-bottom:2px;border:1px solid rgba(255,255,255,0.07);"><div style="width:5px;height:5px;border-radius:50%;background:${dotColor};margin-bottom:2px;"></div><div style="font-size:8px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||clubName}</div>${ev.time?`<div style="font-size:7px;color:rgba(255,255,255,0.4);">${ev.time}</div>`:''}<div style="font-size:7px;color:rgba(255,255,255,0.4);">${freeText}</div></div>`;
-      });
+bodyHtml+=`<div style="background:#1a1a1a;border-radius:6px;padding:5px 6px;margin-bottom:2px;border:1px solid rgba(255,255,255,0.07);"><div style="width:5px;height:5px;border-radius:50%;background:${dotColor};margin-bottom:2px;"></div><div style="font-size:8px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||clubName}</div>${ev.time?`<div style="font-size:7px;color:rgba(255,255,255,0.4);">${ev.time}</div>`:''}<div style="font-size:7px;color:rgba(255,255,255,0.4);">${freeText}</div>${ev.extra_notes?`<div style="font-size:7px;color:rgba(255,255,255,0.3);">${ev.extra_notes}</div>`:''}</div>`;      });
       bodyHtml+=`</td>`;
     });
     bodyHtml+=`</tr>`;
