@@ -2658,11 +2658,11 @@ function renderWeeklyCal(){
   });
   html+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
-    html+=`<tr><td style="padding:4px 4px;vertical-align:top;border-bottom:1px solid var(--border);"><div style="font-size:10px;font-weight:700;color:var(--text);line-height:1.3;">${clubName}</div></td>`;
+    html+=`<tr style="height:1px;"><td style="padding:4px 4px;vertical-align:top;border-bottom:1px solid var(--border);"><div style="font-size:10px;font-weight:700;color:var(--text);line-height:1.3;">${clubName}</div></td>`;
     dates.forEach(dateStr=>{
       const evs=data.events[dateStr]||[];
-      if(!evs.length){html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;"></td>`;return;}
-      html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;">`;
+      if(!evs.length){html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;"><div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;border:1px solid rgba(255,255,255,0.05);height:100%;"><div style="font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;text-align:center;padding:8px 0;">—</div></div></td>`;return;}
+     html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;height:inherit;">`;
       evs.forEach(ev=>{
         const cl=data.club;
         const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
