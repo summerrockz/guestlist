@@ -2640,19 +2640,19 @@ function renderWeeklyCal(){
   let html='';
   for(let i=0;i<7;i++){
     const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
-    const dateStr=${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')};
+    const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isToday=dateStr===todayStr;
     const dayEvents=EVENTS.filter(ev=>normalizeDate(ev.date||'')===dateStr&&(ev.status||'').toLowerCase()!=='inactive');
     const dayName=DAYS[i];
     const dateLabel=d.getDate()+' '+ms[d.getMonth()];
     if(!dayEvents.length){
-      html+=<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);opacity:0.4;">
+      html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);opacity:0.4;">
         <div style="min-width:110px;">
           <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${isToday?'var(--red)':'var(--muted)'};">${dayName}</div>
           <div style="font-size:12px;color:var(--muted);">${dateLabel}</div>
         </div>
         <div style="font-size:12px;color:rgba(255,255,255,0.2);font-style:italic;">No events</div>
-      </div>;
+      </div>`;
       continue;
     }
     html+=`<div style="border-bottom:1px solid var(--border);padding:12px 0;">
