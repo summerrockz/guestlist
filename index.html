@@ -2237,7 +2237,7 @@ async function cpDownloadPDF(){
   });
     // Fill hidden plan card
   const card=document.getElementById('sr-plan-card');
-  card.style.width='800px';
+  card.style.width='560px';
   document.getElementById('sr-plan-card-name').textContent=clientName;
   document.getElementById('sr-plan-card-dates').textContent=fromFmt+(toFmt?' — '+toFmt:'');
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml||'<div style="text-align:center;padding:20px;color:#8b7b69;font-size:13px;">No events selected.</div>';
@@ -2709,7 +2709,7 @@ html+=`<tr style="height:1px;"><td style="padding:2px 2px;vertical-align:top;bor
     });
   });
   const CLUB_LOGOS={'Lio':'https://i.ibb.co/1J6BsgFv/Untitled-150-x-150-px-41.png','Beachhouse':'https://i.ibb.co/C5PRwSZz/Untitled-150-x-150-px-42.png'};
-  let bodyHtml=`<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr><th style="width:60px;padding:4px;font-size:8px;color:rgba(255,255,255,0.3);text-align:left;border-bottom:1px solid rgba(255,255,255,0.08);">VENUE</th>`;
+ let bodyHtml=`<div><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><thead><tr><th style="width:60px;padding:4px;font-size:8px;color:rgba(255,255,255,0.3);text-align:left;border-bottom:1px solid rgba(255,255,255,0.08);">VENUE</th>`;
   dates.forEach((dateStr,i)=>{
     const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
     bodyHtml+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);min-width:40px;"><div style="font-size:8px;color:rgba(255,255,255,0.4);">${DAYS[i]}</div><div style="font-size:10px;font-weight:700;color:#fff;">${d.getDate()}</div></th>`;
