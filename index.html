@@ -533,17 +533,9 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <!-- VIP TABLES — SELLER VIEW -->
     <div class="section" id="section-vip">
       <div class="section-title">VIP Table requests</div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">📲 Send your VIP table request via WhatsApp to Rowan.</div>
-      <input type="text" class="input-field" id="vip-search" placeholder="Search by name…" oninput="renderVipSeller()" style="margin-bottom:12px;">
-      <div class="vip-filter-bar" id="vip-filter-bar">
-        <button class="vip-filter-btn active" onclick="setVipFilter('all',this)">All</button>
-        <button class="vip-filter-btn" onclick="setVipFilter('new',this)">New</button>
-        <button class="vip-filter-btn" onclick="setVipFilter('price_sent',this)">Price sent</button>
-        <button class="vip-filter-btn" onclick="setVipFilter('confirmed',this)">Confirmed</button>
-        <button class="vip-filter-btn" onclick="setVipFilter('paid',this)">Paid</button>
-        <button class="vip-filter-btn" onclick="setVipFilter('cancelled',this)">Cancelled</button>
-      </div>
-      <div id="vip-list"><div class="loading">Loading…</div></div>
+      <button onclick="moreNav('section-vip-process')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:var(--radius);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:600;margin-bottom:20px;">
+  <span>🍾 VIP Process, FAQ & Rates</span><span style="color:var(--muted);">›</span>
+</button>
 <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
   <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">💶 VIP Prices</div>
   <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
