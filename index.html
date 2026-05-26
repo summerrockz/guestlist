@@ -2237,14 +2237,13 @@ async function cpDownloadPDF(){
   });
     // Fill hidden plan card
   const card=document.getElementById('sr-plan-card');
+  card.style.width='800px';
   document.getElementById('sr-plan-card-name').textContent=clientName;
   document.getElementById('sr-plan-card-dates').textContent=fromFmt+(toFmt?' — '+toFmt:'');
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml||'<div style="text-align:center;padding:20px;color:#8b7b69;font-size:13px;">No events selected.</div>';
   document.getElementById('sr-plan-card-seller').textContent=SELLER.seller_name+' · Summerrockz Ibiza';
   card.style.display='block';
-
   try{
-    // Load html2canvas
     if(!window.html2canvas){
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
     }
@@ -2748,7 +2747,7 @@ html+=`<tr style="height:1px;"><td style="padding:4px 4px;vertical-align:top;bor
     card.style.display='none';
     const imgData=canvas.toDataURL('image/png');
     const {jsPDF}=window.jspdf;
-    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[canvas.width/3,canvas.height/3]});
+    const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width/3,canvas.height/3]});
     pdf.addImage(imgData,'PNG',0,0,canvas.width/3,canvas.height/3);
     const pdfBlob=pdf.output('blob');
     const file=new File([pdfBlob],`Guestlist Week ${weekLabel}.pdf`,{type:'application/pdf'});
