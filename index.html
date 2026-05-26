@@ -2591,11 +2591,18 @@ function fpUpdateStats(){
 }
 
 let fpCurrentType='vip';
-const FP_BOTTLES={
+const FP_CDM_BOTTLES={
   vip:['Vodka (Belvedere)','Whiskey (Jack Daniels)','Gin (Hendricks)','Rum (Havana 7)','Tequila (Cazcabel Reposado)'],
   super:['Vodka (Belvedere)','Gin (Bombay)','Rum 🖤 (Bacardi)','Rum 🤍 (Bacardi)','Whiskey (Jack Daniels)'],
   ultra:[]
 };
+const FP_NOBU_BOTTLES={
+  vip:['Vodka (Absolut Elyx)','Whiskey (Jameson)','Gin (Malfy)','Tequila (Avion)','Dark Rum (Havana)','Champagne (Perrier Jouet)','Rosé (St Marguerite)'],
+  super:['Vodka (Absolut Elyx)','Whiskey (Jameson)','Gin (Malfy)','Tequila (Avion)','Dark Rum (Havana)','Champagne (Perrier Jouet)','Rosé (St Marguerite)'],
+  ultra:['Vodka (Absolut Elyx)','Whiskey (Jameson)','Gin (Malfy)','Tequila (Avion)','Dark Rum (Havana)','Champagne (Perrier Jouet)','Rosé (St Marguerite)']
+};
+const FP_BOTTLE_MAX_NOBU={vip:1,super:2,ultra:4};
+const FP_BOTTLES=FP_CDM_BOTTLES;
 
 function fpSetType(type){
   fpCurrentType=type;
@@ -2610,13 +2617,15 @@ function fpSetType(type){
 }
 
 const FP_BOTTLE_MAX={vip:1,super:2,ultra:0};
+let _fpCurrentVenue='cdm';
 
 function fpRenderBottles(type){
   const wrap=document.getElementById('fp-modal-bottles-options');
   if(!wrap)return;
-  const options=FP_BOTTLES[type]||[];
+  const isNobu=window._fpCurrentVenue==='nobu';
+  const options=(isNobu?FP_NOBU_BOTTLES:FP_CDM_BOTTLES)[type]||[];
   const counts=window._fpBottleCounts||{};
-  const max=FP_BOTTLE_MAX[type]||99;
+  const max=(isNobu?FP_BOTTLE_MAX_NOBU:FP_BOTTLE_MAX)[type]||99;
   const total=Object.values(counts).reduce((s,v)=>s+v,0);
   if(!options.length){wrap.innerHTML='<div style="font-size:12px;color:var(--muted);">No bottle options for this table type.</div>';return;}
   wrap.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${total}/${max} bottles selected</div>`
@@ -2637,7 +2646,8 @@ function fpRenderBottles(type){
 
 function fpBottleChange(name,delta){
   if(!window._fpBottleCounts)window._fpBottleCounts={};
-  const max=FP_BOTTLE_MAX[fpCurrentType]||99;
+  const isNobu=window._fpCurrentVenue==='nobu';
+  const max=(isNobu?FP_BOTTLE_MAX_NOBU:FP_BOTTLE_MAX)[fpCurrentType]||99;
   const total=Object.values(window._fpBottleCounts).reduce((s,v)=>s+v,0);
   const current=window._fpBottleCounts[name]||0;
   if(delta>0&&total>=max)return;
@@ -2654,6 +2664,7 @@ function fpOpenTable(id){
   fpCurrentTableId=id;
   fpCurrentType=d?.type||t.type;
   window._fpBottleCounts={};
+  window._fpCurrentVenue='cdm';
   if(d?.bottles){
     d.bottles.split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>{
       window._fpBottleCounts[b]=(window._fpBottleCounts[b]||0)+1;
@@ -2941,6 +2952,7 @@ function fpNobuOpenTable(id){
   if(!fpNobuCurrentEvent){alert('Please select an event date first.');return;}
   const d=fpNobuTableData[id];
   window._fpCurrentNobuTable=id;
+  window._fpCurrentVenue='nobu';
   fpCurrentType=d?.type||'vip';
   window._fpBottleCounts={};
   if(d?.bottles){d.bottles.split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>{window._fpBottleCounts[b]=(window._fpBottleCounts[b]||0)+1;});}
