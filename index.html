@@ -2635,59 +2635,49 @@ function renderWeeklyCal(){
   const weekEnd=new Date(wcalWeekStart);weekEnd.setDate(weekEnd.getDate()+6);
   const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   if(lbl)lbl.textContent=wcalWeekStart.getDate()+' '+ms[wcalWeekStart.getMonth()]+' — '+weekEnd.getDate()+' '+ms[weekEnd.getMonth()];
+  const DAYS=['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const dates=[];
+  for(let i=0;i<7;i++){const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);}
   const todayStr=today();
-  const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  let html='';
-  for(let i=0;i<7;i++){
-    const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
-    const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const byClub={};
+  dates.forEach(dateStr=>{
+    EVENTS.filter(ev=>normalizeDate(ev.date||'')===dateStr&&(ev.status||'').toLowerCase()!=='inactive').forEach(ev=>{
+      const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};
+      const clubName=cl.club_name||ev.club_id;
+      if(!byClub[clubName])byClub[clubName]={club:cl,events:{}};
+      if(!byClub[clubName].events[dateStr])byClub[clubName].events[dateStr]=[];
+      byClub[clubName].events[dateStr].push(ev);
+    });
+  });
+  if(!Object.keys(byClub).length){wrap.innerHTML='<div class="empty">No events this week.</div>';return;}
+  let html=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="width:100%;border-collapse:collapse;min-width:500px;"><thead><tr><th style="width:70px;padding:6px 4px;font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);">VENUE</th>`;
+  dates.forEach((dateStr,i)=>{
     const isToday=dateStr===todayStr;
-    const dayEvents=EVENTS.filter(ev=>normalizeDate(ev.date||'')===dateStr&&(ev.status||'').toLowerCase()!=='inactive');
-    const dayName=DAYS[i];
-    const dateLabel=d.getDate()+' '+ms[d.getMonth()];
-    if(!dayEvents.length){
-      html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);opacity:0.4;">
-        <div style="min-width:110px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${isToday?'var(--red)':'var(--muted)'};">${dayName}</div>
-          <div style="font-size:12px;color:var(--muted);">${dateLabel}</div>
-        </div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.2);font-style:italic;">No events</div>
-      </div>`;
-      continue;
-    }
-    html+=`<div style="border-bottom:1px solid var(--border);padding:12px 0;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <div style="min-width:110px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${isToday?'var(--red)':'var(--text)'};">${isToday?'🔴 ':''}${dayName}</div>
-          <div style="font-size:12px;color:var(--muted);">${dateLabel}</div>
-        </div>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <div style="font-size:11px;color:var(--muted);">${dayEvents.length} event${dayEvents.length>1?'s':''}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${dayEvents.map(ev=>{
-          const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};
-          const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
-          const closed=ds==='closed';
-          const freeText=ev.free_condition||'Free';
-          const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
-          const isFull=spotsLeft!==null&&spotsLeft<=0;
-          return`<div style="background:var(--card);border:1px solid ${closed?'rgba(232,25,44,0.2)':'var(--border)'};border-radius:12px;padding:10px 12px;${closed?'opacity:0.55;':''}">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <div style="font-size:13px;font-weight:600;">${cl.club_name||ev.club_id}${ev.event_name?` <span style="font-weight:400;color:var(--muted);">· ${ev.event_name}</span>`:''}</div>
-              <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:${closed?'rgba(232,25,44,0.15)':ds==='warn'?'rgba(245,158,11,0.15)':'rgba(34,197,94,0.15)'};color:${closed?'var(--red)':ds==='warn'?'var(--amber)':'var(--green)'};">${closed?'Closed':ds==='warn'?'⚠️ '+cl.deadline:'Open'}</span>
-            </div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--muted);flex-wrap:wrap;">
-              ${ev.time?`<span>⏰ ${ev.time}</span>`:''}
-              <span>🎫 ${freeText}</span>
-              ${spotsLeft!==null?`<span style="color:${spotsLeft<=5?'var(--red)':spotsLeft<=15?'var(--amber)':'var(--green)'};">👥 ${spotsLeft} spots</span>`:''}
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
-  wrap.innerHTML=html||'<div class="empty">No events this week.</div>';
+    const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
+    html+=`<th style="padding:6px 3px;text-align:center;border-bottom:1px solid var(--border);min-width:44px;"><div style="font-size:10px;font-weight:700;color:${isToday?'var(--red)':'var(--muted)'};letter-spacing:0.08em;">${DAYS[i]}</div><div style="font-size:11px;font-weight:600;color:${isToday?'var(--red)':'var(--text)'};">${d.getDate()}</div></th>`;
+  });
+  html+=`</tr></thead><tbody>`;
+  Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
+    html+=`<tr><td style="padding:4px 4px;vertical-align:top;border-bottom:1px solid var(--border);"><div style="font-size:10px;font-weight:700;color:var(--text);line-height:1.3;">${clubName}</div></td>`;
+    dates.forEach(dateStr=>{
+      const evs=data.events[dateStr]||[];
+      if(!evs.length){html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;"></td>`;return;}
+      html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;">`;
+      evs.forEach(ev=>{
+        const cl=data.club;
+        const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
+        const closed=ds==='closed';
+        const freeText=ev.free_condition||'Free';
+        const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
+        const dotColor=closed?'#E8192C':ds==='warn'?'#F59E0B':'#22C55E';
+        html+=`<div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;margin-bottom:3px;border:1px solid rgba(255,255,255,0.07);"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div><div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||''}</div></div>${ev.time?`<div style="font-size:9px;color:rgba(255,255,255,0.4);">⏰ ${ev.time}</div>`:''}<div style="font-size:9px;color:rgba(255,255,255,0.4);">🎫 ${freeText}</div>${spotsLeft!==null?`<div style="font-size:9px;color:${spotsLeft<=5?'var(--red)':spotsLeft<=15?'var(--amber)':'rgba(255,255,255,0.4)'};">👥 ${spotsLeft}</div>`:''}</div>`;
+      });
+      html+=`</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  wrap.innerHTML=html;
 }
 function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const _now=new Date();const _shifted=new Date(_now);if(_now.getHours()<3)_shifted.setDate(_shifted.getDate()-1);const todayStr=`${_shifted.getFullYear()}-${String(_shifted.getMonth()+1).padStart(2,'0')}-${String(_shifted.getDate()).padStart(2,'0')}`;const lines=[];myClubs.forEach(cl=>{const seen=new Set();const clubEntries=ENTRIES.filter(e=>e.club_id===cl.club_id&&normalizeDate(e.date||"")===todayStr&&(e.status||"").toLowerCase()==="active"&&!seen.has(e.entry_id)&&seen.add(e.entry_id));if(!clubEntries.length)return;const totalPax=clubEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);lines.push(`${(cl.club_name||"").toUpperCase()} — ${formatDate(todayStr)} (${totalPax} pax)`);clubEntries.forEach(e=>{const paxNum=parseInt(e.pax)||1;const plus=paxNum>1?` +${paxNum-1}`:"";lines.push(`${e.guest_name}${plus}${e.seller_name?' — '+e.seller_name:''}`);});lines.push("");});if(!lines.length){alert("No confirmed entries for today.");return;}const text=lines.join("\n").trim();const btn=document.getElementById("copy-all-today-btn");navigator.clipboard.writeText(text).then(()=>{btn.textContent="✓ Copied!";btn.style.background="linear-gradient(135deg,#22C55E,#16a34a)";setTimeout(()=>{btn.textContent="📋 Copy all confirmed for today";btn.style.background="linear-gradient(135deg,#E8192C,#c01524)";},2500);});}</script>
   <!-- Hidden plan card for PDF generation -->
