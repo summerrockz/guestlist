@@ -571,7 +571,19 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
       <div id="vip-admin-list"><div class="loading">Loading…</div></div>
     </div>
-
+<!-- WEEKLY CALENDAR -->
+<div class="section" id="section-weekly-cal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div class="section-title" style="margin-bottom:0;">Weekly Calendar</div>
+    <div id="wcal-week-label" style="font-size:12px;color:var(--muted);"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button onclick="wcalPrev()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:8px 16px;font-size:16px;cursor:pointer;">‹</button>
+    <button onclick="wcalGoToday()" style="flex:1;background:var(--input-bg);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:8px;font-size:12px;cursor:pointer;">Today</button>
+    <button onclick="wcalNext()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:8px 16px;font-size:16px;cursor:pointer;">›</button>
+  </div>
+  <div id="wcal-list"></div>
+</div>
   <!-- FLOORPLANS -->
 <div class="section" id="section-floorplans">
   <div id="fp-venue-picker">
@@ -806,7 +818,8 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <button onclick="moreNav('section-vip-admin')" id="more-vip-admin" style="display:none;width:100%;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🍾</span><div><div>VIP Management</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Manage all VIP table requests</div></div></button>
     <button onclick="moreNav('section-createprog')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">📋</span><div><div>Create Program</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Generate a personalised client program PDF</div></div></button>
     <button onclick="moreNav('section-faq')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">❓</span><div><div>FAQ</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Frequently asked questions</div></div></button>
-<button onclick="moreNav('section-floorplans')" id="more-floorplans" style="display:none;width:100%;display:none;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🗺️</span><div><div>Floorplans</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Live table management per venue</div></div></button>
+<button onclick="moreNav('section-weekly-cal')" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">📅</span><div><div>Weekly Calendar</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Guestlist events this week</div></div></button>
+    <button onclick="moreNav('section-floorplans')" id="more-floorplans" style="display:none;width:100%;display:none;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.07);color:#fff;cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🗺️</span><div><div>Floorplans</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;">Live table management per venue</div></div></button>
     <button onclick="doLogout()" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px 20px;background:none;border:none;color:rgba(232,25,44,0.85);cursor:pointer;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;text-align:left;"><span style="font-size:22px;">🚪</span><div>Log out</div></button>
   </div>
 </div>
@@ -1051,6 +1064,7 @@ if(id==="section-admin"){
   if(id==="section-program")loadProgram().then(renderProgram);
   if(id==="section-vip-prices")loadVipPrices();
 if(id==="section-floorplans")fpInitCDM();
+  if(id==="section-weekly-cal")loadData().then(renderWeeklyCal);
 }
 
 document.getElementById("login-btn").onclick = async () => {
@@ -2607,6 +2621,73 @@ async function fpClearTable(){
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
   fpCloseModal();
+}
+  let wcalWeekStart=null;
+function wcalGoToday(){wcalWeekStart=null;renderWeeklyCal();}
+function wcalPrev(){if(!wcalWeekStart)wcalWeekStart=getWeekStart(new Date());wcalWeekStart.setDate(wcalWeekStart.getDate()-7);renderWeeklyCal();}
+function wcalNext(){if(!wcalWeekStart)wcalWeekStart=getWeekStart(new Date());wcalWeekStart.setDate(wcalWeekStart.getDate()+7);renderWeeklyCal();}
+
+function renderWeeklyCal(){
+  const wrap=document.getElementById('wcal-list');if(!wrap)return;
+  const lbl=document.getElementById('wcal-week-label');
+  const now=new Date();
+  if(!wcalWeekStart)wcalWeekStart=getWeekStart(now);
+  const weekEnd=new Date(wcalWeekStart);weekEnd.setDate(weekEnd.getDate()+6);
+  const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(lbl)lbl.textContent=wcalWeekStart.getDate()+' '+ms[wcalWeekStart.getMonth()]+' — '+weekEnd.getDate()+' '+ms[weekEnd.getMonth()];
+  const todayStr=today();
+  const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
+    const dateStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const isToday=dateStr===todayStr;
+    const dayEvents=EVENTS.filter(ev=>normalizeDate(ev.date||'')===dateStr&&(ev.status||'').toLowerCase()!=='inactive');
+    const dayName=DAYS[i];
+    const dateLabel=d.getDate()+' '+ms[d.getMonth()];
+    if(!dayEvents.length){
+      html+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);opacity:0.4;">
+        <div style="min-width:110px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${isToday?'var(--red)':'var(--muted)'};">${dayName}</div>
+          <div style="font-size:12px;color:var(--muted);">${dateLabel}</div>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.2);font-style:italic;">No events</div>
+      </div>`;
+      continue;
+    }
+    html+=`<div style="border-bottom:1px solid var(--border);padding:12px 0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="min-width:110px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:${isToday?'var(--red)':'var(--text)'};">${isToday?'🔴 ':''}${dayName}</div>
+          <div style="font-size:12px;color:var(--muted);">${dateLabel}</div>
+        </div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <div style="font-size:11px;color:var(--muted);">${dayEvents.length} event${dayEvents.length>1?'s':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${dayEvents.map(ev=>{
+          const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};
+          const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
+          const closed=ds==='closed';
+          const freeText=ev.free_condition||'Free';
+          const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
+          const isFull=spotsLeft!==null&&spotsLeft<=0;
+          return`<div style="background:var(--card);border:1px solid ${closed?'rgba(232,25,44,0.2)':'var(--border)'};border-radius:12px;padding:10px 12px;${closed?'opacity:0.55;':''}">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:600;">${cl.club_name||ev.club_id}${ev.event_name?` <span style="font-weight:400;color:var(--muted);">· ${ev.event_name}</span>`:''}</div>
+              <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:${closed?'rgba(232,25,44,0.15)':ds==='warn'?'rgba(245,158,11,0.15)':'rgba(34,197,94,0.15)'};color:${closed?'var(--red)':ds==='warn'?'var(--amber)':'var(--green)'};">${closed?'Closed':ds==='warn'?'⚠️ '+cl.deadline:'Open'}</span>
+            </div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--muted);flex-wrap:wrap;">
+              ${ev.time?`<span>⏰ ${ev.time}</span>`:''}
+              <span>🎫 ${freeText}</span>
+              ${spotsLeft!==null?`<span style="color:${spotsLeft<=5?'var(--red)':spotsLeft<=15?'var(--amber)':'var(--green)'};">👥 ${spotsLeft} spots</span>`:''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  wrap.innerHTML=html||'<div class="empty">No events this week.</div>';
 }
 function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const _now=new Date();const _shifted=new Date(_now);if(_now.getHours()<3)_shifted.setDate(_shifted.getDate()-1);const todayStr=`${_shifted.getFullYear()}-${String(_shifted.getMonth()+1).padStart(2,'0')}-${String(_shifted.getDate()).padStart(2,'0')}`;const lines=[];myClubs.forEach(cl=>{const seen=new Set();const clubEntries=ENTRIES.filter(e=>e.club_id===cl.club_id&&normalizeDate(e.date||"")===todayStr&&(e.status||"").toLowerCase()==="active"&&!seen.has(e.entry_id)&&seen.add(e.entry_id));if(!clubEntries.length)return;const totalPax=clubEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);lines.push(`${(cl.club_name||"").toUpperCase()} — ${formatDate(todayStr)} (${totalPax} pax)`);clubEntries.forEach(e=>{const paxNum=parseInt(e.pax)||1;const plus=paxNum>1?` +${paxNum-1}`:"";lines.push(`${e.guest_name}${plus}${e.seller_name?' — '+e.seller_name:''}`);});lines.push("");});if(!lines.length){alert("No confirmed entries for today.");return;}const text=lines.join("\n").trim();const btn=document.getElementById("copy-all-today-btn");navigator.clipboard.writeText(text).then(()=>{btn.textContent="✓ Copied!";btn.style.background="linear-gradient(135deg,#22C55E,#16a34a)";setTimeout(()=>{btn.textContent="📋 Copy all confirmed for today";btn.style.background="linear-gradient(135deg,#E8192C,#c01524)";},2500);});}</script>
   <!-- Hidden plan card for PDF generation -->
