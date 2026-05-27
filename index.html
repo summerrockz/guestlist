@@ -2738,7 +2738,9 @@ async function fpSaveTable(){
     const params=new URLSearchParams({action:'save_cdm_table',event_date:fpCurrentEvent,table_id:fpCurrentTableId,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
-  setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpSaveTable;fpCloseModal();},600);
+  fpRenderTable(fpCurrentTableId);
+fpUpdateStats();
+setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpSaveTable;fpCloseModal();fpRenderAll();},600);
 }
 
 async function fpNobuClearTable(){
@@ -3024,7 +3026,9 @@ async function fpNobuSaveTable(){
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
   btn.textContent='✓ Saved!';
-  setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpNobuSaveTable;fpCloseModal();},600);
+fpNobuRenderTable(id);
+fpNobuUpdateStats();
+setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpNobuSaveTable;fpCloseModal();fpNobuRenderAll();},600);
 }
 
 async function fpNobuClearTable(){
