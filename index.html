@@ -2756,7 +2756,24 @@ async function fpNobuClearTable(){
     const params=new URLSearchParams({action:'clear_nobu_table',event_date:fpNobuCurrentEvent,table_id:id});
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
+  // Pause refresh tijdelijk zodat sheet de delete kan verwerken
+  if(fpNobuRefreshTimer){clearInterval(fpNobuRefreshTimer);fpNobuRefreshTimer=null;}
   fpCloseModal();
+  // Herstart refresh na 5 seconden
+  setTimeout(()=>{
+    fpNobuRefreshTimer=setInterval(async()=>{
+      try{
+        const rows=await fetchSheet('NOBU_TABLES');
+        const fresh={};
+        rows.filter(r=>r.event_date===fpNobuCurrentEvent).forEach(r=>{
+          fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
+        });
+        fpNobuTableData=fresh;fpNobuRenderAll();
+        const ind=document.getElementById('fp-nobu-refresh-ind');
+        if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+      }catch(e){}
+    },15000);
+  },5000);
 }
   let wcalWeekStart=null;
 function wcalGoToday(){wcalWeekStart=null;renderWeeklyCal();}
