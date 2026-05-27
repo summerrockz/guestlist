@@ -2703,7 +2703,7 @@ async function fpSaveTable(){
   setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpNobuSaveTable;fpCloseModal();},600);
 }
 
-async function fpClearTable(){
+async function fpNobuClearTable(){
   if(!fpCurrentTableId||!fpCurrentEvent)return;
   if(!confirm('Clear this table?'))return;
   delete fpTableData[fpCurrentTableId];
