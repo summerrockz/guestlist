@@ -2744,13 +2744,16 @@ setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpSaveTabl
 }
 
 async function fpNobuClearTable(){
-  if(!fpCurrentTableId||!fpCurrentEvent)return;
+  const id=window._fpCurrentNobuTable;
+  if(!id||!fpNobuCurrentEvent)return;
   if(!confirm('Clear this table?'))return;
-  delete fpTableData[fpCurrentTableId];
+  delete fpNobuTableData[id];
   window._fpBottleCounts={};
-  fpRenderTable(fpCurrentTableId);fpUpdateStats();
+  fpNobuRenderTable(id);
+  fpNobuUpdateStats();
+  fpNobuRenderAll();
   try{
-    const params=new URLSearchParams({action:'clear_cdm_table',event_date:fpCurrentEvent,table_id:fpCurrentTableId});
+    const params=new URLSearchParams({action:'clear_nobu_table',event_date:fpNobuCurrentEvent,table_id:id});
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
   fpCloseModal();
