@@ -601,6 +601,11 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-nobu-stat-free" style="font-size:18px;font-weight:700;color:var(--green);">33</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Free</div></div>
     <div style="text-align:center;flex:1;"><div id="fp-nobu-stat-pax" style="font-size:18px;font-weight:700;color:var(--red);">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Pax</div></div>
   </div>
+    <div style="display:flex;gap:0;margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
+  <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-nobu-stat-ultra" style="font-size:18px;font-weight:700;color:#E8192C;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Ultra VIP</div></div>
+  <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-nobu-stat-super" style="font-size:18px;font-weight:700;color:#F59E0B;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Super VIP</div></div>
+  <div style="text-align:center;flex:1;"><div id="fp-nobu-stat-vip" style="font-size:18px;font-weight:700;color:#3B82F6;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">VIP</div></div>
+</div>
   <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#E8192C;"></div>Ultra VIP</div>
     <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#F59E0B;"></div>Super VIP</div>
@@ -2992,12 +2997,21 @@ function fpNobuRenderTable(id){
 function fpNobuUpdateStats(){
   const booked=Object.values(fpNobuTableData).filter(d=>d&&d.guest).length;
   const pax=Object.values(fpNobuTableData).reduce((s,d)=>s+(parseInt(d?.pax)||0),0);
+  const ultraCount=Object.values(fpNobuTableData).filter(d=>d&&d.guest&&d.type==='ultra').length;
+  const superCount=Object.values(fpNobuTableData).filter(d=>d&&d.guest&&d.type==='super').length;
+  const vipCount=Object.values(fpNobuTableData).filter(d=>d&&d.guest&&d.type==='vip').length;
   const b=document.getElementById('fp-nobu-stat-booked');
   const f=document.getElementById('fp-nobu-stat-free');
   const p=document.getElementById('fp-nobu-stat-pax');
+  const u=document.getElementById('fp-nobu-stat-ultra');
+  const sv=document.getElementById('fp-nobu-stat-super');
+  const v=document.getElementById('fp-nobu-stat-vip');
   if(b)b.textContent=booked;
   if(f)f.textContent=FP_NOBU_TABLES.length-booked;
   if(p)p.textContent=pax;
+  if(u)u.textContent=ultraCount;
+  if(sv)sv.textContent=superCount;
+  if(v)v.textContent=vipCount;
 }
 
 function fpNobuOpenTable(id){
