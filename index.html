@@ -2957,9 +2957,11 @@ async function fpNobuLoadEvent(){
   const sel=document.getElementById('fp-nobu-event');
   fpNobuCurrentEvent=sel.value;
   fpNobuTableData={};
+  fpNobuRenderAll();
   if(!fpNobuCurrentEvent){return;}
+  if(fpNobuRefreshTimer){clearInterval(fpNobuRefreshTimer);fpNobuRefreshTimer=null;}
   try{
-    const rows=await fetch(`${OPEN_URL}/NOBU_TABLES?_=${Date.now()}`).then(r=>r.json());
+    const rows=await fetch(`${OPEN_URL}/NOBU_TABLES`).then(r=>r.json());
     const fresh={};
     rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
       fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
@@ -2967,7 +2969,6 @@ async function fpNobuLoadEvent(){
     fpNobuTableData=fresh;
     fpNobuRenderAll();
   }catch(e){}
-  if(fpNobuRefreshTimer)clearInterval(fpNobuRefreshTimer);
   fpNobuRefreshTimer=setInterval(async()=>{
     try{
       const rows=await fetch(`${OPEN_URL}/NOBU_TABLES`).then(r=>r.json());
