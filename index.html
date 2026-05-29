@@ -2779,7 +2779,9 @@ async function fpNobuClearTable(){
     fresh[id]=fpNobuTableData[id];
   }
 });
-fpNobuTableData=fresh;fpNobuRenderAll();
+fpNobuTableData=fresh;
+fpNobuCache[fpNobuCurrentEvent]=fresh;
+fpNobuRenderAll();
         const ind=document.getElementById('fp-nobu-refresh-ind');
         if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
       }catch(e){}
@@ -2920,7 +2922,7 @@ bodyHtml+=`<div style="background:#1a1a1a;border-radius:4px;padding:3px 4px;marg
   if(btn){btn.textContent='📄 Download week PDF';btn.disabled=false;}
 }
   const FP_NOBU_TABLES=['L1','L2','L3','L4','15','1000','1001','1002','1003','1004','1005','1006','1007','1','2','3','4','5','6','7','8','9','10','11','12','13','14','16','17','18','19','20','21','22','23','24','25'];
-let fpNobuTableData={},fpNobuCurrentEvent=null,fpNobuRefreshTimer=null;
+let fpNobuTableData={},fpNobuCurrentEvent=null,fpNobuRefreshTimer=null,fpNobuCache={};
 
 async function fpNobuInitEvents(){
   const sel=document.getElementById('fp-nobu-event');
@@ -2957,18 +2959,30 @@ async function fpNobuLoadEvent(){
   const sel=document.getElementById('fp-nobu-event');
   fpNobuCurrentEvent=sel.value;
   fpNobuTableData={};
-  if(!fpNobuCurrentEvent){fpNobuRenderAll();return;}
-  try{
-    const rows=await fetch(`${OPEN_URL}/NOBU_TABLES?_=${Date.now()}`).then(r=>r.json());
-    rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
-      fpNobuTableData[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
-    });
-  }catch(e){}
+if(!fpNobuCurrentEvent){fpNobuRenderAll();return;}
+if(fpNobuCache[fpNobuCurrentEvent]){
+  fpNobuTableData=fpNobuCache[fpNobuCurrentEvent];
   fpNobuRenderAll();
+}
+try{
+  const rows=await fetch(`${SCRIPT_URL}?action=get_nobu_tables&event_date=${fpNobuCurrentEvent}`).then(r=>r.json());
+  const fresh={};
+  rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
+    fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
+  });
+  Object.keys(fpNobuTableData).forEach(id=>{
+    if(!fresh[id]&&fpNobuTableData[id]&&fpNobuTableData[id].guest){
+      fresh[id]=fpNobuTableData[id];
+    }
+  });
+  fpNobuTableData=fresh;
+  fpNobuCache[fpNobuCurrentEvent]=fresh;
+  fpNobuRenderAll();
+}catch(e){}
   if(fpNobuRefreshTimer)clearInterval(fpNobuRefreshTimer);
   fpNobuRefreshTimer=setInterval(async()=>{
     try{
-      const rows=await fetch(`${OPEN_URL}/NOBU_TABLES?_=${Date.now()}`).then(r=>r.json());
+      const rows=await fetch(`${SCRIPT_URL}?action=get_nobu_tables&event_date=${fpNobuCurrentEvent}`).then(r=>r.json());
       const fresh={};
       rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
         fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
@@ -3087,7 +3101,8 @@ async function fpNobuSaveTable(){
   const btn=document.getElementById('fp-modal-save');
   btn.textContent='Saving…';btn.disabled=true;
   fpNobuTableData[id]={guest,seller,nationality,males,females,pax,notes,bottles,type};
-  fpNobuRenderTable(id);fpNobuUpdateStats();
+fpNobuCache[fpNobuCurrentEvent]=fpNobuTableData;
+fpNobuRenderTable(id);fpNobuUpdateStats();
   try{
     const params=new URLSearchParams({action:'save_nobu_table',event_date:fpNobuCurrentEvent,table_id:id,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
     await fetch(`${SCRIPT_URL}?${params}`);
