@@ -3012,7 +3012,7 @@ async function fpNobuSharePDF(){
     if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
     if(!window.jspdf){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
     const svg=document.getElementById('fp-nobu-svg');
-    const canvas=await html2canvas(svg,{backgroundColor:'#0d0d14',scale:2,useCORS:true,logging:false});
+    const canvas=await html2canvas(svg,{backgroundColor:'#0d0d14',scale:2,useCORS:true,allowTaint:true,logging:false,foreignObjectRendering:false});
     const imgData=canvas.toDataURL('image/png');
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[canvas.width/2,canvas.height/2]});
