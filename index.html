@@ -2605,7 +2605,7 @@ function fpRenderTable(id){
     shape.setAttribute('fill',fpHex(color,0.35));
     shape.setAttribute('stroke',color);
     shape.setAttribute('stroke-width','2');
-    if(nameEl){const flagMap={'🇬🇧':true,'🇪🇸':true,'🇫🇷':true,'🇮🇹':true,'🇳🇱':true,'🌐':true};const parts=d.nationality?d.nationality.split(' '):[];const flag=parts.length&&flagMap[parts[0]]?parts[0]:'';const n=d.guest.split(' ')[0];const short=n.length>7?n.slice(0,7)+'…':n;nameEl.textContent=flag?flag+' '+short:short;nameEl.setAttribute('font-size','9');}
+    if(nameEl){const flagMap={'🇬🇧':true,'🇪🇸':true,'🇫🇷':true,'🇮🇹':true,'🇳🇱':true,'🌐':true};const flag=d.nationality?[...d.nationality][0]:'';const n=d.guest.split(' ')[0];const short=n.length>7?n.slice(0,7)+'…':n;nameEl.textContent=flag?flag+' '+short:short;nameEl.setAttribute('font-size','9');}
   }else{
     shape.setAttribute('fill','rgba(255,255,255,0.06)');
     shape.setAttribute('stroke','rgba(255,255,255,0.12)');
