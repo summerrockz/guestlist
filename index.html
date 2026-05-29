@@ -2774,7 +2774,12 @@ async function fpNobuClearTable(){
         rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
           fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
         });
-        fpNobuTableData=fresh;fpNobuRenderAll();
+        Object.keys(fpNobuTableData).forEach(id=>{
+  if(!fresh[id]&&fpNobuTableData[id]&&fpNobuTableData[id].guest){
+    fresh[id]=fpNobuTableData[id];
+  }
+});
+fpNobuTableData=fresh;fpNobuRenderAll();
         const ind=document.getElementById('fp-nobu-refresh-ind');
         if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
       }catch(e){}
@@ -2968,7 +2973,12 @@ async function fpNobuLoadEvent(){
       rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{
         fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};
       });
-      fpNobuTableData=fresh;fpNobuRenderAll();
+      Object.keys(fpNobuTableData).forEach(id=>{
+  if(!fresh[id]&&fpNobuTableData[id]&&fpNobuTableData[id].guest){
+    fresh[id]=fpNobuTableData[id];
+  }
+});
+fpNobuTableData=fresh;fpNobuRenderAll();
       const ind=document.getElementById('fp-nobu-refresh-ind');
       if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
     }catch(e){}
