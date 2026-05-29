@@ -606,6 +606,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-nobu-stat-super" style="font-size:18px;font-weight:700;color:#F59E0B;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Super VIP</div></div>
   <div style="text-align:center;flex:1;"><div id="fp-nobu-stat-vip" style="font-size:18px;font-weight:700;color:#3B82F6;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">VIP</div></div>
 </div>
+    <button onclick="fpNobuSharePDF()" style="width:100%;padding:12px;border-radius:999px;background:linear-gradient(135deg,#E8192C,#c01524);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;font-family:Poppins,sans-serif;">📄 Share floorplan PDF</button>
   <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#E8192C;"></div>Ultra VIP</div>
     <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#F59E0B;"></div>Super VIP</div>
@@ -2993,7 +2994,29 @@ function fpNobuRenderTable(id){
     if(nameEl)nameEl.textContent='';
   }
 }
-
+async function fpNobuSharePDF(){
+  if(!fpNobuCurrentEvent){alert('Select an event date first.');return;}
+  const btn=document.querySelector('button[onclick="fpNobuSharePDF()"]');
+  if(btn){btn.textContent='⏳ Creating...';btn.disabled=true;}
+  try{
+    if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+    if(!window.jspdf){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+    const svg=document.getElementById('fp-nobu-svg');
+    const canvas=await html2canvas(svg,{backgroundColor:'#0d0d14',scale:2,useCORS:true,logging:false});
+    const imgData=canvas.toDataURL('image/png');
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[canvas.width/2,canvas.height/2]});
+    pdf.addImage(imgData,'PNG',0,0,canvas.width/2,canvas.height/2);
+    const pdfBlob=pdf.output('blob');
+    const file=new File([pdfBlob],`Nobu Rooftop ${fpNobuCurrentEvent}.pdf`,{type:'application/pdf'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:`Nobu Rooftop ${fpNobuCurrentEvent}`});
+    }else{
+      const link=document.createElement('a');link.download=file.name;link.href=URL.createObjectURL(pdfBlob);link.click();
+    }
+  }catch(e){alert('Could not generate PDF. Try again.');}
+  if(btn){btn.textContent='📄 Share floorplan PDF';btn.disabled=false;}
+}
 function fpNobuUpdateStats(){
   const booked=Object.values(fpNobuTableData).filter(d=>d&&d.guest).length;
   const pax=Object.values(fpNobuTableData).reduce((s,d)=>s+(parseInt(d?.pax)||0),0);
