@@ -2957,7 +2957,6 @@ async function fpNobuLoadEvent(){
   const sel=document.getElementById('fp-nobu-event');
   fpNobuCurrentEvent=sel.value;
   fpNobuTableData={};
-  fpNobuRenderAll();
   if(!fpNobuCurrentEvent){return;}
   try{
     const rows=await fetch(`${OPEN_URL}/NOBU_TABLES`).then(r=>r.json());
