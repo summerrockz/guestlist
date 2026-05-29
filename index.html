@@ -2597,7 +2597,7 @@ function fpRenderTable(id){
     shape.setAttribute('fill',fpHex(color,0.35));
     shape.setAttribute('stroke',color);
     shape.setAttribute('stroke-width','2');
-    if(nameEl){const n=d.guest.split(' ')[0];nameEl.textContent=n.length>7?n.slice(0,7)+'…':n;}
+    if(nameEl){const n=d.guest.split(' ')[0];nameEl.textContent=n.length>9?n.slice(0,9)+'…':n;nameEl.setAttribute('font-size','9');}
   }else{
     shape.setAttribute('fill','rgba(255,255,255,0.06)');
     shape.setAttribute('stroke','rgba(255,255,255,0.12)');
