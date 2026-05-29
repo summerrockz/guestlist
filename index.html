@@ -2780,7 +2780,6 @@ async function fpNobuClearTable(){
   }
 });
 fpNobuTableData=fresh;
-fpNobuCache[fpNobuCurrentEvent]=JSON.parse(JSON.stringify(fresh));
 fpNobuRenderAll();
         const ind=document.getElementById('fp-nobu-refresh-ind');
         if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
@@ -3088,7 +3087,6 @@ async function fpNobuSaveTable(){
   const btn=document.getElementById('fp-modal-save');
   btn.textContent='Saving…';btn.disabled=true;
   fpNobuTableData[id]={guest,seller,nationality,males,females,pax,notes,bottles,type};
-fpNobuCache[fpNobuCurrentEvent]=JSON.parse(JSON.stringify(fpNobuTableData));
 fpNobuRenderTable(id);fpNobuUpdateStats();
   try{
     const params=new URLSearchParams({action:'save_nobu_table',event_date:fpNobuCurrentEvent,table_id:id,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
