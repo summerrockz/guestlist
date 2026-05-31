@@ -1585,7 +1585,7 @@ const originalModalSubmit=async()=>{
     const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
     const _goGroup=document.getElementById('modal-girls-only-group');
 const _goCb=document.getElementById('modal-girls-only-cb');
-if(_goGroup&&_goGroup.style.display!=='none'&&_goCb&&!_goCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
+if(_goCb&&_goGroup&&_goGroup.offsetParent!==null&&!_goCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
 if(!names.length){msg.textContent="Enter at least one name.";return;}
     const btn=document.getElementById("modal-submit");if(btn._submitting)return;btn._submitting=true;btn.disabled=true;btn.textContent="Adding…";
     const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
