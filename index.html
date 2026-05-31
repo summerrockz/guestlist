@@ -584,7 +584,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       <div onclick="openFloorplan('cdm')" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;cursor:pointer;"><div style="font-size:28px;margin-bottom:8px;">🌞</div><div style="font-size:13px;font-weight:600;">Café del Mar</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">31 tables</div></div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;opacity:0.4;"><div style="font-size:28px;margin-bottom:8px;">🎸</div><div style="font-size:13px;font-weight:600;">The Site</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Coming soon</div></div>
       <div onclick="openFloorplan('nobu')" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;cursor:pointer;"><div style="font-size:28px;margin-bottom:8px;">🤍</div><div style="font-size:13px;font-weight:600;">Nobu Rooftop</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">37 tables</div></div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;opacity:0.4;"><div style="font-size:28px;margin-bottom:8px;">👙</div><div style="font-size:13px;font-weight:600;">Bam-Bu-Ku</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Coming soon</div></div>
+      <div onclick="openFloorplan('bbk')" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;cursor:pointer;"><div style="font-size:28px;margin-bottom:8px;">👙</div><div style="font-size:13px;font-weight:600;">Bam-Bu-Ku</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">37 tables</div></div>
     </div>
   </div>
   <div id="fp-nobu" style="display:none;">
@@ -719,6 +719,119 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
   wrap.addEventListener('touchend', e=>{ if(e.touches.length<2&&scale<1){ scale=1;tx=0;ty=0;apply(); } },{passive:false});
 })();
 </script>
+
+<div id="fp-bbk" style="display:none;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <button onclick="closeFPVenue()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;">← Back</button>
+    <div style="font-size:15px;font-weight:700;">Bam-Bu-Ku</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+    <select id="fp-bbk-event" class="input-field" style="margin-bottom:0;flex:1;" onchange="fpBbkLoadEvent()">
+      <option value="">— Select event date —</option>
+      <option value="2026-06-03">Wed, 03 Jun 2026 — Bam-Bu-Ku</option>
+      <option value="2026-06-10">Wed, 10 Jun 2026 — Bam-Bu-Ku</option>
+      <option value="2026-06-17">Wed, 17 Jun 2026 — Bam-Bu-Ku</option>
+      <option value="2026-06-24">Wed, 24 Jun 2026 — Bam-Bu-Ku</option>
+      <option value="2026-07-01">Wed, 01 Jul 2026 — Bam-Bu-Ku</option>
+      <option value="2026-07-08">Wed, 08 Jul 2026 — Bam-Bu-Ku</option>
+      <option value="2026-07-15">Wed, 15 Jul 2026 — Bam-Bu-Ku</option>
+      <option value="2026-07-22">Wed, 22 Jul 2026 — Bam-Bu-Ku</option>
+      <option value="2026-07-29">Wed, 29 Jul 2026 — Bam-Bu-Ku</option>
+      <option value="2026-08-05">Wed, 05 Aug 2026 — Bam-Bu-Ku</option>
+      <option value="2026-08-12">Wed, 12 Aug 2026 — Bam-Bu-Ku</option>
+      <option value="2026-08-19">Wed, 19 Aug 2026 — Bam-Bu-Ku</option>
+      <option value="2026-08-26">Wed, 26 Aug 2026 — Bam-Bu-Ku</option>
+      <option value="2026-09-02">Wed, 02 Sep 2026 — Bam-Bu-Ku</option>
+      <option value="2026-09-09">Wed, 09 Sep 2026 — Bam-Bu-Ku</option>
+    </select>
+    <div id="fp-bbk-refresh-ind" style="font-size:10px;color:var(--muted);white-space:nowrap;"></div>
+  </div>
+  <div style="display:flex;gap:0;margin-bottom:8px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
+    <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-bbk-stat-booked" style="font-size:18px;font-weight:700;color:var(--amber);">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Booked</div></div>
+    <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-bbk-stat-free" style="font-size:18px;font-weight:700;color:var(--green);">37</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Free</div></div>
+    <div style="text-align:center;flex:1;"><div id="fp-bbk-stat-pax" style="font-size:18px;font-weight:700;color:var(--red);">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Pax</div></div>
+  </div>
+  <div style="display:flex;gap:0;margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;">
+    <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-bbk-stat-ultra" style="font-size:18px;font-weight:700;color:#E8192C;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Ultra VIP</div></div>
+    <div style="text-align:center;flex:1;border-right:1px solid var(--border);"><div id="fp-bbk-stat-super" style="font-size:18px;font-weight:700;color:#F59E0B;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">Super VIP</div></div>
+    <div style="text-align:center;flex:1;"><div id="fp-bbk-stat-vip" style="font-size:18px;font-weight:700;color:#3B82F6;">0</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;">VIP</div></div>
+  </div>
+  <button onclick="fpBbkSharePDF()" style="width:100%;padding:12px;border-radius:999px;background:linear-gradient(135deg,#E8192C,#c01524);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;font-family:Poppins,sans-serif;">📄 Share floorplan PDF</button>
+  <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#E8192C;"></div>Ultra VIP</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#F59E0B;"></div>Super VIP</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:50%;background:#3B82F6;"></div>VIP</div>
+  </div>
+  <div id="fp-bbk-zoom-wrap" style="overflow:hidden;position:relative;touch-action:none;">
+    <svg id="fp-bbk-svg" viewBox="0 0 680 820" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:340px;max-width:920px;display:block;margin:0 auto;touch-action:manipulation;">
+      <defs>
+        <radialGradient id="bbkBg2" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#0d1a0d"/><stop offset="100%" stop-color="#080f08"/></radialGradient>
+        <radialGradient id="poolGrad2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#5cc8f5"/><stop offset="100%" stop-color="#1a7faa"/></radialGradient>
+        <radialGradient id="jacuzziGrad2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7dd4f5"/><stop offset="100%" stop-color="#2a9fd4"/></radialGradient>
+      </defs>
+      <rect width="680" height="820" fill="url(#bbkBg2)" rx="12"/>
+      <text x="340" y="22" font-family="Poppins" font-size="10" font-weight="700" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="3">BAM-BU-KU</text>
+      <rect x="290" y="50" width="100" height="30" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="340" y="69" font-family="Poppins" font-size="9" font-weight="700" fill="rgba(255,255,255,0.4)" text-anchor="middle">DJ BOOTH</text>
+      <g onclick="fpBbkOpenTable('600')" style="cursor:pointer"><rect id="bbkts-600" x="170" y="88" width="100" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="220" y="106" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">600</text><text id="bbktn-600" x="220" y="120" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('601')" style="cursor:pointer"><rect id="bbkts-601" x="290" y="88" width="100" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="340" y="106" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">601</text><text id="bbktn-601" x="340" y="120" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('602')" style="cursor:pointer"><rect id="bbkts-602" x="410" y="88" width="100" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="460" y="106" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">602</text><text id="bbktn-602" x="460" y="120" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('407')" style="cursor:pointer"><rect id="bbkts-407" x="200" y="155" width="76" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="238" y="173" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">407</text><text id="bbktn-407" x="238" y="187" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('408')" style="cursor:pointer"><rect id="bbkts-408" x="404" y="155" width="76" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="442" y="173" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">408</text><text id="bbktn-408" x="442" y="187" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('308')" style="cursor:pointer"><circle id="bbkts-308" cx="50" cy="165" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="162" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">308</text><text id="bbktn-308" x="50" y="174" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('307')" style="cursor:pointer"><circle id="bbkts-307" cx="50" cy="225" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="222" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">307</text><text id="bbktn-307" x="50" y="234" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('306')" style="cursor:pointer"><circle id="bbkts-306" cx="50" cy="290" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="287" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">306</text><text id="bbktn-306" x="50" y="299" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('305')" style="cursor:pointer"><circle id="bbkts-305" cx="50" cy="355" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="352" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">305</text><text id="bbktn-305" x="50" y="364" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('304')" style="cursor:pointer"><circle id="bbkts-304" cx="50" cy="420" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="417" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">304</text><text id="bbktn-304" x="50" y="429" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('303')" style="cursor:pointer"><circle id="bbkts-303" cx="50" cy="485" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="482" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">303</text><text id="bbktn-303" x="50" y="494" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('302')" style="cursor:pointer"><circle id="bbkts-302" cx="50" cy="550" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="547" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">302</text><text id="bbktn-302" x="50" y="559" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('301')" style="cursor:pointer"><circle id="bbkts-301" cx="50" cy="615" r="26" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="50" y="612" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">301</text><text id="bbktn-301" x="50" y="624" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('406')" style="cursor:pointer"><rect id="bbkts-406" x="100" y="148" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="140" y="166" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">406</text><text id="bbktn-406" x="140" y="180" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('405')" style="cursor:pointer"><rect id="bbkts-405" x="100" y="208" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="140" y="226" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">405</text><text id="bbktn-405" x="140" y="240" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('404')" style="cursor:pointer"><rect id="bbkts-404" x="100" y="268" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="140" y="286" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">404</text><text id="bbktn-404" x="140" y="300" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('403')" style="cursor:pointer"><rect id="bbkts-403" x="100" y="328" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="140" y="346" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">403</text><text id="bbktn-403" x="140" y="360" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('402')" style="cursor:pointer"><rect id="bbkts-402" x="100" y="388" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="140" y="406" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">402</text><text id="bbktn-402" x="140" y="420" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <rect x="260" y="310" width="160" height="220" rx="14" fill="url(#poolGrad2)" opacity="0.85"/>
+      <text x="340" y="425" font-family="Poppins" font-size="10" font-weight="700" fill="rgba(255,255,255,0.5)" text-anchor="middle">POOL</text>
+      <g onclick="fpBbkOpenTable('401')" style="cursor:pointer"><rect id="bbkts-401" x="210" y="540" width="40" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="230" y="558" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">401</text><text id="bbktn-401" x="230" y="572" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('414')" style="cursor:pointer"><rect id="bbkts-414" x="430" y="540" width="40" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="450" y="558" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">414</text><text id="bbktn-414" x="450" y="572" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('409')" style="cursor:pointer"><rect id="bbkts-409" x="520" y="148" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="560" y="166" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">409</text><text id="bbktn-409" x="560" y="180" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('410')" style="cursor:pointer"><rect id="bbkts-410" x="520" y="208" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="560" y="226" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">410</text><text id="bbktn-410" x="560" y="240" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('411')" style="cursor:pointer"><rect id="bbkts-411" x="520" y="268" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="560" y="286" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">411</text><text id="bbktn-411" x="560" y="300" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('412')" style="cursor:pointer"><rect id="bbkts-412" x="520" y="328" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="560" y="346" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">412</text><text id="bbktn-412" x="560" y="360" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('413')" style="cursor:pointer"><rect id="bbkts-413" x="520" y="388" width="80" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="560" y="406" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">413</text><text id="bbktn-413" x="560" y="420" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('500')" style="cursor:pointer"><path id="bbkts-500" d="M 60 690 A 55 55 0 0 1 170 690 Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="115" y="678" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">500</text><text id="bbktn-500" x="115" y="690" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('501')" style="cursor:pointer"><path id="bbkts-501" d="M 195 680 A 40 40 0 0 1 275 680 Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="235" y="670" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">501</text><text id="bbktn-501" x="235" y="681" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <circle cx="450" cy="640" r="36" fill="url(#jacuzziGrad2)" opacity="0.85"/>
+      <text x="450" y="644" font-family="Poppins" font-size="9" font-weight="700" fill="rgba(255,255,255,0.6)" text-anchor="middle">JACUZZI</text>
+      <g onclick="fpBbkOpenTable('241')" style="cursor:pointer"><rect id="bbkts-241" x="330" y="700" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="353" y="720" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">241</text><text id="bbktn-241" x="353" y="732" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('240')" style="cursor:pointer"><rect id="bbkts-240" x="386" y="700" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="409" y="720" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">240</text><text id="bbktn-240" x="409" y="732" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('239')" style="cursor:pointer"><rect id="bbkts-239" x="442" y="700" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="465" y="720" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">239</text><text id="bbktn-239" x="465" y="732" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('238')" style="cursor:pointer"><rect id="bbkts-238" x="30" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="53" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">238</text><text id="bbktn-238" x="53" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('237')" style="cursor:pointer"><rect id="bbkts-237" x="86" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="109" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">237</text><text id="bbktn-237" x="109" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('236')" style="cursor:pointer"><rect id="bbkts-236" x="142" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="165" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">236</text><text id="bbktn-236" x="165" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('235')" style="cursor:pointer"><rect id="bbkts-235" x="198" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="221" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">235</text><text id="bbktn-235" x="221" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('234')" style="cursor:pointer"><rect id="bbkts-234" x="254" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="277" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">234</text><text id="bbktn-234" x="277" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('233')" style="cursor:pointer"><rect id="bbkts-233" x="310" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="333" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">233</text><text id="bbktn-233" x="333" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+      <g onclick="fpBbkOpenTable('232')" style="cursor:pointer"><rect id="bbkts-232" x="366" y="755" width="46" height="36" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><text x="389" y="775" font-family="Poppins" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">232</text><text id="bbktn-232" x="389" y="787" font-family="Poppins" font-size="7" fill="rgba(255,255,255,0.6)" text-anchor="middle"></text></g>
+    </svg>
+  </div>
+  <script>
+(function(){
+  const wrap=document.getElementById('fp-bbk-zoom-wrap');
+  const svg=document.getElementById('fp-bbk-svg');
+  if(!wrap||!svg)return;
+  let scale=1,startDist=0,startScale=1,tx=0,ty=0,startTx=0,startTy=0,startMidX=0,startMidY=0;
+  function dist(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);}
+  function mid(t){return{x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2};}
+  function apply(){if(scale<=1){tx=0;ty=0;svg.style.transform='scale(1)';svg.style.transformOrigin='center center';}else{svg.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;svg.style.transformOrigin='0 0';}}
+  wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){startDist=dist(e.touches);startScale=scale;const m=mid(e.touches);startMidX=m.x;startMidY=m.y;startTx=tx;startTy=ty;e.preventDefault();}},{passive:false});
+  wrap.addEventListener('touchmove',e=>{if(e.touches.length===2){const d=dist(e.touches);const newScale=Math.min(4,Math.max(1,startScale*(d/startDist)));const m=mid(e.touches);const wRect=wrap.getBoundingClientRect();const originX=startMidX-wRect.left;const originY=startMidY-wRect.top;tx=m.x-wRect.left-(originX/startScale)*newScale+(startTx-(-originX+originX/startScale*startScale));ty=m.y-wRect.top-(originY/startScale)*newScale+(startTy-(-originY+originY/startScale*startScale));scale=newScale;apply();e.preventDefault();}},{passive:false});
+  wrap.addEventListener('touchend',e=>{if(e.touches.length<2&&scale<1){scale=1;tx=0;ty=0;apply();}},{passive:false});
+})();
+  </script>
+</div>
+
   <div id="fp-cdm" style="display:none;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <button onclick="closeFPVenue()" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;">← Back</button>
@@ -2563,6 +2676,8 @@ function closeFPVenue(){
   document.getElementById('fp-nobu').style.display='none';
   if(fpRefreshTimer){clearInterval(fpRefreshTimer);fpRefreshTimer=null;}
   if(fpNobuRefreshTimer){clearInterval(fpNobuRefreshTimer);fpNobuRefreshTimer=null;}
+  if(typeof fpBbkRefreshTimer!=='undefined'&&fpBbkRefreshTimer){clearInterval(fpBbkRefreshTimer);fpBbkRefreshTimer=null;}
+  document.getElementById('fp-bbk').style.display='none';
   fpCurrentEvent=null;fpTableData={};
 }
 
@@ -3114,6 +3229,164 @@ fpNobuUpdateStats();
 if(fpNobuRefreshTimer){clearInterval(fpNobuRefreshTimer);fpNobuRefreshTimer=null;}
 setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpNobuSaveTable;fpCloseModal();fpNobuRenderAll();setTimeout(()=>{fpNobuRefreshTimer=setInterval(async()=>{try{const rows=await fetch(`${OPEN_URL}/NOBU_TABLES`).then(r=>r.json()).catch(()=>[]);const fresh={};rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});fpNobuTableData=fresh;fpNobuRenderAll();}catch(e){}},15000);},5000);},600);}
 
+  const BBK_TABLES=['600','601','602','407','408','500','501','301','302','303','304','305','306','307','308','402','403','404','405','406','409','410','411','412','413','414','401','232','233','234','235','236','237','238','239','240','241'];
+const BBK_TYPES={600:'ultra',601:'ultra',602:'ultra',407:'ultra',408:'ultra',500:'ultra',501:'ultra',301:'super',302:'super',303:'super',304:'super',305:'super',306:'super',307:'super',308:'super',401:'super',402:'super',403:'super',404:'super',405:'super',406:'super',409:'super',410:'super',411:'super',412:'super',413:'super',414:'super',232:'vip',233:'vip',234:'vip',235:'vip',236:'vip',237:'vip',238:'vip',239:'vip',240:'vip',241:'vip'};
+const BBK_BOTTLES={vip:['Vodka (Grey Goose)','Whiskey (Dewar\'s)','Gin (Bombay)','Tequila (Patrón)','Rum ⚫ (Bacardi)','Rum ⚪ (Bacardi)','Champagne (Moët Ice)'],super:['Vodka (Grey Goose)','Whiskey (Dewar\'s)','Gin (Bombay)','Tequila (Patrón)','Rum ⚫ (Bacardi)','Rum ⚪ (Bacardi)','Champagne (Moët Ice)','Grey Goose 1.75L'],ultra:['Vodka (Grey Goose)','Whiskey (Dewar\'s)','Gin (Bombay)','Tequila (Patrón)','Rum ⚫ (Bacardi)','Rum ⚪ (Bacardi)','Champagne (Moët Ice)','Grey Goose 1.75L','Cîroc 3L']};
+const BBK_BOTTLE_MAX={vip:1,super:2,ultra:4};
+
+let fpBbkTableData={},fpBbkCurrentEvent=null,fpBbkRefreshTimer=null;
+
+function fpBbkHex(hex,alpha){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${alpha})`;}
+
+async function fpBbkLoadEvent(){
+  const sel=document.getElementById('fp-bbk-event');
+  fpBbkCurrentEvent=sel.value;
+  fpBbkTableData={};
+  fpBbkRenderAll();
+  if(!fpBbkCurrentEvent)return;
+  if(fpBbkRefreshTimer){clearInterval(fpBbkRefreshTimer);fpBbkRefreshTimer=null;}
+  try{
+    const rows=await fetch(`${OPEN_URL}/BBK_TABLES`).then(r=>r.json()).catch(()=>[]);
+    const fresh={};
+    rows.filter(r=>String(r.event_date||'').slice(0,10)===fpBbkCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});
+    fpBbkTableData=fresh;
+    fpBbkRenderAll();
+  }catch(e){}
+  fpBbkRefreshTimer=setInterval(async()=>{
+    try{
+      const rows=await fetch(`${OPEN_URL}/BBK_TABLES`).then(r=>r.json()).catch(()=>[]);
+      const fresh={};
+      rows.filter(r=>String(r.event_date||'').slice(0,10)===fpBbkCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});
+      fpBbkTableData=fresh;fpBbkRenderAll();
+      const ind=document.getElementById('fp-bbk-refresh-ind');
+      if(ind){const n=new Date();ind.textContent='↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+    }catch(e){}
+  },15000);
+}
+
+function fpBbkRenderAll(){BBK_TABLES.forEach(id=>fpBbkRenderTable(id));fpBbkUpdateStats();}
+
+function fpBbkRenderTable(id){
+  const d=fpBbkTableData[id];
+  const shape=document.getElementById('bbkts-'+id);
+  const nameEl=document.getElementById('bbktn-'+id);
+  if(!shape)return;
+  const type=BBK_TYPES[id]||'vip';
+  const color=FP_COLORS[type];
+  if(d&&d.guest){
+    shape.setAttribute('fill',fpBbkHex(color,0.35));
+    shape.setAttribute('stroke',color);
+    shape.setAttribute('stroke-width','2');
+    if(nameEl){const natMap={'🇬🇧 UK':'UK','🇪🇸 Spanish':'ES','🇫🇷 French':'FR','🇮🇹 Italian':'IT','🇳🇱 Dutch':'NL','🌐 International':'INT'};const nat=d.nationality?natMap[d.nationality]||'':'';const n=d.guest.split(' ')[0];const short=n.length>8?n.slice(0,8)+'…':n;const paxStr=d.pax?d.pax+(d.females!==''&&d.females!==undefined?'/'+d.females:''):'';nameEl.textContent=short+(nat?' - '+nat:'')+(paxStr?' ('+paxStr+')':'');nameEl.setAttribute('font-size','11');}
+  }else{
+    shape.setAttribute('fill','rgba(255,255,255,0.06)');
+    shape.setAttribute('stroke','rgba(255,255,255,0.12)');
+    shape.setAttribute('stroke-width','1.5');
+    if(nameEl)nameEl.textContent='';
+  }
+}
+
+function fpBbkUpdateStats(){
+  const booked=Object.values(fpBbkTableData).filter(d=>d&&d.guest).length;
+  const pax=Object.values(fpBbkTableData).reduce((s,d)=>s+(parseInt(d?.pax)||0),0);
+  const ultraCount=BBK_TABLES.filter(id=>BBK_TYPES[id]==='ultra'&&fpBbkTableData[id]?.guest).length;
+  const superCount=BBK_TABLES.filter(id=>BBK_TYPES[id]==='super'&&fpBbkTableData[id]?.guest).length;
+  const vipCount=BBK_TABLES.filter(id=>BBK_TYPES[id]==='vip'&&fpBbkTableData[id]?.guest).length;
+  const b=document.getElementById('fp-bbk-stat-booked');const f=document.getElementById('fp-bbk-stat-free');const p=document.getElementById('fp-bbk-stat-pax');const u=document.getElementById('fp-bbk-stat-ultra');const sv=document.getElementById('fp-bbk-stat-super');const v=document.getElementById('fp-bbk-stat-vip');
+  if(b)b.textContent=booked;if(f)f.textContent=BBK_TABLES.length-booked;if(p)p.textContent=pax;if(u)u.textContent=ultraCount;if(sv)sv.textContent=superCount;if(v)v.textContent=vipCount;
+}
+
+function fpBbkOpenTable(id){
+  if(!fpBbkCurrentEvent){alert('Please select an event date first.');return;}
+  const d=fpBbkTableData[id];
+  window._fpCurrentBbkTable=id;
+  window._fpCurrentVenue='bbk';
+  fpCurrentType=d?.type||BBK_TYPES[id]||'vip';
+  window._fpBottleCounts={};
+  if(d?.bottles){d.bottles.split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>{window._fpBottleCounts[b]=(window._fpBottleCounts[b]||0)+1;});}
+  document.getElementById('fp-modal-title').textContent='Table '+id;
+  document.getElementById('fp-modal-sub').textContent='Bam-Bu-Ku · '+(BBK_TYPES[id]==='ultra'?'Ultra VIP':BBK_TYPES[id]==='super'?'Super VIP':'VIP');
+  document.getElementById('fp-modal-guest').value=d?.guest||'';
+  document.getElementById('fp-modal-seller').value=d?.seller||'';
+  document.getElementById('fp-modal-nationality').value=d?.nationality||'';
+  document.getElementById('fp-modal-males').value=d?.males||'';
+  document.getElementById('fp-modal-females').value=d?.females||'';
+  document.getElementById('fp-modal-pax').value=d?.pax||'';
+  document.getElementById('fp-modal-notes').value=d?.notes||'';
+  fpSetType(fpCurrentType);
+  document.getElementById('fp-modal-clear').style.display=d?.guest?'block':'none';
+  document.getElementById('fp-modal-save').onclick=fpBbkSaveTable;
+  document.getElementById('fp-modal-clear').onclick=fpBbkClearTable;
+  document.getElementById('fp-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('fp-modal-guest').focus(),100);
+}
+
+async function fpBbkSaveTable(){
+  const id=window._fpCurrentBbkTable;
+  if(!id||!fpBbkCurrentEvent)return;
+  const guest=document.getElementById('fp-modal-guest').value.trim();
+  const seller=document.getElementById('fp-modal-seller').value.trim();
+  const nationality=document.getElementById('fp-modal-nationality').value.trim();
+  const males=document.getElementById('fp-modal-males').value.trim();
+  const females=document.getElementById('fp-modal-females').value.trim();
+  const pax=document.getElementById('fp-modal-pax').value.trim();
+  const notes=document.getElementById('fp-modal-notes').value.trim();
+  const bottles=Object.entries(window._fpBottleCounts||{}).flatMap(([b,n])=>Array(n).fill(b)).join(', ');
+  const type=fpCurrentType;
+  const btn=document.getElementById('fp-modal-save');
+  btn.textContent='Saving…';btn.disabled=true;
+  fpBbkTableData[id]={guest,seller,nationality,males,females,pax,notes,bottles,type};
+  fpBbkRenderTable(id);fpBbkUpdateStats();
+  try{
+    const params=new URLSearchParams({action:'save_bbk_table',event_date:fpBbkCurrentEvent,table_id:id,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
+    await fetch(`${SCRIPT_URL}?${params}`);
+  }catch(e){}
+  btn.textContent='✓ Saved!';
+  fpBbkRenderTable(id);fpBbkUpdateStats();
+  if(fpBbkRefreshTimer){clearInterval(fpBbkRefreshTimer);fpBbkRefreshTimer=null;}
+  setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpBbkSaveTable;fpCloseModal();fpBbkRenderAll();setTimeout(()=>{fpBbkRefreshTimer=setInterval(async()=>{try{const rows=await fetch(`${OPEN_URL}/BBK_TABLES`).then(r=>r.json()).catch(()=>[]);const fresh={};rows.filter(r=>String(r.event_date||'').slice(0,10)===fpBbkCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});fpBbkTableData=fresh;fpBbkRenderAll();}catch(e){}},15000);},5000);},600);
+}
+
+async function fpBbkClearTable(){
+  const id=window._fpCurrentBbkTable;
+  if(!id||!fpBbkCurrentEvent)return;
+  if(!confirm('Clear this table?'))return;
+  delete fpBbkTableData[id];
+  window._fpBottleCounts={};
+  fpBbkRenderTable(id);fpBbkUpdateStats();
+  try{const params=new URLSearchParams({action:'clear_bbk_table',event_date:fpBbkCurrentEvent,table_id:id});await fetch(`${SCRIPT_URL}?${params}`);}catch(e){}
+  if(fpBbkRefreshTimer){clearInterval(fpBbkRefreshTimer);fpBbkRefreshTimer=null;}
+  fpCloseModal();
+  setTimeout(()=>{fpBbkRefreshTimer=setInterval(async()=>{try{const rows=await fetch(`${OPEN_URL}/BBK_TABLES`).then(r=>r.json()).catch(()=>[]);const fresh={};rows.filter(r=>String(r.event_date||'').slice(0,10)===fpBbkCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});fpBbkTableData=fresh;fpBbkRenderAll();}catch(e){}},15000);},5000);
+}
+
+async function fpBbkSharePDF(){
+  if(!fpBbkCurrentEvent){alert('Select an event date first.');return;}
+  const btn=document.querySelector('button[onclick="fpBbkSharePDF()"]');
+  if(btn){btn.textContent='⏳ Creating...';btn.disabled=true;}
+  try{
+    const svg=document.getElementById('fp-bbk-svg');
+    const svgData=new XMLSerializer().serializeToString(svg);
+    const svgBlob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+    const url=URL.createObjectURL(svgBlob);
+    const img=new Image();
+    img.onload=async()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=svg.viewBox.baseVal.width*2;canvas.height=svg.viewBox.baseVal.height*2;
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(async(blob)=>{
+        const file=new File([blob],`Bam-Bu-Ku ${fpBbkCurrentEvent}.png`,{type:'image/png'});
+        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:file.name});}
+        else{const link=document.createElement('a');link.download=file.name;link.href=URL.createObjectURL(blob);link.click();}
+        if(btn){btn.textContent='📄 Share floorplan PDF';btn.disabled=false;}
+      },'image/png');
+    };
+    img.onerror=()=>{alert('Could not generate.');if(btn){btn.textContent='📄 Share floorplan PDF';btn.disabled=false;}};
+    img.src=url;
+  }catch(e){alert('Could not generate.');if(btn){btn.textContent='📄 Share floorplan PDF';btn.disabled=false;};}
+}
+  
 function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myClubs=CLUBS.filter(c=>String(c.admin_id||"").split(",").map(x=>x.trim()).includes(myId));const _now=new Date();const _shifted=new Date(_now);if(_now.getHours()<3)_shifted.setDate(_shifted.getDate()-1);const todayStr=`${_shifted.getFullYear()}-${String(_shifted.getMonth()+1).padStart(2,'0')}-${String(_shifted.getDate()).padStart(2,'0')}`;const lines=[];myClubs.forEach(cl=>{const seen=new Set();const clubEntries=ENTRIES.filter(e=>e.club_id===cl.club_id&&normalizeDate(e.date||"")===todayStr&&(e.status||"").toLowerCase()==="active"&&!seen.has(e.entry_id)&&seen.add(e.entry_id));if(!clubEntries.length)return;const totalPax=clubEntries.reduce((sum,e)=>sum+(parseInt(e.pax)||1),0);lines.push(`${(cl.club_name||"").toUpperCase()} — ${formatDate(todayStr)} (${totalPax} pax)`);clubEntries.forEach(e=>{const paxNum=parseInt(e.pax)||1;const plus=paxNum>1?` +${paxNum-1}`:"";lines.push(`${e.guest_name}${plus}${e.seller_name?' — '+e.seller_name:''}`);});lines.push("");});if(!lines.length){alert("No confirmed entries for today.");return;}const text=lines.join("\n").trim();const btn=document.getElementById("copy-all-today-btn");navigator.clipboard.writeText(text).then(()=>{btn.textContent="✓ Copied!";btn.style.background="linear-gradient(135deg,#22C55E,#16a34a)";setTimeout(()=>{btn.textContent="📋 Copy all confirmed for today";btn.style.background="linear-gradient(135deg,#E8192C,#c01524)";},2500);});}</script>
   <!-- Hidden plan card for PDF generation -->
 <div id="sr-plan-card" style="position:fixed;left:-9999px;top:0;width:390px;background:#111111;font-family:Poppins,Arial,sans-serif;display:none;">
