@@ -3168,6 +3168,27 @@ function fpNobuOpenTable(id){
   document.getElementById('fp-modal-females').value=d?.females||'';
   document.getElementById('fp-modal-pax').value=d?.pax||'';
   document.getElementById('fp-modal-notes').value=d?.notes||'';
+  // Move to table dropdown
+  let moveWrap=document.getElementById('fp-modal-move-wrap');
+  if(!moveWrap){
+    moveWrap=document.createElement('div');
+    moveWrap.id='fp-modal-move-wrap';
+    moveWrap.style.cssText='margin-bottom:16px;';
+    moveWrap.innerHTML='<label class="form-label">Move to table</label><select class="input-field" id="fp-modal-move-to" style="margin-bottom:0;"><option value="">— same table —</option></select>';
+    const notesLabel=document.querySelector('#fp-modal .form-label:last-of-type');
+    document.getElementById('fp-modal-notes').parentNode.insertBefore(moveWrap,document.getElementById('fp-modal-notes'));
+  }
+  const moveSel=document.getElementById('fp-modal-move-to');
+  moveSel.innerHTML='<option value="">— same table —</option>';
+  FP_NOBU_TABLES.forEach(tid=>{
+    if(tid===id)return;
+    const isOccupied=fpNobuTableData[tid]&&fpNobuTableData[tid].guest;
+    const opt=document.createElement('option');
+    opt.value=tid;
+    opt.textContent='Table '+tid+(isOccupied?' (bezet)':'');
+    moveSel.appendChild(opt);
+  });
+  moveSel.value='';
   fpSetType(fpCurrentType);
   document.getElementById('fp-modal-clear').style.display=d?.guest?'block':'none';
   document.getElementById('fp-modal-save').onclick=fpNobuSaveTable;
@@ -3188,16 +3209,28 @@ async function fpNobuSaveTable(){
   const notes=document.getElementById('fp-modal-notes').value.trim();
   const bottles=Object.entries(window._fpBottleCounts||{}).flatMap(([b,n])=>Array(n).fill(b)).join(', ');
   const type=fpCurrentType;
+  const moveToId=(document.getElementById('fp-modal-move-to')?.value||'').trim();
+  const targetId=moveToId||id;
   const btn=document.getElementById('fp-modal-save');
   btn.textContent='Saving…';btn.disabled=true;
-  fpNobuTableData[id]={guest,seller,nationality,males,females,pax,notes,bottles,type};
-fpNobuRenderTable(id);fpNobuUpdateStats();
+  // Als move: clear oude tafel eerst
+  if(moveToId&&moveToId!==id){
+    delete fpNobuTableData[id];
+    fpNobuRenderTable(id);
+    try{
+      const clearParams=new URLSearchParams({action:'clear_nobu_table',event_date:fpNobuCurrentEvent,table_id:id});
+      await fetch(`${SCRIPT_URL}?${clearParams}`);
+    }catch(e){}
+  }
+  fpNobuTableData[targetId]={guest,seller,nationality,males,females,pax,notes,bottles,type};
+  fpNobuRenderTable(targetId);fpNobuUpdateStats();
   try{
-    const params=new URLSearchParams({action:'save_nobu_table',event_date:fpNobuCurrentEvent,table_id:id,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
+    const params=new URLSearchParams({action:'save_nobu_table',event_date:fpNobuCurrentEvent,table_id:targetId,guest,seller,nationality,males,females,pax,notes,bottles,type,updated_by:SELLER.seller_name,updated_at:new Date().toISOString()});
     await fetch(`${SCRIPT_URL}?${params}`);
   }catch(e){}
+  window._fpCurrentNobuTable=targetId;
   btn.textContent='✓ Saved!';
-fpNobuRenderTable(id);
+fpNobuRenderTable(targetId);
 fpNobuUpdateStats();
 if(fpNobuRefreshTimer){clearInterval(fpNobuRefreshTimer);fpNobuRefreshTimer=null;}
 setTimeout(()=>{btn.textContent='Save';btn.disabled=false;btn.onclick=fpNobuSaveTable;fpCloseModal();fpNobuRenderAll();setTimeout(()=>{fpNobuRefreshTimer=setInterval(async()=>{try{const rows=await fetch(`${OPEN_URL}/NOBU_TABLES`).then(r=>r.json()).catch(()=>[]);const fresh={};rows.filter(r=>String(r.event_date).slice(0,10)===fpNobuCurrentEvent).forEach(r=>{fresh[r.table_id]={guest:r.guest||'',seller:r.seller||'',nationality:r.nationality||'',males:r.males||'',females:r.females||'',pax:r.pax||'',notes:r.notes||'',bottles:r.bottles||'',type:r.type||''};});fpNobuTableData=fresh;fpNobuRenderAll();}catch(e){}},15000);},5000);},600);}
