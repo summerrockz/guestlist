@@ -1051,6 +1051,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
       <div id="modal-drink-fields" style="display:none;"><label class="form-label">Drink package</label><select class="input-field" id="modal-drink-package"><option value="">— select package —</option></select><label class="form-label">Phone number <span style="color:var(--red);">*</span></label><input type="tel" class="input-field" id="modal-drink-phone" placeholder="+34 600 000 000"></div>
     </div>
+    <div id="modal-male-entry-group" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:12px;cursor:pointer;" onclick="if(event.target.id!=='modal-male-entry-cb')document.getElementById('modal-male-entry-cb').click()">
+        <input type="checkbox" id="modal-male-entry-cb" style="width:18px;height:18px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0;">
+        <div><div style="font-size:13px;font-weight:600;color:#3B82F6;">🎟️ Male entry — €40 incl. 1 drink</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Wed & Sun only</div></div>
+      </div>
+    </div>
     <div id="modal-girls-only-group" style="display:none;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:12px;cursor:pointer;" onclick="if(event.target.id!=='modal-girls-only-cb')document.getElementById('modal-girls-only-cb').click()">
         <input type="checkbox" id="modal-girls-only-cb" style="width:18px;height:18px;accent-color:#EC4899;cursor:pointer;flex-shrink:0;">
@@ -1649,6 +1655,31 @@ function openModal(eventId,clubId){
   document.getElementById("modal-notes").value="";
   document.getElementById("modal-msg").textContent="";
   document.getElementById("modal-girls-only-group").style.display=(CURRENT_EVENT?.girls_only||"").toLowerCase()==="yes"?"block":"none";
+  // Chinois drink packages
+  const isChinois=(cl.club_name||"").toLowerCase().includes("chinois");
+  const drinkGroup=document.getElementById("modal-drink-group");
+  const drinkPkgSel=document.getElementById("modal-drink-package");
+  if(isChinois){
+    drinkGroup.style.display="block";
+    drinkPkgSel.innerHTML='<option value="">— select package —</option><option value="3 drinks - €45">3 drinks — €45</option><option value="5 drinks - €60">5 drinks — €60</option><option value="3 water - €20">3 water — €20</option>';
+    window._drinkPackageEnabled=false;
+    const cb=document.getElementById("modal-drink-checkbox");
+    cb.innerHTML="";cb.style.background="transparent";cb.style.borderColor="rgba(245,158,11,0.5)";
+    document.getElementById("modal-drink-fields").style.display="none";
+  } else {
+    drinkGroup.style.display="none";
+  }
+  // Lio male entry (Wed=3, Sun=0)
+  const isLio=(cl.club_name||"").toLowerCase().includes("lio");
+  const maleGroup=document.getElementById("modal-male-entry-group");
+  if(isLio&&maleGroup){
+    const eventDate=CURRENT_EVENT?.date||"";
+    const dow=eventDate?new Date(eventDate+"T12:00:00").getDay():-1;
+    maleGroup.style.display=(dow===3||dow===0)?"block":"none";
+    document.getElementById("modal-male-entry-cb").checked=false;
+  } else if(maleGroup){
+    maleGroup.style.display="none";
+  }
   document.getElementById("gl-modal").classList.add("open");
 }
 
@@ -1660,7 +1691,18 @@ const originalModalSubmit=async()=>{
   const guestName=document.getElementById("modal-guest-name").value.trim();
   const pax=document.getElementById("modal-pax").value;
   const email=document.getElementById("modal-email").value.trim();
-  const notes=document.getElementById("modal-notes").value.trim();
+  let notes=document.getElementById("modal-notes").value.trim();
+  // Chinois drink package
+  if(window._drinkPackageEnabled){
+    const pkg=document.getElementById("modal-drink-package").value;
+    const phone=document.getElementById("modal-drink-phone").value.trim();
+    if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");
+  }
+  // Lio male entry
+  const _maleEntryCb=document.getElementById("modal-male-entry-cb");
+  if(_maleEntryCb&&_maleEntryCb.checked){
+    notes=(notes?notes+" · ":"")+"🎟️ Male entry €40 incl. 1 drink";
+  }
   const msg=document.getElementById("modal-msg");
   const cl=CLUBS.find(c=>c.club_id===CURRENT_EVENT?.club_id)||{};
   const needsEmail=(cl.format||"").includes("email");
