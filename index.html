@@ -1617,7 +1617,7 @@ function copyExport(clubId,btn){
 
 function copyConfirmed(clubId,btn){
   const box=document.getElementById(`export-${clubId}`);
-  const lines=Array.from(box.querySelectorAll("div")).filter(row=>{const cb=row.querySelector("input[type=checkbox]");return cb&&cb.checked;}).map(row=>{const span=row.querySelector("span[style*='font-family:monospace']");return span?(span.dataset.copy||span.textContent.trim()):"";}).filter(Boolean).join("\n");
+  const lines=Array.from(box.querySelectorAll("div")).filter(row=>{const cb=row.querySelector("input[type=checkbox]");return cb&&cb.checked;}).map(row=>{const span=row.querySelector("span[style*='font-family:monospace']");const sellerEl=row.querySelector("span[style*='color:rgba(255,255,255,0.3)']");const seller=sellerEl?` — ${sellerEl.textContent.trim()}`:'';return span?(span.dataset.copy||span.textContent.trim())+seller:"";}).filter(Boolean).join("\n");
   if(!lines){btn.textContent="Nothing confirmed";setTimeout(()=>{btn.textContent="✅ Copy confirmed";},2000);return;}
   navigator.clipboard.writeText(lines).then(()=>{btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="✅ Copy confirmed";btn.classList.remove("copied");},2000);});
 }
