@@ -2402,7 +2402,7 @@ let CP_SELECTED={};
 
 function cpNextStep(step){
   if(step===2){if(!document.getElementById('cp-client-name').value.trim()){alert('Please enter a client name.');return;}}
-  if(step===3){const from=document.getElementById('cp-date-from').value;const to=document.getElementById('cp-date-to').value;if(!from||!to){alert('Please select arrival and departure dates.');return;}if(from>to){alert('Departure must be after arrival.');return;}cpBuildEventsList();}
+  if(step===3){const from=document.getElementById('cp-date-from').value;const to=document.getElementById('cp-date-to').value;if(!from||!to){alert('Please select arrival and departure dates.');return;}if(from>to){alert('Departure must be after arrival.');return;}loadProgram().then(cpBuildEventsList);}
   if(step===4){cpBuildPreview();}
   [1,2,3,4].forEach(i=>{document.getElementById('cp-page-'+i).style.display=i===step?'block':'none';const stepEl=document.getElementById('cp-step-'+i);stepEl.style.background=i===step?'var(--red)':i<step?'rgba(34,197,94,0.3)':'var(--input-bg)';stepEl.style.color=i<=step?'#fff':'var(--muted)';});
   window.scrollTo(0, 0);
