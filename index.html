@@ -1500,6 +1500,13 @@ async function confirmGuestComing(entryId,btn){
   renderMyGL();
 }
 
+async function confirmGuestComing(entryId,btn){
+  btn.disabled=true;btn.textContent="Confirming…";
+  try{await post({action:"confirm_entry",entry_id:entryId});}catch(e){}
+  ENTRIES=ENTRIES.map(e=>e.entry_id===entryId?{...e,seller_confirmed:"yes"}:e);
+  renderMyGL();
+}
+
 async function deleteEntry(entryId,btn){
   if(!confirm("Cancel this entry?"))return;
   btn.textContent="Cancelling…";btn.disabled=true;
