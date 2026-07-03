@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+notification<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -254,7 +254,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <div id="vip-dash-card" class="dash-card" onclick="showSection('section-vip')"><div class="dash-card-title">🍾 VIP Tables</div><div class="dash-card-sub">Prices & status overview</div></div>
         <div id="admin-dash-card" class="dash-card" onclick="showSection('section-admin')" style="display:none;"><div class="dash-card-title">📤 Admin export</div><div class="dash-card-sub">Export guestlists per club</div></div>
         <div id="vip-mgmt-dash-card" class="dash-card" onclick="showSection('section-vip-admin')" style="display:none;"><div class="dash-card-title">🍾 VIP Management</div><div class="dash-card-sub">Manage all VIP table requests</div></div>
-        <button class="btn-secondary" id="notif-btn" style="width:100%; margin-top:12px;" onclick="enableNotifications()">🔔 Enable notifications</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(255,255,255,0.1);"><span style="font-size:13px;font-weight:600;">🔔 Notifications</span><div id="notif-toggle" onclick="toggleNotifications()" style="width:44px;height:24px;border-radius:999px;background:var(--red);cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;"><div id="notif-toggle-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s;"></div></div></div>
         <div id="notif-hint" style="display:none;font-size:11px;color:var(--red);font-weight:600;text-align:center;margin-top:6px;letter-spacing:0.05em;">⚠️ You must turn this on and allow notifications. Only works after you added the app to your home screen</div>
         <button class="btn-secondary" id="logout-btn" style="display:none;">Log out</button>
       </div>
@@ -1331,26 +1331,51 @@ async function setupPushNotifications() {
   if(!("serviceWorker" in navigator)||!("PushManager" in window))return;
   try {
     const reg=await navigator.serviceWorker.register("/sw.js");
-    const btn=document.getElementById("notif-btn");
-    if(Notification.permission==="granted"){
-      const existing=await reg.pushManager.getSubscription();
-      if(existing){if(btn){btn.textContent="✅ Notifications enabled";btn.disabled=true;}localStorage.setItem("srz_notif_enabled","1");await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:existing,sellerId:SELLER.seller_id})}).catch(()=>{});}
+    if(Notification.permission==="granted"&&localStorage.getItem("srz_notif_enabled")==="1"){
+      let existing=await reg.pushManager.getSubscription();
+      if(!existing){try{existing=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});}catch(e){}}
+      if(existing){await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:existing,sellerId:SELLER.seller_id})}).catch(()=>{});}
     }
-    if(localStorage.getItem("srz_notif_enabled")==="1"){if(btn){btn.textContent="✅ Notifications enabled";btn.disabled=true;}const hint=document.getElementById("notif-hint");if(hint)hint.style.display="none";}
+    updateNotifToggle();
+    const hint=document.getElementById("notif-hint");
+    if(localStorage.getItem("srz_notif_enabled")==="1"&&hint)hint.style.display="none";
   }catch(e){console.log("SW registration failed:",e);}
 }
 
-async function enableNotifications() {
-  if(!("serviceWorker" in navigator)||!("PushManager" in window)){alert("Add to Home Screen via Safari first.");return;}
-  try {
-    const reg=await navigator.serviceWorker.ready;
-    const permission=await Notification.requestPermission();
-    if(permission!=="granted"){alert("Notifications blocked.");return;}
-    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
-    const response=await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:sub,sellerId:SELLER.seller_id})});
-    const result=await response.json();
-    if(result.ok){document.getElementById("notif-btn").textContent="✅ Notifications enabled";document.getElementById("notif-btn").disabled=true;localStorage.setItem("srz_notif_enabled","1");const hint=document.getElementById("notif-hint");if(hint)hint.style.display="none";}
-  }catch(e){alert("Could not enable: "+e.message);}
+async function toggleNotifications(){
+  const toggle=document.getElementById("notif-toggle");
+  const knob=document.getElementById("notif-toggle-knob");
+  const isOn=localStorage.getItem("srz_notif_enabled")==="1";
+  if(isOn){
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.getSubscription();
+      if(sub)await sub.unsubscribe();
+    }catch(e){}
+    localStorage.removeItem("srz_notif_enabled");
+    toggle.style.background="rgba(255,255,255,0.2)";
+    knob.style.left="3px";
+  } else {
+    if(!("serviceWorker" in navigator)||!("PushManager" in window)){alert("Add to Home Screen via Safari first.");return;}
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      const permission=await Notification.requestPermission();
+      if(permission!=="granted"){alert("Notifications blocked.");return;}
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
+      const response=await fetch(VERCEL_URL+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subscription:sub,sellerId:SELLER.seller_id})});
+      const result=await response.json();
+      if(result.ok){localStorage.setItem("srz_notif_enabled","1");toggle.style.background="var(--green)";knob.style.left="23px";const hint=document.getElementById("notif-hint");if(hint)hint.style.display="none";}
+    }catch(e){alert("Could not enable: "+e.message);}
+  }
+}
+async function enableNotifications(){await toggleNotifications();}
+function updateNotifToggle(){
+  const toggle=document.getElementById("notif-toggle");
+  const knob=document.getElementById("notif-toggle-knob");
+  if(!toggle||!knob)return;
+  const isOn=localStorage.getItem("srz_notif_enabled")==="1";
+  toggle.style.background=isOn?"var(--green)":"rgba(255,255,255,0.2)";
+  knob.style.left=isOn?"23px":"3px";
 }
 
 function urlBase64ToUint8Array(b){const p="=".repeat((4-b.length%4)%4);const base64=(b+p).replace(/-/g,"+").replace(/_/g,"/");const raw=window.atob(base64);const out=new Uint8Array(raw.length);for(let i=0;i<raw.length;++i)out[i]=raw.charCodeAt(i);return out;}
