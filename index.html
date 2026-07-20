@@ -3063,8 +3063,12 @@ bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18
   const card=document.getElementById('sr-plan-card');
   document.getElementById('sr-plan-card-name').textContent='GUESTLIST CALENDAR';
   document.getElementById('sr-plan-card-dates').textContent=(ms[wcalWeekStart.getMonth()]).toUpperCase()+' '+wcalWeekStart.getDate()+'-'+weekEnd.getDate();
-  document.getElementById('sr-plan-card-body').innerHTML=bodyHtml;
+ document.getElementById('sr-plan-card-body').innerHTML=bodyHtml;
   document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
+  const _wcalLogoEl=document.getElementById('sr-plan-card-logo');
+  const _wcalSubEl=document.getElementById('sr-plan-card-subtitle');
+  if(_wcalLogoEl)_wcalLogoEl.style.display='none';
+  if(_wcalSubEl)_wcalSubEl.style.display='none';
   card.style.width='1500px';
   card.style.display='block';
   try{
