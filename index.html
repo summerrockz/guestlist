@@ -2980,9 +2980,9 @@ function renderWeeklyCal(){
     });
   });
   if(!Object.keys(byClub).length){wrap.innerHTML='<div class="empty">No events this week.</div>';return;}
-  let html=`<div style="background:#3d3d3d;border-radius:12px;padding:12px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:500px;"><thead><tr><th style="width:52px;padding:4px 2px;border-bottom:1px solid rgba(255,255,255,0.1);"></th>`;
+  let html=`<div style="background:#3d3d3d;border-radius:12px;padding:8px 4px;overflow-x:hidden;"><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><thead><tr><th style="width:28px;padding:2px 1px;border-bottom:1px solid rgba(255,255,255,0.1);"></th>`;
   dates.forEach((dateStr,i)=>{
-    html+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);min-width:44px;"><div style="width:20px;height:20px;line-height:20px;margin:0 auto;background:#111;border-radius:5px;font-size:10px;font-weight:800;color:#fff;">${DAYS[i]}</div></th>`;
+    html+=`<th style="padding:2px 1px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);"><div style="width:14px;height:14px;line-height:14px;margin:0 auto;background:#111;border-radius:4px;font-size:7px;font-weight:800;color:#fff;">${DAYS[i]}</div></th>`;
   });
   html+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
