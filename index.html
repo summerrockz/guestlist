@@ -499,6 +499,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
         <button onclick="progJumpMonth(8)" class="prog-month-btn" id="prog-m-8">Sep</button>
         <button onclick="progJumpMonth(9)" class="prog-month-btn" id="prog-m-9">Oct</button>
       </div>
+      <input type="text" class="input-field" id="prog-search" placeholder="Search club or event…" oninput="renderProgram()" style="margin-bottom:12px;">
       <div style="display:flex;gap:6px;margin-bottom:12px;">
         <button onclick="setProgView('all',this)" id="prog-view-all" class="vip-filter-btn active" style="flex:1;">All</button>
         <button onclick="setProgView('gl',this)" id="prog-view-gl" class="vip-filter-btn" style="flex:1;">Guestlists only</button>
@@ -2119,7 +2120,7 @@ function setProgView(view,btn){progView=view;document.querySelectorAll('[id^="pr
 
 function renderProgram(){
   const source=(typeof PROGRAMME_SHEET!=="undefined"&&Object.keys(PROGRAMME_SHEET).length)?PROGRAMME_SHEET:PROGRAMME;
-  const todayStr=today();const progFrom=document.getElementById("prog-date-from")?.value||"";const progTo=document.getElementById("prog-date-to")?.value||"";const _seasonEnd="2026-10-05";const _todayDate=new Date();_todayDate.setHours(0,0,0,0);
+  const todayStr=today();const progFrom=document.getElementById("prog-date-from")?.value||"";const progTo=document.getElementById("prog-date-to")?.value||"";const progSearch=(document.getElementById("prog-search")?.value||"").toLowerCase().trim();const _seasonEnd="2026-10-05";const _todayDate=new Date();_todayDate.setHours(0,0,0,0);
   if(!progWeekStart)progWeekStart=getWeekStart(_todayDate);
   const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const weekEnd=new Date(progWeekStart);weekEnd.setDate(weekEnd.getDate()+6);
@@ -2131,9 +2132,14 @@ function renderProgram(){
     const _rNow=new Date();const _rShifted=new Date(_rNow);if(_rNow.getHours()<3)_rShifted.setDate(_rShifted.getDate()-1);const _rToday=`${_rShifted.getFullYear()}-${String(_rShifted.getMonth()+1).padStart(2,'0')}-${String(_rShifted.getDate()).padStart(2,'0')}`;if(dateStr<_rToday||dateStr>_seasonEnd)continue;
     if(progFrom&&dateStr<progFrom)continue;if(progTo&&dateStr>progTo)continue;
     const isToday=dateStr===todayStr;
-    const clubs=source[dateStr]||[];
+    let clubs=source[dateStr]||[];
     const fullDayName=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-    const glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||"")===dateStr);
+    let glEvents=EVENTS.filter(ev=>normalizeDate(ev.date||"")===dateStr);
+    if(progSearch){
+      clubs=clubs.filter(c=>c.toLowerCase().includes(progSearch));
+      glEvents=glEvents.filter(ev=>{const cl=CLUBS.find(c=>c.club_id===ev.club_id)||{};return(cl.club_name||"").toLowerCase().includes(progSearch)||(ev.event_name||"").toLowerCase().includes(progSearch);});
+      if(!clubs.length&&!glEvents.length)continue;
+    }
     const glSection=progView!=='prog'&&glEvents.length>0?'<div style="'+(clubs.length>0?'border-top:1px solid var(--border);padding-top:10px;':'')+';"><div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Guestlists</div>'+buildGLHtml(glEvents,dateStr)+'</div>':'';
     html+='<div style="background:var(--card);border:2px solid '+(isToday?'var(--red)':'rgba(255,255,255,0.15)')+';border-radius:var(--radius);padding:14px 16px;">'
       +'<div style="font-size:15px;font-weight:700;color:'+(isToday?'var(--red)':'var(--text)')+';margin-bottom:10px;">'+(isToday?'🔴 ':'')+fullDayName+'</div>'
