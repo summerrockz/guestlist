@@ -3051,7 +3051,7 @@ const _pdfLogo=getClubLogo(clubName);
       if(!evs.length){bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;"><div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:6px;height:100%;min-height:44px;"></div></td>`;return;}
       bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;vertical-align:top;">`;
       evs.forEach(ev=>{
-        const isPaid=!!ev.price_after;
+        const isPaid=!ev.free_condition&&!!(ev.price_after&&parseFloat(ev.price_after)>0);
         const freeText=ev.free_condition||(isPaid?`${ev.price_after}€ ${ev.price_type||''}`.trim():'FREE');
 bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#fff'};">${freeText}</div></div>`;
       });
