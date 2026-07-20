@@ -3062,7 +3062,7 @@ bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18
   bodyHtml+=`</tbody></table></div>`;
   const card=document.getElementById('sr-plan-card');
   document.getElementById('sr-plan-card-name').textContent='GUESTLIST CALENDAR';
-  document.getElementById('sr-plan-card-dates').textContent=(ms[wcalWeekStart.getMonth()]).toUpperCase()+' '+wcalWeekStart.getDate()+'-'+weekEnd.getDate();
+  document.getElementById('sr-plan-card-dates').textContent=(ms[wcalWeekStart.getMonth()]).toUpperCase()+' '+wcalWeekStart.getDate()+'-'+weekEnd.getDate()+', 2026';
  document.getElementById('sr-plan-card-body').innerHTML=bodyHtml;
   document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
   const _wcalLogoEl=document.getElementById('sr-plan-card-logo');
@@ -3074,7 +3074,7 @@ bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18
   try{
     if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
     if(!window.jspdf){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
-    const canvas=await html2canvas(card,{backgroundColor:'#111111',scale:3,useCORS:true,logging:false});
+    const canvas=await html2canvas(card,{backgroundColor:'#4a4a4a',scale:3,useCORS:true,logging:false});
     card.style.display='none';
     card.style.width='420px';
     if(_wcalLogoEl)_wcalLogoEl.style.display='';
