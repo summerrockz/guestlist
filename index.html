@@ -2964,8 +2964,8 @@ function renderWeeklyCal(){
   if(!wcalWeekStart)wcalWeekStart=getWeekStart(now);
   const weekEnd=new Date(wcalWeekStart);weekEnd.setDate(weekEnd.getDate()+6);
   const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  if(lbl)lbl.textContent=wcalWeekStart.getDate()+' '+ms[wcalWeekStart.getMonth()]+' — '+weekEnd.getDate()+' '+ms[weekEnd.getMonth()];
-  const DAYS=['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const weekLabel=wcalWeekStart.getDate()+' '+ms[wcalWeekStart.getMonth()]+' — '+weekEnd.getDate()+' '+ms[weekEnd.getMonth()]+' 2026';
+  const DAYS=['M','T','W','T','F','S','S'];
   const dates=[];
   for(let i=0;i<7;i++){const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);}
   const todayStr=today();
@@ -3038,35 +3038,33 @@ html+=`<tr style="height:1px;"><td style="padding:2px 2px;vertical-align:top;bor
       byClub[clubName].events[dateStr].push(ev);
     });
   });
- let bodyHtml=`<div><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><thead><tr><th style="width:60px;padding:4px;font-size:8px;color:rgba(255,255,255,0.3);text-align:left;border-bottom:1px solid rgba(255,255,255,0.08);">VENUE</th>`;
+ let bodyHtml=`<div><table style="width:100%;border-collapse:collapse;table-layout:fixed;"><thead><tr><th style="width:56px;padding:4px 2px;font-size:7px;color:rgba(255,255,255,0.3);text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);"></th>`;
   dates.forEach((dateStr,i)=>{
-    const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
-    bodyHtml+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);min-width:40px;"><div style="font-size:8px;color:rgba(255,255,255,0.4);">${DAYS[i]}</div><div style="font-size:10px;font-weight:700;color:#fff;">${d.getDate()}</div></th>`;
+    bodyHtml+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);min-width:40px;"><div style="width:18px;height:18px;line-height:18px;margin:0 auto;background:#0d0d0d;border:1px solid rgba(255,255,255,0.25);border-radius:4px;font-size:10px;font-weight:700;color:#fff;">${DAYS[i]}</div></th>`;
   });
   bodyHtml+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
 const _pdfLogo=getClubLogo(clubName);
-    bodyHtml+=`<tr><td style="padding:4px;vertical-align:top;border-bottom:1px solid rgba(255,255,255,0.05);">${_pdfLogo?`<img src="${_pdfLogo}" style="width:24px;height:24px;border-radius:4px;object-fit:contain;display:block;" crossorigin="anonymous">`:''}<div style="font-size:8px;color:rgba(255,255,255,0.6);margin-top:2px;">${clubName}</div></td>`;    dates.forEach(dateStr=>{
+    bodyHtml+=`<tr><td style="padding:4px 4px 4px 0;vertical-align:middle;border-bottom:1px solid rgba(255,255,255,0.06);">${_pdfLogo?`<img src="${_pdfLogo}" style="width:38px;height:38px;border-radius:6px;object-fit:cover;display:block;" crossorigin="anonymous">`:`<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);">${clubName}</div>`}</td>`;
+    dates.forEach(dateStr=>{
       const evs=data.events[dateStr]||[];
-      if(!evs.length){bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.05);padding:4px 2px;"><div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:4px;height:100%;"><div style="font-size:8px;color:rgba(255,255,255,0.15);text-align:center;">—</div></div></td>`;return;}
-      bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.05);padding:4px 2px;vertical-align:top;">`;
+      if(!evs.length){bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;"><div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:6px;height:100%;min-height:44px;"></div></td>`;return;}
+      bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;vertical-align:top;">`;
       evs.forEach(ev=>{
-        const cl=data.club;
-        const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
-        const closed=ds==='closed';
-        const freeText=ev.free_condition||'Free';
-        const dotColor=closed?'#E8192C':ds==='warn'?'#F59E0B':'#22C55E';
-bodyHtml+=`<div style="background:#1a1a1a;border-radius:4px;padding:3px 4px;margin-bottom:2px;border:1px solid rgba(255,255,255,0.07);"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.3;">${ev.event_name||clubName}</div><div style="font-size:6px;color:rgba(255,255,255,0.4);">${freeText}</div>${ev.extra_notes?`<div style="font-size:6px;color:rgba(255,255,255,0.3);">${ev.extra_notes}</div>`:''}</div>`;      });
+        const isPaid=!!ev.price_after;
+        const freeText=ev.free_condition||(isPaid?`${ev.price_after}€ ${ev.price_type||''}`.trim():'FREE');
+        bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#fff'};margin-bottom:2px;">${freeText}</div>${ev.time?`<div style="font-size:6px;color:rgba(255,255,255,0.45);">${ev.time}</div>`:''}</div>`;
+      });
       bodyHtml+=`</td>`;
     });
     bodyHtml+=`</tr>`;
   });
   bodyHtml+=`</tbody></table></div>`;
   const card=document.getElementById('sr-plan-card');
-  document.getElementById('sr-plan-card-name').textContent='Weekly Guestlist';
-  document.getElementById('sr-plan-card-dates').textContent=weekLabel;
+  document.getElementById('sr-plan-card-name').textContent='GUESTLIST CALENDAR';
+  document.getElementById('sr-plan-card-dates').textContent=(ms[wcalWeekStart.getMonth()]).toUpperCase()+' '+wcalWeekStart.getDate()+'-'+weekEnd.getDate();
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml;
-  document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza';
+  document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
   card.style.display='block';
   try{
     if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
