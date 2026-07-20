@@ -2528,8 +2528,12 @@ async function cpDownloadPDF(){
   document.getElementById('sr-plan-card-name').textContent=clientName;
   document.getElementById('sr-plan-card-dates').textContent=fromFmt+(toFmt?' — '+toFmt:'');
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml||'<div style="text-align:center;padding:20px;color:#8b7b69;font-size:13px;">No events selected.</div>';
-  document.getElementById('sr-plan-card-seller').textContent=SELLER.seller_name+' · Summerrockz Ibiza';
-  card.style.width='420px';
+  document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
+  const _wcalLogoEl=document.getElementById('sr-plan-card-logo');
+  const _wcalSubEl=document.getElementById('sr-plan-card-subtitle');
+  if(_wcalLogoEl)_wcalLogoEl.style.display='none';
+  if(_wcalSubEl)_wcalSubEl.style.display='none';
+  card.style.width='1500px';
   card.style.display='block';
   try{
     if(!window.html2canvas){
@@ -3053,7 +3057,7 @@ const _pdfLogo=getClubLogo(clubName);
       evs.forEach(ev=>{
         const isPaid=!!ev.price_after;
         const freeText=ev.free_condition||(isPaid?`${ev.price_after}€ ${ev.price_type||''}`.trim():'FREE');
-        bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#fff'};margin-bottom:2px;">${freeText}</div>${ev.time?`<div style="font-size:6px;color:rgba(255,255,255,0.45);">${ev.time}</div>`:''}</div>`;
+bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#fff'};">${freeText}</div></div>`;
       });
       bodyHtml+=`</td>`;
     });
@@ -3073,6 +3077,8 @@ const _pdfLogo=getClubLogo(clubName);
     const canvas=await html2canvas(card,{backgroundColor:'#111111',scale:3,useCORS:true,logging:false});
     card.style.display='none';
     card.style.width='420px';
+    if(_wcalLogoEl)_wcalLogoEl.style.display='';
+    if(_wcalSubEl)_wcalSubEl.style.display='';
     const imgData=canvas.toDataURL('image/png');
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width/3,canvas.height/3]});
@@ -3468,9 +3474,9 @@ function copyAllToday(){const myId=String(SELLER.seller_id||"").trim();const myC
 
   <!-- HEADER — like login screen -->
   <div style="background:#0e0e0e;padding:40px 24px 32px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);">
-    <img src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" crossorigin="anonymous"
+    <img id="sr-plan-card-logo" src="https://i.ibb.co/h1nY2LXH/SR-LOGO-CIRLCE-FULL-WHITE-RED-BG.png" crossorigin="anonymous"
       style="width:72px;height:72px;border-radius:50%;margin-bottom:16px;">
-    <div style="font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:20px;">Summerrockz Ibiza · Guestlist</div>
+    <div id="sr-plan-card-subtitle" style="font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-weight:600;margin-bottom:20px;">Summerrockz Ibiza · Guestlist</div>
     <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 20px;">
       <div id="sr-plan-card-name" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;"></div>
       <div id="sr-plan-card-dates" style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.05em;"></div>
