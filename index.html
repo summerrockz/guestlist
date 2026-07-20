@@ -3045,15 +3045,15 @@ html+=`<tr style="height:1px;"><td style="padding:2px 2px;vertical-align:top;bor
   bodyHtml+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
 const _pdfLogo=getClubLogo(clubName);
-    bodyHtml+=`<tr><td style="padding:4px 4px 4px 0;vertical-align:middle;border-bottom:1px solid rgba(255,255,255,0.06);">${_pdfLogo?`<img src="${_pdfLogo}" style="width:38px;height:38px;border-radius:6px;object-fit:cover;display:block;" crossorigin="anonymous">`:`<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);">${clubName}</div>`}</td>`;
+    bbodyHtml+=`<tr><td style="padding:4px 4px 4px 0;vertical-align:middle;border-bottom:2px solid rgba(255,255,255,0.25);">${_pdfLogo?`<img src="${_pdfLogo}" style="width:38px;height:38px;border-radius:6px;object-fit:cover;display:block;" crossorigin="anonymous">`:`<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);">${clubName}</div>`}</td>`;
     dates.forEach(dateStr=>{
       const evs=data.events[dateStr]||[];
-      if(!evs.length){bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;"><div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:6px;height:100%;min-height:44px;"></div></td>`;return;}
-      bodyHtml+=`<td style="border-bottom:1px solid rgba(255,255,255,0.06);padding:3px 2px;vertical-align:top;">`;
+      if(!evs.length){bodyHtml+=`<td style="border-bottom:2px solid rgba(255,255,255,0.25);padding:3px 2px;"><div style="background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:6px;height:100%;min-height:44px;"></div></td>`;return;}
+      bodyHtml+=`<td style="border-bottom:2px solid rgba(255,255,255,0.25);padding:3px 2px;vertical-align:top;">`;
       evs.forEach(ev=>{
         const isPaid=!ev.free_condition&&!!(ev.price_after&&parseFloat(ev.price_after)>0);
         const freeText=ev.free_condition||(isPaid?`${ev.price_after}€ ${ev.price_type||''}`.trim():'FREE');
-bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#fff'};">${freeText}</div></div>`;
+bodyHtml+=`<div style="background:#0d0d0d;border:1px solid rgba(255,255,255,0.18);border-radius:6px;padding:4px 3px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:700;color:#fff;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;border:1px solid rgba(255,255,255,0.3);border-radius:3px;padding:1px 5px;font-size:6px;font-weight:700;color:${isPaid?'#E8192C':'#F59E0B'};">${freeText}</div></div>`;
       });
       bodyHtml+=`</td>`;
     });
