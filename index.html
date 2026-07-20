@@ -2980,27 +2980,22 @@ function renderWeeklyCal(){
     });
   });
   if(!Object.keys(byClub).length){wrap.innerHTML='<div class="empty">No events this week.</div>';return;}
-  let html=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="width:100%;border-collapse:collapse;min-width:500px;"><thead><tr><th style="width:70px;padding:6px 4px;font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);">VENUE</th>`;
+  let html=`<div style="background:#3d3d3d;border-radius:12px;padding:12px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="width:100%;border-collapse:collapse;table-layout:fixed;min-width:500px;"><thead><tr><th style="width:52px;padding:4px 2px;border-bottom:1px solid rgba(255,255,255,0.1);"></th>`;
   dates.forEach((dateStr,i)=>{
-    const isToday=dateStr===todayStr;
-    const d=new Date(wcalWeekStart);d.setDate(d.getDate()+i);
-    html+=`<th style="padding:6px 3px;text-align:center;border-bottom:1px solid var(--border);min-width:44px;"><div style="font-size:10px;font-weight:700;color:${isToday?'var(--red)':'var(--muted)'};letter-spacing:0.08em;">${DAYS[i]}</div><div style="font-size:11px;font-weight:600;color:${isToday?'var(--red)':'var(--text)'};">${d.getDate()}</div></th>`;
+    html+=`<th style="padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);min-width:44px;"><div style="width:20px;height:20px;line-height:20px;margin:0 auto;background:#111;border-radius:5px;font-size:10px;font-weight:800;color:#fff;">${DAYS[i]}</div></th>`;
   });
   html+=`</tr></thead><tbody>`;
   Object.entries(byClub).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([clubName,data])=>{
     const _wcalLogo=getClubLogo(clubName);
-html+=`<tr style="height:1px;"><td style="padding:2px 2px;vertical-align:top;border-bottom:1px solid var(--border);width:50px;">${_wcalLogo?`<img src="${_wcalLogo}" style="width:24px;height:24px;border-radius:4px;object-fit:contain;display:block;" title="${clubName}">`:''}<div style="font-size:8px;font-weight:700;color:var(--text);line-height:1.2;margin-top:1px;max-width:46px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_wcalLogo?'':clubName}</div></td>`;    dates.forEach(dateStr=>{
+html+=`<tr><td style="padding:4px 4px 4px 0;vertical-align:middle;border-bottom:2px solid rgba(255,255,255,0.25);">${_wcalLogo?`<img src="${_wcalLogo}" style="width:34px;height:34px;border-radius:5px;object-fit:cover;display:block;" title="${clubName}">`:`<div style="font-size:8px;font-weight:700;color:#fff;">${clubName}</div>`}</td>`;    dates.forEach(dateStr=>{
       const evs=data.events[dateStr]||[];
-      if(!evs.length){html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;"><div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;border:1px solid rgba(255,255,255,0.05);height:100%;"><div style="font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;text-align:center;padding:8px 0;">—</div></div></td>`;return;}
-     html+=`<td style="border-bottom:1px solid var(--border);padding:4px 3px;vertical-align:top;height:inherit;">`;
+      if(!evs.length){html+=`<td style="border-bottom:2px solid rgba(255,255,255,0.25);padding:3px 2px;"><div style="height:100%;min-height:40px;"></div></td>`;return;}
+     html+=`<td style="border-bottom:2px solid rgba(255,255,255,0.25);padding:3px 2px;vertical-align:top;">`;
       evs.forEach(ev=>{
-        const cl=data.club;
-        const ds=deadlineStatus(cl.deadline,dateStr,ev.time?ev.time.split('-').pop().trim():null);
-        const closed=ds==='closed';
-        const freeText=ev.free_condition||'Free';
-        const spotsLeft=ev.spots_left!==undefined&&ev.spots_left!==''?parseInt(ev.spots_left):null;
-        const dotColor=closed?'#E8192C':ds==='warn'?'#F59E0B':'#22C55E';
-        html+=`<div style="background:#1a1a1a;border-radius:8px;padding:6px 7px;margin-bottom:3px;border:1px solid rgba(255,255,255,0.07);"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><div style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;"></div><div style="font-size:10px;font-weight:700;color:#fff;line-height:1.2;">${ev.event_name||''}</div></div>${ev.time?`<div style="font-size:9px;color:rgba(255,255,255,0.4);">⏰ ${ev.time}</div>`:''}<div style="font-size:9px;color:rgba(255,255,255,0.4);">🎫 ${freeText}</div>${ev.extra_notes?`<div style="font-size:9px;color:rgba(255,255,255,0.35);">📝 ${ev.extra_notes}</div>`:''}</div>`;
+        const isPaid=!ev.free_condition&&!!(ev.price_after&&parseFloat(ev.price_after)>0);
+        const priceLabel=isPaid?`${ev.price_after}€`:'FREE';
+        const subLabel=ev.free_condition||(ev.time?('Before '+ev.time):'');
+        html+=`<div style="background:#f2f0ec;border-radius:6px;padding:5px 4px;margin-bottom:3px;text-align:center;"><div style="font-size:7px;font-weight:800;color:#111;line-height:1.15;margin-bottom:3px;">${ev.event_name||clubName}</div><div style="display:inline-block;background:#111;border-radius:3px;padding:1px 6px;font-size:6px;font-weight:800;color:${isPaid?'#E8192C':'#F59E0B'};">${priceLabel}</div>${subLabel?`<div style="font-size:5.5px;color:#666;margin-top:2px;">${subLabel}</div>`:''}</div>`;
       });
       html+=`</td>`;
     });
