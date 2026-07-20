@@ -2529,10 +2529,6 @@ async function cpDownloadPDF(){
   document.getElementById('sr-plan-card-dates').textContent=fromFmt+(toFmt?' — '+toFmt:'');
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml||'<div style="text-align:center;padding:20px;color:#8b7b69;font-size:13px;">No events selected.</div>';
   document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
-  const _wcalLogoEl=document.getElementById('sr-plan-card-logo');
-  const _wcalSubEl=document.getElementById('sr-plan-card-subtitle');
-  if(_wcalLogoEl)_wcalLogoEl.style.display='none';
-  if(_wcalSubEl)_wcalSubEl.style.display='none';
   card.style.width='1500px';
   card.style.display='block';
   try{
