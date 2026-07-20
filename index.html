@@ -3065,12 +3065,14 @@ const _pdfLogo=getClubLogo(clubName);
   document.getElementById('sr-plan-card-dates').textContent=(ms[wcalWeekStart.getMonth()]).toUpperCase()+' '+wcalWeekStart.getDate()+'-'+weekEnd.getDate();
   document.getElementById('sr-plan-card-body').innerHTML=bodyHtml;
   document.getElementById('sr-plan-card-seller').textContent='Summerrockz Ibiza · Internal use only';
+  card.style.width='1500px';
   card.style.display='block';
   try{
     if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
     if(!window.jspdf){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
     const canvas=await html2canvas(card,{backgroundColor:'#111111',scale:3,useCORS:true,logging:false});
     card.style.display='none';
+    card.style.width='420px';
     const imgData=canvas.toDataURL('image/png');
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width/3,canvas.height/3]});
