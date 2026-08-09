@@ -1256,6 +1256,7 @@ function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
   return "ok";
 }
 function deadlineLabel(s) { return s?`Deadline ${s}`:""; }
+function cpIsLioRestricted(ev,cl){if(!(cl.club_name||"").toLowerCase().includes("lio"))return false;const d=new Date((ev.date||"")+"T12:00:00").getDay();if(d!==3&&d!==0)return false;return (SELLER.lio_wed_sun||"").toLowerCase()!=="yes";}
 function statusLabel(s) { return {new:"🆕 New",sent:"📤 Sent to venue",price_sent:"💬 Price sent",confirmed:"✅ Confirmed",paid:"💰 Paid",cancelled:"❌ Cancelled"}[s]||s; }
 function statusClass(s) { return {new:"status-new",sent:"status-new",price_sent:"status-price_sent",confirmed:"status-confirmed",paid:"status-paid",cancelled:"status-cancelled"}[s]||"status-new"; }
 function showNotePopup(note){let existing=document.getElementById('note-popup');if(existing)existing.remove();const popup=document.createElement('div');popup.id='note-popup';popup.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;';popup.innerHTML=`<div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px 20px;width:85%;max-width:360px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:10px;">📝 Note</div><div style="font-size:14px;color:#fff;line-height:1.6;">${note}</div><button onclick="document.getElementById('note-popup').remove()" style="width:100%;margin-top:20px;padding:12px;border-radius:999px;background:#E8192C;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;">Close</button></div>`;popup.addEventListener('click',function(e){if(e.target===this)this.remove();});document.body.appendChild(popup);}
@@ -1417,7 +1418,8 @@ dayEvents.forEach(e=>{const d=normalizeDate(e.date||"");if(!byDateClub[d])byDate
         const isFull=spotsLeft!==null&&spotsLeft<=0;
         const freeText=ev.free_condition?ev.free_condition:(ev.price_after?`€${ev.price_after} ${ev.price_type||""}`:"Free");
         const isInactive=(ev.status||"").toLowerCase()==="inactive";
-        return`<div class="event-card" style="${isInactive?'opacity:0.55;':''}"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull||isInactive)?"disabled":""} onclick="${closed||isFull||isInactive?"":"openModal('"+ev.event_id+"','"+clubId+"')"}">${closed?"Deadline passed":isFull?"Guestlist full":isInactive?"Guestlist not available":"+ Add to guestlist"}</button></div>`;
+        const lioBlocked=cpIsLioRestricted(ev,cl);
+        return`<div class="event-card" style="${isInactive?'opacity:0.55;':''}"><div class="event-card-top"><div><div class="event-club">${cl.club_name||clubId}</div>${ev.event_name?`<div class="event-name">${ev.event_name}</div>`:""}</div><div class="deadline-badge ${dsClass}">${closed?"Closed":deadlineLabel(cl.deadline)}</div></div><div class="event-meta">${ev.time?`<span>🕐 ${ev.time}</span>`:""}<span>🎫 ${freeText}</span>${spotsLeft!==null?`<span>👥 ${spotsLeft} spots left</span>`:""}</div>${ev.extra_notes?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${ev.extra_notes}</div>`:""}<button class="btn-add-gl" ${(closed||isFull||isInactive||lioBlocked)?"disabled":""} onclick="${closed||isFull||isInactive||lioBlocked?"":"openModal('"+ev.event_id+"','"+clubId+"')"}">${closed?"Deadline passed":isFull?"Guestlist full":isInactive?"Guestlist not available":lioBlocked?"Not available":"+ Add to guestlist"}</button></div>`;
       }).join("");
     }).join("");
   }).join("");
@@ -1650,6 +1652,10 @@ async function markEntrySent(entryId,isSent){
 function openModal(eventId,clubId){
   CURRENT_EVENT=EVENTS.find(e=>e.event_id===eventId);
   const cl=CLUBS.find(c=>c.club_id===clubId)||{};
+  if(CURRENT_EVENT&&cpIsLioRestricted(CURRENT_EVENT,cl)){
+    alert("This guestlist is not available for you on this day.");
+    return;
+  }
   document.getElementById("modal-club-name").textContent=cl.club_name||clubId;
   document.getElementById("modal-event-info").textContent=(CURRENT_EVENT?.event_name||"")+(CURRENT_EVENT?.time?` · ${CURRENT_EVENT.time}`:"");
   const needsEmail=(cl.format||"").includes("email");
@@ -2244,7 +2250,7 @@ function buildGLHtml(dayGl,dateStr){
     var isFull=spots!==null&&spots<=0;
     var evEndTime=ev.time?ev.time.split("-").pop().trim():null;var ds=deadlineStatus(cl.deadline,dateStr,evEndTime);
     var closed=ds==='closed';
-    var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive';
+    var disabled=closed||isFull||(ev.status||'').toLowerCase()==='inactive'||cpIsLioRestricted(ev,cl);
     var ticketInfo=ev.free_condition||(ev.price_after?'€'+ev.price_after+' after':'');
     var spotsColor=spots!==null&&spots<=5?'var(--red)':spots!==null&&spots<=15?'var(--amber)':'var(--green)';
     var fc=getFormatColor(cl.format);
