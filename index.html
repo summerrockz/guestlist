@@ -1322,7 +1322,10 @@ async function initApp() {
     renderEvents();
   };
   document.getElementById("mygl-date").onchange=renderMyGL;
-  await loadData(); await loadVipRequests(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
+  await loadData();
+  const _freshSeller=SELLERS.find(s=>String(s.seller_id||"").trim()===String(SELLER.seller_id||"").trim());
+  if(_freshSeller){SELLER=_freshSeller;localStorage.setItem("srz_seller",JSON.stringify(SELLER));}
+  await loadVipRequests(); renderDashboard(); checkDeadlines(); setupPushNotifications(); loadNotifications();
   setInterval(loadNotifications,60000);
   startGlobalAutoRefresh();
 }
