@@ -51,14 +51,22 @@ export default async function handler(req, res) {
       return { id, status: 'sent' };
 
     } catch (err) {
-      console.error(
-        `Push failed for seller ${id}:`,
-        err.statusCode,
-        err.message
-      );
+  console.error(
+    `Push failed for seller ${id}:`,
+    err.statusCode,
+    err.message
+  );
 
-      throw err;
-    }
+  // Subscription is expired/gone → remove it
+  if (err.statusCode === 404 || err.statusCode === 410) {
+    await redis.del(`push_sub_${id}`);
+    await redis.srem('push_subscribers', id);
+    console.log(`Removed expired push subscription for seller ${id}`);
+    return { id, status: 'expired_removed' };
+  }
+
+  throw err;
+}
   })
 );
 
