@@ -1261,7 +1261,7 @@ function statusLabel(s) { return {new:"🆕 New",sent:"📤 Sent to venue",price
 function statusClass(s) { return {new:"status-new",sent:"status-new",price_sent:"status-price_sent",confirmed:"status-confirmed",paid:"status-paid",cancelled:"status-cancelled"}[s]||"status-new"; }
 function showNotePopup(note){let existing=document.getElementById('note-popup');if(existing)existing.remove();const popup=document.createElement('div');popup.id='note-popup';popup.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;';popup.innerHTML=`<div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px 20px;width:85%;max-width:360px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:10px;">📝 Note</div><div style="font-size:14px;color:#fff;line-height:1.6;">${note}</div><button onclick="document.getElementById('note-popup').remove()" style="width:100%;margin-top:20px;padding:12px;border-radius:999px;background:#E8192C;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;">Close</button></div>`;popup.addEventListener('click',function(e){if(e.target===this)this.remove();});document.body.appendChild(popup);}
 
-async function fetchSheet(tab) { const r=await fetch(`${OPEN_URL}/${tab}`); const j=await r.json(); return Array.isArray(j)?j:[]; }
+async function fetchSheet(tab) { const r=await fetch(`${OPEN_URL}/${tab}`); return r.json(); }
 async function post(body) { const p=new URLSearchParams(body).toString(); return fetch(`${SCRIPT_URL}?${p}`); }
 
 function showSection(id) {
@@ -2405,8 +2405,8 @@ async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const ms
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
-function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const newEntries=await fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).catch(()=>null);if(Array.isArray(newEntries)){ENTRIES=newEntries;renderAdminAndRestore();  
-function stopAdminRefresh(){if(adminRefreshTimer){clearInterval(adminRefreshTimer);adminRefreshTimer=null;}}
+function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const newEntries=await fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).then(r=>r.json()).catch(()=>null);if(newEntries){ENTRIES=newEntries;renderAdminAndRestore();const el=document.getElementById("admin-last-updated");if(el){const now=new Date();el.textContent="Updated "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0");}}},20000);}
+  function stopAdminRefresh(){if(adminRefreshTimer){clearInterval(adminRefreshTimer);adminRefreshTimer=null;}}
 
 const _deadlineNotifSent={};
 function checkDeadlines(){if(!CLUBS||!EVENTS||!SELLER)return;const now=new Date();const todayStr=now.toISOString().slice(0,10);const banner=document.getElementById("deadline-banner");if(!banner)return;const warnings=[];CLUBS.forEach(cl=>{if(!cl.deadline)return;const[h,m]=cl.deadline.split(":").map(Number);const deadline=new Date();deadline.setHours(h,m,0,0);if(h<6)deadline.setDate(deadline.getDate()+1);const diff=deadline-now;const minsLeft=Math.round(diff/60000);if(diff>0&&diff<30*60*1000){const hasEvent=EVENTS.some(ev=>ev.club_id===cl.club_id&&normalizeDate(ev.date||"")===todayStr&&(ev.status||"").toLowerCase()!=="inactive");if(hasEvent)warnings.push(`⚠️ ${cl.club_name} deadline in ${minsLeft} min`);}});if(warnings.length){banner.textContent=warnings.join("  ·  ");banner.style.display="block";}else{banner.style.display="none";}}
