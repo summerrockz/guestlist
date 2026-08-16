@@ -33,14 +33,44 @@ export default async function handler(req, res) {
       subscriberIds = await redis.smembers('push_subscribers');
     }
 
-    await Promise.allSettled(
-      subscriberIds.map(async (id) => {
-        const sub = await redis.get(`push_sub_${id}`);
-        if (!sub) return;
-        const subscription = JSON.parse(sub);
-        await webpush.sendNotification(subscription, JSON.stringify({ title, body }));
-      })
-    );
+    const results = await Promise.allSettled(
+  subscriberIds.map(async (id) => {
+    const sub = await redis.get(`push_sub_${id}`);
+    if (!sub) {
+      return { id, status: 'no_subscription' };
+    }
+
+    const subscription = JSON.parse(sub);
+
+    try {
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({ title, body })
+      );
+
+      return { id, status: 'sent' };
+
+    } catch (err) {
+      console.error(
+        `Push failed for seller ${id}:`,
+        err.statusCode,
+        err.message
+      );
+
+      throw err;
+    }
+  })
+);
+
+console.log(
+  'PUSH RESULTS:',
+  results.map((r, i) => ({
+    sellerId: subscriberIds[i],
+    result: r.status,
+    error: r.status === 'rejected' ? r.reason?.message : null,
+    statusCode: r.status === 'rejected' ? r.reason?.statusCode : null
+  }))
+);
 
     await redis.quit();
     return res.status(200).json({ ok: true, count: subscriberIds.length });
