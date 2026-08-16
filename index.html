@@ -1050,18 +1050,15 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
       </div>
       <div id="modal-drink-fields" style="display:none;"><label class="form-label">Drink package</label><select class="input-field" id="modal-drink-package"><option value="">— select package —</option></select><label class="form-label">Phone number <span style="color:var(--red);">*</span></label><input type="tel" class="input-field" id="modal-drink-phone" placeholder="+34 600 000 000"></div>
     </div>
-    <div id="modal-male-entry-group" style="display:none;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:12px;cursor:pointer;" onclick="if(event.target.id!=='modal-male-entry-cb')document.getElementById('modal-male-entry-cb').click()">
-        <input type="checkbox" id="modal-male-entry-cb" style="width:18px;height:18px;accent-color:#3B82F6;cursor:pointer;flex-shrink:0;">
-        <div><div style="font-size:13px;font-weight:600;color:#3B82F6;">🎟️ Male entry — €40 incl. 1 drink</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Wed & Sun only</div></div>
-      </div>
-    </div>
-    <div id="modal-girls-only-group" style="display:none;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:12px;cursor:pointer;" onclick="if(event.target.id!=='modal-girls-only-cb')document.getElementById('modal-girls-only-cb').click()">
-        <input type="checkbox" id="modal-girls-only-cb" style="width:18px;height:18px;accent-color:#EC4899;cursor:pointer;flex-shrink:0;">
-        <div style="font-size:13px;font-weight:600;color:#EC4899;">💃 I confirm all guests are female</div>
-      </div>
-    </div>
+    <div id="modal-lio-gender-group" style="display:none;">
+  <label class="form-label">Group</label>
+  <select class="input-field" id="modal-lio-gender">
+    <option value="">— select group —</option>
+    <option value="women">💄 Women</option>
+    <option value="men">🍆 Men</option>
+    <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
+  </select>
+</div>
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
@@ -1256,7 +1253,9 @@ function deadlineStatus(deadlineStr, eventDate, eventEndTime) {
   return "ok";
 }
 function deadlineLabel(s) { return s?`Deadline ${s}`:""; }
-function cpIsLioRestricted(ev,cl){if(!(cl.club_name||"").toLowerCase().includes("lio"))return false;const parts=String(ev.date||"").split("-");if(parts.length!==3)return false;const d=new Date(+parts[2],+parts[1]-1,+parts[0],12).getDay();if(d!==3&&d!==0)return false;return (SELLER.lio_wed_sun||"").toLowerCase()!=="yes";}
+function cpIsLioRestricted(ev,cl){if(!(cl.club_name||"").toLowerCase().includes("lio"))return false;const normalized=normalizeDate(ev.date||"");
+if(!normalized)return false;
+const d=new Date(normalized+"T12:00:00").getDay();if(d!==3&&d!==0)return false;return (SELLER.lio_wed_sun||"").toLowerCase()!=="yes";}
 function statusLabel(s) { return {new:"🆕 New",sent:"📤 Sent to venue",price_sent:"💬 Price sent",confirmed:"✅ Confirmed",paid:"💰 Paid",cancelled:"❌ Cancelled"}[s]||s; }
 function statusClass(s) { return {new:"status-new",sent:"status-new",price_sent:"status-price_sent",confirmed:"status-confirmed",paid:"status-paid",cancelled:"status-cancelled"}[s]||"status-new"; }
 function showNotePopup(note){
@@ -1664,7 +1663,11 @@ if(todayBtn)todayBtn.style.display=_isAdmin?"block":"none";
       const emailPart=format.includes("email")&&e.email?` ${e.email}`:"";
 const drinkPart=(e.notes||"").includes("🍹 Drink package:")?` 🍹`:"";
       const notesPart=e.notes&&!e.notes.includes("🍹")?` · ${e.notes}`:"";
-      const line=`${e.guest_name}${plusPax}${emailPart}`;
+      const lioGender=
+  (e.notes||"").includes("🎭 Lio group: 💄 Women")?"💄 ":
+  (e.notes||"").includes("🎭 Lio group: 🍆 Men")?"🍆 ":
+  (e.notes||"").includes("🎭 Lio group: 👩🏼‍❤️‍👨🏽 Mixed")?"👩🏼‍❤️‍👨🏽 ":"";
+      const line=`${lioGender}${e.guest_name}${plusPax}${emailPart}`;
       const copyLine=`${e.guest_name}${plusPax}${emailPart}${drinkPart}`;
       const sentKey="sent_"+cardKey+"_"+e.entry_id;
       const isModified=!!(e.modified_at&&isRecent(e.modified_at,24));
@@ -1678,7 +1681,12 @@ const drinkPart=(e.notes||"").includes("🍹 Drink package:")?` 🍹`:"";
       const newBadge=isModified&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(59,130,246,0.2);color:var(--blue);border:1px solid rgba(59,130,246,0.4);flex-shrink:0;">MODIFIED</span>`:isNew&&!isCancelled?`<span style="font-size:9px;font-weight:700;padding:2px 5px;border-radius:999px;background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.4);flex-shrink:0;">NEW</span>`:"";
       const sellerTag=e.seller_name?`<span style="font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;">${e.seller_name}</span>`:"";
       const sellerConfirmedBadge=(e.seller_confirmed||"").toLowerCase()==="yes"?`<span style="font-size:9px;flex-shrink:0;" title="Seller confirmed guest is coming">👍🏻</span>`:"";
-const noteBadge=e.notes&&!e.notes.includes("🍹")?`<span onclick="event.stopPropagation();showNotePopup('${e.notes.replace(/'/g,"\\'")}')" style="font-size:13px;cursor:pointer;flex-shrink:0;">📝</span>`:e.notes&&e.notes.includes("🍹")?`<span onclick="event.stopPropagation();showNotePopup('${e.notes.replace(/'/g,"\\'")}')" style="font-size:13px;cursor:pointer;flex-shrink:0;">🍹</span>`:"";
+const noteBadge=
+  e.notes&&e.notes.includes("🍹")?
+    `<span onclick="event.stopPropagation();showNotePopup('${e.notes.replace(/'/g,"\\'")}')" style="font-size:13px;cursor:pointer;flex-shrink:0;">🍹</span>`:
+  e.notes&&!e.notes.includes("🎭 Lio group:")?
+    `<span onclick="event.stopPropagation();showNotePopup('${e.notes.replace(/'/g,"\\'")}')" style="font-size:13px;cursor:pointer;flex-shrink:0;">📝</span>`:
+  "";
       const cancelBtn=!isCancelled?`<button onclick="adminCancelEntry('${e.entry_id}',this)" style="background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:13px;padding:2px 4px;flex-shrink:0;" title="Cancel entry">✕</button>`:``;
 return`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);opacity:${rowOpacity};">${checkbox}<span data-copy="${copyLine}" style="font-family:monospace;font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${textStyle}">${text}</span>${newBadge}${sellerConfirmedBadge}${noteBadge}${sellerTag}${cancelBtn}</div>`;
     }).join("");
@@ -1747,7 +1755,6 @@ function openModal(eventId,clubId){
   document.getElementById("modal-email").value="";
   document.getElementById("modal-notes").value="";
   document.getElementById("modal-msg").textContent="";
-  document.getElementById("modal-girls-only-group").style.display=(CURRENT_EVENT?.girls_only||"").toLowerCase()==="yes"?"block":"none";
   // Chinois drink packages
   const isChinois=(cl.club_name||"").toLowerCase().includes("chinois");
   const drinkGroup=document.getElementById("modal-drink-group");
@@ -1762,17 +1769,42 @@ function openModal(eventId,clubId){
   } else {
     drinkGroup.style.display="none";
   }
-  // Lio male entry (Wed=3, Sun=0)
-  const isLio=(cl.club_name||"").toLowerCase().includes("lio");
-  const maleGroup=document.getElementById("modal-male-entry-group");
-  if(isLio&&maleGroup){
-    const eventDate=CURRENT_EVENT?.date||"";
-    const dow=eventDate?new Date(eventDate+"T12:00:00").getDay():-1;
-    maleGroup.style.display=(dow===3||dow===0)?"block":"none";
-    document.getElementById("modal-male-entry-cb").checked=false;
-  } else if(maleGroup){
-    maleGroup.style.display="none";
+  // Lio group selection
+const isLio=(cl.club_name||"").toLowerCase().includes("lio");
+const lioGenderGroup=document.getElementById("modal-lio-gender-group");
+const lioGender=document.getElementById("modal-lio-gender");
+
+if(isLio&&lioGenderGroup&&lioGender){
+  const eventDate=CURRENT_EVENT?.date||"";
+  const dow=eventDate?new Date(eventDate+"T12:00:00").getDay():-1;
+  const now=new Date();
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+const normalizedEventDate=normalizeDate(eventDate);
+const after22=normalizedEventDate===today&&now.getHours()>=22;
+
+  lioGenderGroup.style.display="block";
+
+  // Wednesday = women only
+  // Sunday before 22:00 = women / men / mixed
+  // Sunday from 22:00 = women only
+  if(dow===0&&!after22){
+    lioGender.innerHTML=`
+      <option value="">— select group —</option>
+      <option value="women">💄 Women</option>
+      <option value="men">🍆 Men</option>
+      <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
+    `;
+  }else{
+    lioGender.innerHTML=`
+      <option value="">— select group —</option>
+      <option value="women">💄 Women</option>
+    `;
   }
+
+  lioGender.value="";
+}else if(lioGenderGroup){
+  lioGenderGroup.style.display="none";
+}
   document.getElementById("gl-modal").classList.add("open");
 }
 
@@ -1791,11 +1823,26 @@ const originalModalSubmit=async()=>{
     const phone=document.getElementById("modal-drink-phone").value.trim();
     if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");
   }
-  // Lio male entry
-  const _maleEntryCb=document.getElementById("modal-male-entry-cb");
-  if(_maleEntryCb&&_maleEntryCb.checked){
-    notes=(notes?notes+" · ":"")+"🎟️ Male entry €40 incl. 1 drink";
+  // Lio group
+const _lioGender=document.getElementById("modal-lio-gender");
+const _lioGenderGroup=document.getElementById("modal-lio-gender-group");
+
+if(_lioGenderGroup&&_lioGenderGroup.style.display!=="none"){
+  const gender=_lioGender.value;
+
+  if(!gender){
+    document.getElementById("modal-msg").textContent="⚠️ Select Women, Men or Mixed.";
+    return;
   }
+
+  const genderNotes={
+    women:"💄 Women",
+    men:"🍆 Men",
+    mixed:"👩🏼‍❤️‍👨🏽 Mixed"
+  };
+
+  notes=(notes?notes+" · ":"")+"🎭 Lio group: "+genderNotes[gender];
+}
   const msg=document.getElementById("modal-msg");
   const cl=CLUBS.find(c=>c.club_id===CURRENT_EVENT?.club_id)||{};
   const needsEmail=(cl.format||"").includes("email");
@@ -1804,11 +1851,7 @@ const originalModalSubmit=async()=>{
   if(nameOnly){
     const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));
 const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
-const _goGroup=document.getElementById('modal-girls-only-group');
-const _goCb=document.getElementById('modal-girls-only-cb');
 if(!names.length){msg.textContent="Enter at least one name.";return;}
-if(_goCb&&_goGroup&&_goGroup.style.display!=='none'&&!_goCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
-if((_goGroup?.style.display!=='none')&&_goCb&&!_goCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
 const btn=document.getElementById("modal-submit");if(btn._submitting)return;btn._submitting=true;btn.disabled=true;btn.textContent="Adding…";
 const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
 for(const _e of _entries){await post({action:"add_entry",..._e});await new Promise(r=>setTimeout(r,600));}
@@ -1821,8 +1864,7 @@ showSuccessModal(names,[_venueLabel]);renderDashboard();
     adminIds2.forEach(adminId=>addNotification("new_entry",adminId,{club:cl2.club_name||CURRENT_EVENT.club_id,guest:names.join(", ")+" ("+names.length+" pax)",event:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,by:SELLER.seller_name}));
     return;
   }
-  const girlsOnlyCb=document.getElementById('modal-girls-only-cb');
-if(girlsOnlyCb&&girlsOnlyCb.closest('[style*="display: block"]')&&!girlsOnlyCb.checked){msg.textContent="⚠️ You must confirm all guests are female.";return;}
+
   if(!guestName){msg.textContent="Guest name is required.";return;}
 if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
@@ -2417,9 +2459,68 @@ async function updateVipRequest(requestId){
   finally{btn.disabled=false;btn.textContent="Update request";btn.onclick=submitVipRequest;}
 }
 function clearMultiGL(){SELECTED_EVENTS=[];document.querySelectorAll(".gl-card-cb,.multi-gl-cb").forEach(cb=>{cb.checked=false;const lbl=document.getElementById("gl-label-"+cb.dataset.eventId);if(lbl){lbl.style.background="rgba(255,255,255,0.06)";lbl.style.border="1px solid rgba(255,255,255,0.12)";lbl.style.color="rgba(255,255,255,0.85)";}const txt=document.getElementById("gl-label-text-"+cb.dataset.eventId);if(txt)txt.textContent="Add to guestlist";});document.getElementById("multi-gl-bar").style.display="none";}
-function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}const maxPaxM=parseInt(cl.max_pax_per_email)||3;const paxSelM=document.getElementById("modal-pax");paxSelM.innerHTML="";for(let i=1;i<=maxPaxM;i++){const o=document.createElement("option");o.value=i;o.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSelM.appendChild(o);}const _isChinoisM=(cl.club_name||"").toLowerCase().includes("chinois");const _drinkGroupM=document.getElementById("modal-drink-group");const _drinkPkgSelM=document.getElementById("modal-drink-package");if(_isChinoisM){_drinkGroupM.style.display="block";_drinkPkgSelM.innerHTML='<option value="">— select package —</option><option value="3 drinks - €45">3 drinks — €45</option><option value="5 drinks - €60">5 drinks — €60</option><option value="3 water - €20">3 water — €20</option>';window._drinkPackageEnabled=false;const _cbM=document.getElementById("modal-drink-checkbox");_cbM.innerHTML="";_cbM.style.background="transparent";_cbM.style.borderColor="rgba(245,158,11,0.5)";document.getElementById("modal-drink-fields").style.display="none";}else{_drinkGroupM.style.display="none";}const _maleGroupM=document.getElementById("modal-male-entry-group");if(_maleGroupM)_maleGroupM.style.display="none";document.getElementById("modal-girls-only-group").style.display=(SELECTED_EVENTS[0]?.event?.girls_only||"").toLowerCase()==="yes"?"block":"none";document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-notes").value="";document.getElementById("modal-msg").textContent="";const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
+function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}const maxPaxM=parseInt(cl.max_pax_per_email)||3;const paxSelM=document.getElementById("modal-pax");paxSelM.innerHTML="";for(let i=1;i<=maxPaxM;i++){const o=document.createElement("option");o.value=i;o.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSelM.appendChild(o);}const _isChinoisM=(cl.club_name||"").toLowerCase().includes("chinois");const _drinkGroupM=document.getElementById("modal-drink-group");const _drinkPkgSelM=document.getElementById("modal-drink-package");if(_isChinoisM){_drinkGroupM.style.display="block";_drinkPkgSelM.innerHTML='<option value="">— select package —</option><option value="3 drinks - €45">3 drinks — €45</option><option value="5 drinks - €60">5 drinks — €60</option><option value="3 water - €20">3 water — €20</option>';window._drinkPackageEnabled=false;const _cbM=document.getElementById("modal-drink-checkbox");_cbM.innerHTML="";_cbM.style.background="transparent";_cbM.style.borderColor="rgba(245,158,11,0.5)";document.getElementById("modal-drink-fields").style.display="none";}else{_drinkGroupM.style.display="none";}
+
+// Lio group selection
+const _isLioM=(cl.club_name||"").toLowerCase().includes("lio");
+const _lioGenderGroupM=document.getElementById("modal-lio-gender-group");
+const _lioGenderM=document.getElementById("modal-lio-gender");
+
+if(_isLioM&&_lioGenderGroupM&&_lioGenderM){
+  const eventDate=SELECTED_EVENTS[0]?.event?.date||"";
+const normalizedEventDate=normalizeDate(eventDate);
+const dow=normalizedEventDate?new Date(normalizedEventDate+"T12:00:00").getDay():-1;
+const now=new Date();
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+const after22=normalizedEventDate===today&&now.getHours()>=22;
+
+  _lioGenderGroupM.style.display="block";
+
+  if(dow===0&&!after22){
+    _lioGenderM.innerHTML=`
+      <option value="">— select group —</option>
+      <option value="women">💄 Women</option>
+      <option value="men">🍆 Men</option>
+      <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
+    `;
+  }else{
+    _lioGenderM.innerHTML=`
+      <option value="">— select group —</option>
+      <option value="women">💄 Women</option>
+    `;
+  }
+
+  _lioGenderM.value="";
+}else if(_lioGenderGroupM){
+  _lioGenderGroupM.style.display="none";
+}
+
+document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-notes").value="";document.getElementById("modal-msg").textContent="";const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
 function toggleMultiGL(checkbox,eventId,clubId){const event=EVENTS.find(e=>e.event_id===eventId);const club=CLUBS.find(c=>c.club_id===clubId)||{};if(checkbox.checked){SELECTED_EVENTS.push({eventId,clubId,event,club});}else{SELECTED_EVENTS=SELECTED_EVENTS.filter(e=>e.eventId!==eventId);}const bar=document.getElementById("multi-gl-bar");const count=document.getElementById("multi-gl-count");if(SELECTED_EVENTS.length>0){bar.style.display="block";count.textContent=`+ Add to guestlist (${SELECTED_EVENTS.length})`;}else{bar.style.display="none";}}
-async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");let notes=document.getElementById("modal-notes").value.trim();if(window._drinkPackageEnabled){const pkg=document.getElementById("modal-drink-package").value;const phone=document.getElementById("modal-drink-phone").value.trim();if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");}const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(needsEmail&&!email){msg.textContent="Email is required for this club.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}for(const sel of SELECTED_EVENTS){const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(sel.event?.date||"")&&e.club_id===sel.clubId&&(e.status||"").toLowerCase()==="active");if(dupEmail){msg.textContent="⚠️ "+( CLUBS.find(c=>c.club_id===sel.clubId)?.club_name||sel.clubId)+" — this email is already on the guestlist for this date.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
+async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");let notes=document.getElementById("modal-notes").value.trim();if(window._drinkPackageEnabled){const pkg=document.getElementById("modal-drink-package").value;const phone=document.getElementById("modal-drink-phone").value.trim();if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");}
+
+// Lio group
+const _lioGenderM=document.getElementById("modal-lio-gender");
+const _lioGenderGroupM=document.getElementById("modal-lio-gender-group");
+
+if(_lioGenderGroupM&&_lioGenderGroupM.style.display!=="none"){
+  const gender=_lioGenderM.value;
+
+  if(!gender){
+    msg.textContent="⚠️ Select Women, Men or Mixed.";
+    return;
+  }
+
+  const genderNotes={
+    women:"💄 Women",
+    men:"🍆 Men",
+    mixed:"👩🏼‍❤️‍👨🏽 Mixed"
+  };
+
+  notes=(notes?notes+" · ":"")+"🎭 Lio group: "+genderNotes[gender];
+}
+
+const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(needsEmail&&!email){msg.textContent="Email is required for this club.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}for(const sel of SELECTED_EVENTS){const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(sel.event?.date||"")&&e.club_id===sel.clubId&&(e.status||"").toLowerCase()==="active");if(dupEmail){msg.textContent="⚠️ "+( CLUBS.find(c=>c.club_id===sel.clubId)?.club_name||sel.clubId)+" — this email is already on the guestlist for this date.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
   const notified=new Set();
   for(const sel of SELECTED_EVENTS){
     if(notified.has(sel.clubId))continue;notified.add(sel.clubId);
@@ -2430,6 +2531,7 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
     const adminIds=String(cl2.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
     adminIds.forEach(adminId=>addNotification("new_entry",adminId,{club:cl2.club_name||sel.clubId,guest:gName+(parseInt(paxN)>1?" +"+(parseInt(paxN)-1):""),event:sel.event?.event_name||"",date:sel.event?.date||"",by:SELLER.seller_name}));
   }
+  const _venueLabels=SELECTED_EVENTS.map(e=>(e.club?.club_name||e.clubId)+' · '+formatDate(normalizeDate(e.event?.date||'')));
   SELECTED_EVENTS=[];
   document.getElementById("multi-gl-bar").style.display="none";
   // Reset all GL checkboxes
@@ -2440,17 +2542,7 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
     const txt=document.getElementById("gl-label-text-"+cb.dataset.eventId);
     if(txt)txt.textContent="Add to guestlist";
   });
-  // Notify admins
-  const _notified=new Set();
-  for(const sel of SELECTED_EVENTS){
-    if(_notified.has(sel.clubId))continue;_notified.add(sel.clubId);
-    const _cl=sel.club;
-    const _gName=nameOnly?(document.querySelectorAll(".modal-multi-name")[0]?.value.trim()||""):(document.getElementById("modal-guest-name")?.value.trim()||"");
-    const _pax=nameOnly?1:(document.getElementById("modal-pax")?.value||1);
-    notifyClubAdmins(sel.clubId,_cl.club_name||sel.clubId,_gName,_pax,sel.event?.event_name||"",formatDate(normalizeDate(sel.event?.date||"")));
-    const _adminIds=String(_cl.admin_id||"").split(",").map(x=>x.trim()).filter(Boolean);
-    _adminIds.forEach(adminId=>addNotification("new_entry",adminId,{club:_cl.club_name||sel.clubId,guest:_gName+(parseInt(_pax)>1?" +"+(parseInt(_pax)-1):""),event:sel.event?.event_name||"",date:sel.event?.date||"",by:SELLER.seller_name}));
-  }
+  
   SELECTED_EVENTS=[];
   document.getElementById("multi-gl-bar").style.display="none";
   document.querySelectorAll(".gl-card-cb,.multi-gl-cb").forEach(cb=>{
@@ -2461,7 +2553,7 @@ async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.
     if(txt)txt.textContent="Add to guestlist";
   });
   const _names=nameOnly?Array.from(document.querySelectorAll(".modal-multi-name")).map(f=>f.value.trim()).filter(Boolean):[document.getElementById("modal-guest-name")?.value.trim()||""];
-  const _venueLabels=SELECTED_EVENTS.map(e=>(e.club?.club_name||e.clubId)+' · '+formatDate(normalizeDate(e.event?.date||'')));SELECTED_EVENTS=[];document.getElementById("multi-gl-bar").style.display="none";document.querySelectorAll(".gl-card-cb,.multi-gl-cb").forEach(cb=>{cb.checked=false;const lbl=document.getElementById("gl-label-"+cb.dataset.eventId);if(lbl){lbl.style.background="rgba(255,255,255,0.06)";lbl.style.border="1px solid rgba(255,255,255,0.12)";lbl.style.color="#fff";}const txt=document.getElementById("gl-label-text-"+cb.dataset.eventId);if(txt)txt.textContent="Add to guestlist";});closeModal();showSuccessModal(_names,_venueLabels);renderDashboard();
+  document.getElementById("multi-gl-bar").style.display="none";document.querySelectorAll(".gl-card-cb,.multi-gl-cb").forEach(cb=>{cb.checked=false;const lbl=document.getElementById("gl-label-"+cb.dataset.eventId);if(lbl){lbl.style.background="rgba(255,255,255,0.06)";lbl.style.border="1px solid rgba(255,255,255,0.12)";lbl.style.color="#fff";}const txt=document.getElementById("gl-label-text-"+cb.dataset.eventId);if(txt)txt.textContent="Add to guestlist";});closeModal();showSuccessModal(_names,_venueLabels);renderDashboard();
   const submitBtn=document.getElementById("modal-submit");submitBtn.textContent="Add to guestlist";submitBtn.disabled=false;submitBtn.onclick=originalModalSubmit;}
 
 function openEditEntryModal(entryId){const entry=ENTRIES.find(e=>e.entry_id===entryId);if(!entry)return;const cl=CLUBS.find(c=>c.club_id===entry.club_id)||{};const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;CURRENT_EVENT=EVENTS.find(e=>e.event_id===entry.event_id)||{club_id:entry.club_id,event_name:entry.event_name,date:entry.date};document.getElementById("modal-club-name").textContent="✏️ Edit — "+(cl.club_name||entry.club_name);document.getElementById("modal-event-info").textContent=(entry.event_name||"")+" · "+formatDate(normalizeDate(entry.date||""));document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";document.getElementById("modal-guest-name").value=entry.guest_name||"";document.getElementById("modal-email").value=entry.email||"";document.getElementById("modal-pax").value=entry.pax||"1";document.getElementById("modal-notes").value=entry.notes||"";document.getElementById("modal-drink-group").style.display="none";document.getElementById("modal-msg").textContent="";if(nameOnly){const paxCountEl=document.getElementById("modal-pax-count");if(paxCountEl){paxCountEl.value="1";paxCountEl.closest("div").previousElementSibling&&(paxCountEl.closest("div").previousElementSibling.style.display="none");paxCountEl.style.display="none";const lbl=paxCountEl.previousElementSibling;if(lbl&&lbl.tagName==="LABEL")lbl.style.display="none";}renderNameFields();setTimeout(()=>{const fields=document.querySelectorAll(".modal-multi-name");if(fields[0])fields[0].value=entry.guest_name||"";},50);}const btn=document.getElementById("modal-submit");btn.textContent="Save changes";btn.onclick=()=>saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax);document.getElementById("gl-modal").classList.add("open");}
