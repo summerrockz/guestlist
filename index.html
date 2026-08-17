@@ -1062,7 +1062,7 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <div id="modal-lio-onbehalf-group" style="display:none;">
   <label class="form-label">Namens seller</label>
   <select class="input-field" id="modal-lio-onbehalf-seller">
-    <option value="">— mezelf —</option>
+    <option value="">— myself —</option>
   </select>
 </div>
     <label class="form-label">Notes (optional)</label>
@@ -1830,7 +1830,7 @@ if(isLio&&(_lioMyRole==="manager"||_lioMyRole==="admin")&&lioOnbehalfGroup&&lioO
   lioOnbehalfGroup.style.display="block";
   const myId=String(SELLER.seller_id||"").trim();
   const myTeam=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(myId)&&(s.status||"").toLowerCase()==="active";}).sort((a,b)=>(a.seller_name||"").localeCompare(b.seller_name||""));
-  lioOnbehalfSelect.innerHTML='<option value="">— mezelf ('+SELLER.seller_name+') —</option>'+myTeam.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
+  lioOnbehalfSelect.innerHTML='<option value="">— myself ('+SELLER.seller_name+') —</option>'+myTeam.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
   lioOnbehalfSelect.value="";
 }else if(lioOnbehalfGroup){
   lioOnbehalfGroup.style.display="none";
@@ -2556,7 +2556,7 @@ if(_isLioM&&(_lioMyRoleM==="manager"||_lioMyRoleM==="admin")&&_lioOnbehalfGroupM
   _lioOnbehalfGroupM.style.display="block";
   const _myIdM=String(SELLER.seller_id||"").trim();
   const _myTeamM=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(_myIdM)&&(s.status||"").toLowerCase()==="active";}).sort((a,b)=>(a.seller_name||"").localeCompare(b.seller_name||""));
-  _lioOnbehalfSelectM.innerHTML='<option value="">— mezelf ('+SELLER.seller_name+') —</option>'+_myTeamM.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
+  _lioOnbehalfSelectM.innerHTML='<option value="">— myself ('+SELLER.seller_name+') —</option>'+_myTeamM.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
   _lioOnbehalfSelectM.value="";
 }else if(_lioOnbehalfGroupM){
   _lioOnbehalfGroupM.style.display="none";
