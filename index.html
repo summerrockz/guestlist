@@ -1825,7 +1825,7 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
 }
 const lioOnbehalfGroup=document.getElementById("modal-lio-onbehalf-group");
 const lioOnbehalfSelect=document.getElementById("modal-lio-onbehalf-seller");
-const _lioMyRole=(SELLER.role||"").toLowerCase();
+const _lioMyRole=String(SELLER.role||"").trim().toLowerCase();
 if(isLio&&(_lioMyRole==="manager"||_lioMyRole==="admin")&&lioOnbehalfGroup&&lioOnbehalfSelect){
   lioOnbehalfGroup.style.display="block";
   const myId=String(SELLER.seller_id||"").trim();
@@ -2551,7 +2551,7 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
 }
 const _lioOnbehalfGroupM=document.getElementById("modal-lio-onbehalf-group");
 const _lioOnbehalfSelectM=document.getElementById("modal-lio-onbehalf-seller");
-const _lioMyRoleM=(SELLER.role||"").toLowerCase();
+const _lioMyRoleM=String(SELLER.role||"").trim().toLowerCase();
 if(_isLioM&&(_lioMyRoleM==="manager"||_lioMyRoleM==="admin")&&_lioOnbehalfGroupM&&_lioOnbehalfSelectM){
   _lioOnbehalfGroupM.style.display="block";
   const _myIdM=String(SELLER.seller_id||"").trim();
