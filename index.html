@@ -2514,11 +2514,23 @@ function clearMultiGL(){SELECTED_EVENTS=[];document.querySelectorAll(".gl-card-c
 function openMultiGLModal(){if(!SELECTED_EVENTS.length)return;CURRENT_EVENT=SELECTED_EVENTS[0].event;const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;document.getElementById("modal-club-name").textContent=SELECTED_EVENTS.length===1?cl.club_name:`${cl.club_name} + ${SELECTED_EVENTS.length-1} more`;document.getElementById("modal-event-info").textContent=SELECTED_EVENTS.map(e=>(e.event?.event_name||"")+" · "+formatDate(normalizeDate(e.event?.date||""))).join(" | ");document.getElementById("modal-single-name-group").style.display=nameOnly?"none":"block";document.getElementById("modal-pax-group").style.display=needsPax?"block":"none";document.getElementById("modal-email-group").style.display=needsEmail?"block":"none";document.getElementById("modal-multi-name-group").style.display=nameOnly?"block":"none";if(nameOnly){document.getElementById("modal-pax-count").value="1";renderNameFields();}const maxPaxM=parseInt(cl.max_pax_per_email)||3;const paxSelM=document.getElementById("modal-pax");paxSelM.innerHTML="";for(let i=1;i<=maxPaxM;i++){const o=document.createElement("option");o.value=i;o.textContent=i===1?"1 (just the guest)":`+${i-1} (${i} total)`;paxSelM.appendChild(o);}const _isChinoisM=(cl.club_name||"").toLowerCase().includes("chinois");const _drinkGroupM=document.getElementById("modal-drink-group");const _drinkPkgSelM=document.getElementById("modal-drink-package");if(_isChinoisM){_drinkGroupM.style.display="block";_drinkPkgSelM.innerHTML='<option value="">— select package —</option><option value="3 drinks - €45">3 drinks — €45</option><option value="5 drinks - €60">5 drinks — €60</option><option value="3 water - €20">3 water — €20</option>';window._drinkPackageEnabled=false;const _cbM=document.getElementById("modal-drink-checkbox");_cbM.innerHTML="";_cbM.style.background="transparent";_cbM.style.borderColor="rgba(245,158,11,0.5)";document.getElementById("modal-drink-fields").style.display="none";}else{_drinkGroupM.style.display="none";}
 
 // Lio group selection
-const _isLioM=(cl.club_name||"").toLowerCase().includes("lio");
+const _isLioM=(cl.club_id||"").toLowerCase()==="lio";
+const _isLio40M=(cl.club_id||"").toLowerCase()==="lio_40";
 const _lioGenderGroupM=document.getElementById("modal-lio-gender-group");
 const _lioGenderM=document.getElementById("modal-lio-gender");
 
-if(_isLioM&&_lioGenderGroupM&&_lioGenderM){
+if(_isLio40M&&_lioGenderGroupM&&_lioGenderM){
+  // Lio €40: always Women / Men / Mixed
+  _lioGenderGroupM.style.display="block";
+  _lioGenderM.innerHTML=`
+    <option value="">— select group —</option>
+    <option value="women">💄 Women</option>
+    <option value="men">🍆 Men</option>
+    <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
+  `;
+  _lioGenderM.value="";
+
+}else if(_isLioM&&_lioGenderGroupM&&_lioGenderM){
   const eventDate=SELECTED_EVENTS[0]?.event?.date||"";
 const normalizedEventDate=normalizeDate(eventDate);
 const dow=normalizedEventDate?new Date(normalizedEventDate+"T12:00:00").getDay():-1;
