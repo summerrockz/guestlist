@@ -1059,6 +1059,12 @@ textarea.input-field { border-radius: 18px; resize: vertical; min-height: 90px; 
     <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
   </select>
 </div>
+    <div id="modal-lio-onbehalf-group" style="display:none;">
+  <label class="form-label">Namens seller</label>
+  <select class="input-field" id="modal-lio-onbehalf-seller">
+    <option value="">— mezelf —</option>
+  </select>
+</div>
     <label class="form-label">Notes (optional)</label>
     <textarea class="input-field" id="modal-notes" placeholder="Any special info…"></textarea>
     <button class="btn-primary" id="modal-submit">Add to guestlist</button>
@@ -1817,6 +1823,18 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
 }else if(lioGenderGroup){
   lioGenderGroup.style.display="none";
 }
+const lioOnbehalfGroup=document.getElementById("modal-lio-onbehalf-group");
+const lioOnbehalfSelect=document.getElementById("modal-lio-onbehalf-seller");
+const _lioMyRole=(SELLER.role||"").toLowerCase();
+if(isLio&&(_lioMyRole==="manager"||_lioMyRole==="admin")&&lioOnbehalfGroup&&lioOnbehalfSelect){
+  lioOnbehalfGroup.style.display="block";
+  const myId=String(SELLER.seller_id||"").trim();
+  const myTeam=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(myId)&&(s.status||"").toLowerCase()==="active";}).sort((a,b)=>(a.seller_name||"").localeCompare(b.seller_name||""));
+  lioOnbehalfSelect.innerHTML='<option value="">— mezelf ('+SELLER.seller_name+') —</option>'+myTeam.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
+  lioOnbehalfSelect.value="";
+}else if(lioOnbehalfGroup){
+  lioOnbehalfGroup.style.display="none";
+}
   document.getElementById("gl-modal").classList.add("open");
 }
 
@@ -1834,6 +1852,16 @@ const originalModalSubmit=async()=>{
     const pkg=document.getElementById("modal-drink-package").value;
     const phone=document.getElementById("modal-drink-phone").value.trim();
     if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");
+  }
+  // Lio: namens andere seller toevoegen
+  const _lioOnbehalfSelect=document.getElementById("modal-lio-onbehalf-seller");
+  const _lioOnbehalfGroup=document.getElementById("modal-lio-onbehalf-group");
+  let _effSellerId=SELLER.seller_id,_effSellerName=SELLER.seller_name;
+  if(_lioOnbehalfGroup&&_lioOnbehalfGroup.style.display!=="none"&&_lioOnbehalfSelect&&_lioOnbehalfSelect.value){
+    _effSellerId=_lioOnbehalfSelect.value;
+    const _opt=_lioOnbehalfSelect.selectedOptions[0];
+    _effSellerName=_opt?(_opt.dataset.name||_opt.textContent):SELLER.seller_name;
+    notes=(notes?notes+" · ":"")+"🔀 Added by "+SELLER.seller_name;
   }
   // Lio group
 const _lioGender=document.getElementById("modal-lio-gender");
@@ -1865,7 +1893,7 @@ if(_lioGenderGroup&&_lioGenderGroup.style.display!=="none"){
 const names=nameFields.map(f=>f.value.trim()).filter(Boolean);
 if(!names.length){msg.textContent="Enter at least one name.";return;}
 const btn=document.getElementById("modal-submit");if(btn._submitting)return;btn._submitting=true;btn.disabled=true;btn.textContent="Adding…";
-const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
+const _entries=names.map(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:_effSellerId,seller_name:_effSellerName,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);return entry;});
 for(const _e of _entries){await post({action:"add_entry",..._e});await new Promise(r=>setTimeout(r,600));}
 var _venueLabel=(cl.club_name||CURRENT_EVENT.club_id)+' · '+formatDate(normalizeDate(CURRENT_EVENT.date||''));
 closeModal();btn._submitting=false;btn.disabled=false;btn.textContent="Add to guestlist";
@@ -1882,7 +1910,7 @@ if(needsEmail&&!email){msg.textContent="Email is required for this club.";return
   if(needsEmail&&!email){msg.textContent="Email is required for this club.";return;}
 const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(CURRENT_EVENT.date||"")&&e.club_id===CURRENT_EVENT.club_id&&(e.status||"").toLowerCase()==="active");
 if(dupEmail){msg.textContent="⚠️ This email is already on the guestlist for this event.";return;}
-  const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};
+  const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:_effSellerId,seller_name:_effSellerName,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};
   const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";msg.textContent="";
   ENTRIES.push(entry);
   try{await post({action:"add_entry",...entry});}catch(e){}
@@ -2521,11 +2549,31 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
 }else if(_lioGenderGroupM){
   _lioGenderGroupM.style.display="none";
 }
-
+const _lioOnbehalfGroupM=document.getElementById("modal-lio-onbehalf-group");
+const _lioOnbehalfSelectM=document.getElementById("modal-lio-onbehalf-seller");
+const _lioMyRoleM=(SELLER.role||"").toLowerCase();
+if(_isLioM&&(_lioMyRoleM==="manager"||_lioMyRoleM==="admin")&&_lioOnbehalfGroupM&&_lioOnbehalfSelectM){
+  _lioOnbehalfGroupM.style.display="block";
+  const _myIdM=String(SELLER.seller_id||"").trim();
+  const _myTeamM=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(_myIdM)&&(s.status||"").toLowerCase()==="active";}).sort((a,b)=>(a.seller_name||"").localeCompare(b.seller_name||""));
+  _lioOnbehalfSelectM.innerHTML='<option value="">— mezelf ('+SELLER.seller_name+') —</option>'+_myTeamM.map(s=>`<option value="${String(s.seller_id).trim()}" data-name="${(s.seller_name||"").replace(/"/g,'&quot;')}">${s.seller_name||s.seller_id}</option>`).join("");
+  _lioOnbehalfSelectM.value="";
+}else if(_lioOnbehalfGroupM){
+  _lioOnbehalfGroupM.style.display="none";
+}
 document.getElementById("modal-guest-name").value="";document.getElementById("modal-email").value="";document.getElementById("modal-notes").value="";document.getElementById("modal-msg").textContent="";const btn=document.getElementById("modal-submit");btn.disabled=false;btn.textContent=`Add to ${SELECTED_EVENTS.length} guestlist${SELECTED_EVENTS.length>1?"s":""}`;btn.onclick=submitMultiGL;document.getElementById("gl-modal").classList.add("open");}
 function toggleMultiGL(checkbox,eventId,clubId){const event=EVENTS.find(e=>e.event_id===eventId);const club=CLUBS.find(c=>c.club_id===clubId)||{};if(checkbox.checked){SELECTED_EVENTS.push({eventId,clubId,event,club});}else{SELECTED_EVENTS=SELECTED_EVENTS.filter(e=>e.eventId!==eventId);}const bar=document.getElementById("multi-gl-bar");const count=document.getElementById("multi-gl-count");if(SELECTED_EVENTS.length>0){bar.style.display="block";count.textContent=`+ Add to guestlist (${SELECTED_EVENTS.length})`;}else{bar.style.display="none";}}
 async function submitMultiGL(){const cl=SELECTED_EVENTS[0].club;const format=cl.format||"name";const needsEmail=format.includes("email");const needsPax=format.includes("pax");const nameOnly=!needsPax&&!needsEmail;const msg=document.getElementById("modal-msg");let notes=document.getElementById("modal-notes").value.trim();if(window._drinkPackageEnabled){const pkg=document.getElementById("modal-drink-package").value;const phone=document.getElementById("modal-drink-phone").value.trim();if(pkg)notes=(notes?notes+" · ":"")+"🍹 Drink package: "+pkg+(phone?" · "+phone:"");}
-
+// Lio: namens andere seller toevoegen
+const _lioOnbehalfSelectM2=document.getElementById("modal-lio-onbehalf-seller");
+const _lioOnbehalfGroupM2=document.getElementById("modal-lio-onbehalf-group");
+let _effSellerIdM=SELLER.seller_id,_effSellerNameM=SELLER.seller_name;
+if(_lioOnbehalfGroupM2&&_lioOnbehalfGroupM2.style.display!=="none"&&_lioOnbehalfSelectM2&&_lioOnbehalfSelectM2.value){
+  _effSellerIdM=_lioOnbehalfSelectM2.value;
+  const _optM2=_lioOnbehalfSelectM2.selectedOptions[0];
+  _effSellerNameM=_optM2?(_optM2.dataset.name||_optM2.textContent):SELLER.seller_name;
+  notes=(notes?notes+" · ":"")+"🔀 Added by "+SELLER.seller_name;
+}
 // Lio group
 const _lioGenderM=document.getElementById("modal-lio-gender");
 const _lioGenderGroupM=document.getElementById("modal-lio-gender-group");
@@ -2547,7 +2595,7 @@ if(_lioGenderGroupM&&_lioGenderGroupM.style.display!=="none"){
   notes=(notes?notes+" · ":"")+"🎭 Lio group: "+genderNotes[gender];
 }
 
-const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(needsEmail&&!email){msg.textContent="Email is required for this club.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}for(const sel of SELECTED_EVENTS){const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(sel.event?.date||"")&&e.club_id===sel.clubId&&(e.status||"").toLowerCase()==="active");if(dupEmail){msg.textContent="⚠️ "+( CLUBS.find(c=>c.club_id===sel.clubId)?.club_name||sel.clubId)+" — this email is already on the guestlist for this date.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:SELLER.seller_id,seller_name:SELLER.seller_name,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
+const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";if(nameOnly){const nameFields=Array.from(document.querySelectorAll(".modal-multi-name"));const names=nameFields.map(f=>f.value.trim()).filter(Boolean);if(!names.length){msg.textContent="Enter at least one name.";btn.disabled=false;return;}for(const sel of SELECTED_EVENTS){const cl2=sel.club;names.forEach(name=>{const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:_effSellerIdM,seller_name:_effSellerNameM,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:name,pax:1,email:"",notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);post({action:"add_entry",...entry});});}}else{const guestName=document.getElementById("modal-guest-name").value.trim();const pax=document.getElementById("modal-pax").value;const email=document.getElementById("modal-email").value.trim();if(needsEmail&&!email){msg.textContent="Email is required for this club.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}for(const sel of SELECTED_EVENTS){const dupEmail=ENTRIES.find(e=>e.email&&e.email.toLowerCase()===email.toLowerCase()&&normalizeDate(e.date||"")===normalizeDate(sel.event?.date||"")&&e.club_id===sel.clubId&&(e.status||"").toLowerCase()==="active");if(dupEmail){msg.textContent="⚠️ "+( CLUBS.find(c=>c.club_id===sel.clubId)?.club_name||sel.clubId)+" — this email is already on the guestlist for this date.";btn.disabled=false;btn.textContent="Add to guestlist";btn.onclick=submitMultiGL;return;}}const _multiEntries=[];for(const sel of SELECTED_EVENTS){const cl2=sel.club;const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5),seller_id:_effSellerIdM,seller_name:_effSellerNameM,club_id:sel.clubId,club_name:cl2.club_name||sel.clubId,event_id:sel.eventId,event_name:sel.event?.event_name||"",date:sel.event?.date||"",guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};ENTRIES.push(entry);_multiEntries.push(entry);}for(const _e of _multiEntries){await post({action:"add_entry",..._e});}}// Notify admins for each club
   const notified=new Set();
   for(const sel of SELECTED_EVENTS){
     if(notified.has(sel.clubId))continue;notified.add(sel.clubId);
