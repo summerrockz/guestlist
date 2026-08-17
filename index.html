@@ -1777,10 +1777,22 @@ function openModal(eventId,clubId){
   }
   // Lio group selection
 const isLio=(cl.club_id||"").toLowerCase()==="lio";
+const isLio40=(cl.club_id||"").toLowerCase()==="lio_40";
 const lioGenderGroup=document.getElementById("modal-lio-gender-group");
 const lioGender=document.getElementById("modal-lio-gender");
 
-if(isLio&&lioGenderGroup&&lioGender){
+if(isLio40&&lioGenderGroup&&lioGender){
+  // Lio €40: always Women / Men / Mixed
+  lioGenderGroup.style.display="block";
+  lioGender.innerHTML=`
+    <option value="">— select group —</option>
+    <option value="women">💄 Women</option>
+    <option value="men">🍆 Men</option>
+    <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
+  `;
+  lioGender.value="";
+
+}else if(isLio&&lioGenderGroup&&lioGender){
   const eventDate=CURRENT_EVENT?.date||"";
   const dow=eventDate?new Date(eventDate+"T12:00:00").getDay():-1;
   const now=new Date();
