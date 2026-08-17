@@ -2614,7 +2614,7 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
 const _lioOnbehalfGroupM=document.getElementById("modal-lio-onbehalf-group");
 const _lioOnbehalfSelectM=document.getElementById("modal-lio-onbehalf-seller");
 const _lioMyRoleM=String(SELLER.role||"").trim().toLowerCase();
-if(_isLioM&&(_lioMyRoleM==="manager"||_lioMyRoleM==="admin")&&_lioOnbehalfGroupM&&_lioOnbehalfSelectM){
+if((_isLioM||_isLio40M)&&(_lioMyRoleM==="manager"||_lioMyRoleM==="admin")&&_lioOnbehalfGroupM&&_lioOnbehalfSelectM){
   _lioOnbehalfGroupM.style.display="block";
   const _myIdM=String(SELLER.seller_id||"").trim();
   const _myTeamM=SELLERS.filter(s=>{const mgrs=String(s.manager_id||"").split(",").map(x=>x.trim());return mgrs.includes(_myIdM)&&(s.status||"").toLowerCase()==="active";}).sort((a,b)=>(a.seller_name||"").localeCompare(b.seller_name||""));
