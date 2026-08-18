@@ -1963,15 +1963,22 @@ if(dupEmail){msg.textContent="⚠️ This email is already on the guestlist for 
   const entry={entry_id:"GL-"+Date.now().toString(36).toUpperCase(),seller_id:_effSellerId,seller_name:_effSellerName,club_id:CURRENT_EVENT.club_id,club_name:cl.club_name||CURRENT_EVENT.club_id,event_id:CURRENT_EVENT.event_id,event_name:CURRENT_EVENT.event_name||"",date:CURRENT_EVENT.date,guest_name:guestName,pax,email,notes,created_at:new Date().toISOString(),status:"active"};
   const btn=document.getElementById("modal-submit");btn.disabled=true;btn.textContent="Adding…";msg.textContent="";
   ENTRIES.push(entry);
-  let _saveOk=false;
+  let _saveOk=false,_saveStatus="";
   for(let _try=0;_try<2&&!_saveOk;_try++){
-    try{const _r=await post({action:"add_entry",...entry});if(_r&&_r.ok)_saveOk=true;}catch(e){}
+    try{
+      const _r=await post({action:"add_entry",...entry});
+      if(_r&&_r.ok){
+        const _j=await _r.json().catch(()=>null);
+        _saveStatus=_j&&_j.status?_j.status:"";
+        if(_saveStatus==="ok")_saveOk=true;
+      }
+    }catch(e){}
     if(!_saveOk&&_try===0)await new Promise(r=>setTimeout(r,800));
   }
   if(!_saveOk){
     ENTRIES=ENTRIES.filter(e=>e.entry_id!==entry.entry_id);
     btn.disabled=false;btn.textContent="Add to guestlist";
-    msg.textContent="⚠️ Could not save, check your connection and try again.";
+    msg.textContent=_saveStatus==="full"?"⚠️ Guestlist is full, could not add.":_saveStatus==="duplicate"?"⚠️ Duplicate entry, try again.":"⚠️ Could not save, check your connection and try again.";
     return;
   }
   closeModal();btn.disabled=false;btn.textContent="Add to guestlist";
