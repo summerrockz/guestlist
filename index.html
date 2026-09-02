@@ -1325,7 +1325,7 @@ function showNotePopup(note){
 
   document.body.appendChild(popup);
 }
-async function fetchSheet(tab) { const r=await fetch(`${OPEN_URL}/${tab}`); return r.json(); }
+async function fetchSheet(tab) { const r=await fetch(`${OPEN_URL}/${tab}`); if(!r.ok) return []; const d=await r.json(); return Array.isArray(d)?d:[]; }
 async function post(body) { const p=new URLSearchParams(body).toString(); return fetch(`${SCRIPT_URL}?${p}`); }
 
 function showSection(id) {
@@ -1862,8 +1862,8 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
   lioGender.innerHTML=`
     <option value="">— select group —</option>
     <option value="women">💄 Women</option>
+    <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
   `;
-
 }else{
   // All other days: no group selection
   lioGenderGroup.style.display="none";
@@ -2617,8 +2617,8 @@ const after22=normalizedEventDate===today&&now.getHours()>=22;
   _lioGenderM.innerHTML=`
     <option value="">— select group —</option>
     <option value="women">💄 Women</option>
+    <option value="mixed">👩🏼‍❤️‍👨🏽 Mixed</option>
   `;
-
 }else{
   // All other days
   _lioGenderGroupM.style.display="none";
@@ -2715,7 +2715,7 @@ async function saveEditedEntry(entryId,cl,nameOnly,needsEmail,needsPax){const ms
 
 let adminRefreshTimer=null;
 function renderAdminAndRestore(){renderAdmin();document.querySelectorAll('.admin-entry-cb').forEach(cb=>{const key=cb.dataset.key;if(key&&localStorage.getItem(key)==='1'){cb.checked=true;if(cb.closest('div'))cb.closest('div').style.opacity='0.4';}});}
-function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const newEntries=await fetch(`${OPEN_URL}/GL_ENTRIES`).then(r=>r.json()).catch(()=>null);if(newEntries){ENTRIES=newEntries;renderAdminAndRestore();const el=document.getElementById("admin-last-updated");if(el){const now=new Date();el.textContent="Updated "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0");}}},20000);}
+function startAdminRefresh(){stopAdminRefresh();adminRefreshTimer=setInterval(async()=>{const r=await fetch(`${OPEN_URL}/GL_ENTRIES?_=${Date.now()}`).catch(()=>null);if(r&&r.ok){const newEntries=await r.json().catch(()=>null);if(Array.isArray(newEntries)){ENTRIES=newEntries;renderAdminAndRestore();const el=document.getElementById("admin-last-updated");if(el){const now=new Date();el.textContent="Updated "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0");}}}},20000);}
   function stopAdminRefresh(){if(adminRefreshTimer){clearInterval(adminRefreshTimer);adminRefreshTimer=null;}}
 
 const _deadlineNotifSent={};
