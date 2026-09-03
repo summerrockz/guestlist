@@ -1978,7 +1978,7 @@ if(dupEmail){msg.textContent="⚠️ This email is already on the guestlist for 
   if(!_saveOk){
     ENTRIES=ENTRIES.filter(e=>e.entry_id!==entry.entry_id);
     btn.disabled=false;btn.textContent="Add to guestlist";
-    msg.textContent=_saveStatus==="full"?"⚠️ Guestlist is full, could not add.":_saveStatus==="duplicate"?"⚠️ Duplicate entry, try again.":"⚠️ Could not save, check your connection and try again.";
+        msg.textContent=_saveStatus==="full"?"⚠️ Guestlist is full, could not add.":_saveStatus==="duplicate"?"⚠️ Duplicate entry, try again.":_saveStatus==="deadline_closed"?"⚠️ Deadline has passed, could not add.":"⚠️ Could not save, check your connection and try again.";
     return;
   }
   closeModal();btn.disabled=false;btn.textContent="Add to guestlist";
