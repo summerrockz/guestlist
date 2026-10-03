@@ -2351,7 +2351,7 @@ function setProgView(view,btn){progView=view;document.querySelectorAll('[id^="pr
 
 function renderProgram(){
   const source=(typeof PROGRAMME_SHEET!=="undefined"&&Object.keys(PROGRAMME_SHEET).length)?PROGRAMME_SHEET:PROGRAMME;
-  const todayStr=today();const progFrom=document.getElementById("prog-date-from")?.value||"";const progTo=document.getElementById("prog-date-to")?.value||"";const progSearch=(document.getElementById("prog-search")?.value||"").toLowerCase().trim();const _seasonEnd="2026-10-05";const _todayDate=new Date();_todayDate.setHours(0,0,0,0);
+  const todayStr=today();const progFrom=document.getElementById("prog-date-from")?.value||"";const progTo=document.getElementById("prog-date-to")?.value||"";const progSearch=(document.getElementById("prog-search")?.value||"").toLowerCase().trim();const _seasonEnd="2026-12-01";const _todayDate=new Date();_todayDate.setHours(0,0,0,0);
   if(!progWeekStart)progWeekStart=getWeekStart(_todayDate);
   const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const weekEnd=new Date(progWeekStart);weekEnd.setDate(weekEnd.getDate()+6);
